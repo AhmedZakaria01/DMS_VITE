@@ -1,0 +1,11 @@
+{
+    "welcome": "Welcome",
+    "login": {
+         "username": "Username",
+        "password": "Password"
+ 
+    },
+    "sidebar": {
+        "home": "Home"
+    }
+}

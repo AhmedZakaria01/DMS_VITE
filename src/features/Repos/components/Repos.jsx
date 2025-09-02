@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
-import { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { fetchUserRepos } from "../repoThunks";
 
 function Repos() {
@@ -60,6 +60,8 @@ function Repos() {
       </div>
       {/* Log Data */}
       {console.log(data ? data : "")}
+
+      
       <ReUsableTable
         columns={columns}
         data={data}
@@ -76,4 +78,4 @@ function Repos() {
   );
 }
 
-export default Repos;
+export default React.memo(Repos);

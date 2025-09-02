@@ -7,11 +7,11 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
-import { useReducer, useState } from "react";
-import { useSelector } from "react-redux";
 
 const VITE_APP_BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
+
+// Encrypt Token
 const encryptToken = (token) => {
   try {
     return CryptoJS.AES.encrypt(token, ENCRYPTION_KEY).toString();
@@ -21,6 +21,7 @@ const encryptToken = (token) => {
   }
 };
 
+// Decrypt Token
 export const decryptToken = (encryptedToken) => {
   try {
     const decryptedBytes = CryptoJS.AES.decrypt(encryptedToken, ENCRYPTION_KEY);
@@ -144,6 +145,7 @@ export const getToken = () => {
   return encryptedToken ? decryptToken(encryptedToken) : null;
 };
 
+// Get User Repos
 export async function getUserRepos(userId) {
   try {
     if (!userId) return;
@@ -155,5 +157,35 @@ export async function getUserRepos(userId) {
     return response;
   } catch (error) {
     throw new error(error);
+  }
+}
+
+// Fetch Audit Trail
+export async function getAuditTrail() {
+  try {
+    const response = await api.get("AuditLog");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Audit Trail", err);
+  }
+}
+
+// Fetch Users
+export async function getUsers() {
+  try {
+    const response = await api.get("Accounting/GetAllUsers");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Users", err);
+  }
+}
+
+// Create User
+export async function createNewUser(userData) {
+  try {
+    const response = await api.post("Authenticate/register", userData);
+    return response;
+  } catch (err) {
+    console.err("Failed to Create User", err);
   }
 }

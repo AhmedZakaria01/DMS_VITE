@@ -11,6 +11,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import "./Table.css";
+
 import Popup from "../../globalComponents/Popup";
 import DisplaySelectedItems from "./DisplaySelectedItems";
 
@@ -78,59 +79,68 @@ Checkbox.propTypes = {
  * Pagination controls component
  */
 const PaginationControls = ({ table, pageSizeOptions }) => (
-  <div className="pagination-container">
-    <div className="pagination-buttons">
+  <div className="pagination-container flex items-center justify-between gap-4">
+    <div className="pagination-buttons flex items-center gap-1">
       <button
         onClick={() => table.setPageIndex(0)}
         disabled={!table.getCanPreviousPage()}
+        className="px-2 py-1 border rounded disabled:opacity-50"
       >
         {"<<"}
       </button>
       <button
         onClick={() => table.previousPage()}
         disabled={!table.getCanPreviousPage()}
+        className="px-2 py-1 border rounded disabled:opacity-50"
       >
         {"<"}
       </button>
       <button
         onClick={() => table.nextPage()}
         disabled={!table.getCanNextPage()}
+        className="px-2 py-1 border rounded disabled:opacity-50"
       >
         {">"}
       </button>
       <button
         onClick={() => table.setPageIndex(table.getPageCount() - 1)}
         disabled={!table.getCanNextPage()}
+        className="px-2 py-1 border rounded disabled:opacity-50"
       >
         {">>"}
       </button>
     </div>
-    <span className="page-indicator">
-      Page
-      <strong>
-        {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-      </strong>
-    </span>
-    <input
-      type="number"
-      defaultValue={table.getState().pagination.pageIndex + 1}
-      onChange={(e) => {
-        const page = e.target.value ? Number(e.target.value) - 1 : 0;
-        table.setPageIndex(page);
-      }}
-      style={{ width: "100px" }}
-    />
-    <select
-      className="page-size-select"
-      value={table.getState().pagination.pageSize}
-      onChange={(e) => table.setPageSize(Number(e.target.value))}
-    >
-      {pageSizeOptions.map((size) => (
-        <option key={size} value={size}>
-          Show {size}
-        </option>
-      ))}
-    </select>
+
+    <div className="flex items-center gap-3">
+      <span className="page-indicator text-sm whitespace-nowrap">
+        Page <strong>{table.getState().pagination.pageIndex + 1}</strong> of{" "}
+        <strong>{table.getPageCount()}</strong>
+      </span>
+
+      <input
+        type="number"
+        defaultValue={table.getState().pagination.pageIndex + 1}
+        onChange={(e) => {
+          const page = e.target.value ? Number(e.target.value) - 1 : 0;
+          table.setPageIndex(page);
+        }}
+        className="w-16 px-2 py-1 text-center border rounded"
+        min="1"
+        max={table.getPageCount()}
+      />
+
+      <select
+        className="page-size-select px-2 py-1 border rounded"
+        value={table.getState().pagination.pageSize}
+        onChange={(e) => table.setPageSize(Number(e.target.value))}
+      >
+        {pageSizeOptions.map((size) => (
+          <option key={size} value={size}>
+            Show {size}
+          </option>
+        ))}
+      </select>
+    </div>
   </div>
 );
 
@@ -165,8 +175,10 @@ const ReUsableTable = ({
       ...col,
       id: col.id || col.accessorKey || `col_${idx}`,
       accessorKey: col.accessorKey || col.accessor || col.id,
-      enableSorting: col.canSort !== false,
-      enableColumnFilter: true,
+      enableSorting: col.enableSorting !== false && col.canSort !== false,
+      // Disable filtering for actions column or columns that explicitly disable it
+      enableColumnFilter:
+        col.enableColumnFilter !== false && col.id !== "actions",
       filterFn: "includesString",
     }));
   }, [userColumns]);
@@ -217,6 +229,7 @@ const ReUsableTable = ({
             </div>
           ),
           enableSorting: false,
+          enableColumnFilter: false,
           enableHiding: false,
           size: 50,
         },
@@ -323,14 +336,15 @@ const ReUsableTable = ({
                               header.column.columnDef.header,
                               header.getContext()
                             )}
-                            {header.column.id !== "select" && (
-                              <span className="sort-indicator">
-                                {{
-                                  asc: " ▲",
-                                  desc: " ▼",
-                                }[header.column.getIsSorted()] ?? " ↕"}
-                              </span>
-                            )}
+                            {header.column.id !== "select" &&
+                              header.column.id !== "actions" && (
+                                <span className="sort-indicator">
+                                  {{
+                                    asc: " ▲",
+                                    desc: " ▼",
+                                  }[header.column.getIsSorted()] ?? " ↕"}
+                                </span>
+                              )}
                           </div>
                         )}
                       </div>
@@ -341,8 +355,12 @@ const ReUsableTable = ({
                 <tr key={`filter-${headerGroup.id}`} className="filter-row">
                   {headerGroup.headers.map((header) => (
                     <th key={`${header.id}-filter`}>
-                      {header.column.getCanFilter() && (
+                      {header.column.getCanFilter() &&
+                      header.column.id !== "actions" ? (
                         <DefaultColumnFilter column={header.column} />
+                      ) : (
+                        // Empty cell for non-filterable columns (like actions)
+                        <div className="filter-placeholder"></div>
                       )}
                     </th>
                   ))}
@@ -373,6 +391,13 @@ const ReUsableTable = ({
                 <tr
                   key={row.id}
                   onClick={(e) => {
+                    // Prevent row selection if clicking on action buttons or checkboxes
+                    if (
+                      e.target.closest("button") ||
+                      e.target.closest('input[type="checkbox"]')
+                    ) {
+                      return;
+                    }
                     // Only prevent selection if clicking on the checkbox and selection is enabled
                     if (
                       enableSelection &&
@@ -382,7 +407,11 @@ const ReUsableTable = ({
                       e.preventDefault();
                     }
                   }}
-                  onDoubleClick={() => {
+                  onDoubleClick={(e) => {
+                    // Don't trigger double click if clicking on action buttons
+                    if (e.target.closest("button")) {
+                      return;
+                    }
                     console.log("Row double-clicked! Row ID:", row.original.id);
                     if (onRowDoubleClick) onRowDoubleClick(row);
                   }}

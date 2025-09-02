@@ -15,21 +15,21 @@ export default function Sidebar({
   const [activeNavItem, setActiveNavItem] = useState("Dashboard");
 
   const navigation = [
-    { name: t("sidebar.home"), link: "/repos", icon: "🏠" },
+    { name: t("sidebar.home"), link: "/", icon: "🏠" },
     { name: t("users"), link: "/users", icon: "👤" },
     { name: t("roles"), link: "/roles", icon: "👥" },
     { name: t("audit_trail"), link: "/audit", icon: "📈" },
     {
-      name: t("advanced_search") ,
+      name: t("advanced_search"),
       link: "/advancesSearch",
       icon: "🔍",
     },
     {
-      name: t("file_category") ,
+      name: t("file_category"),
       link: "/category",
       icon: "📁",
     },
-    { name: t("settings"), link: "/settings", icon: "⚙️" },
+    // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {
@@ -194,7 +194,7 @@ export default function Sidebar({
                 </ul>
               </li>
 
-              <li className="mt-auto">
+              {/* <li className="mt-auto">
                 <Link
                   to="/profile"
                   className={`w-full group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gradient-to-r hover:from-slate-400 hover:to-gray-500 hover:text-white hover:shadow-md transition-all duration-200 ${
@@ -213,7 +213,7 @@ export default function Sidebar({
                     </span>
                   )}
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>

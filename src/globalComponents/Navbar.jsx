@@ -2,13 +2,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import logo from "../../src/assets/logo.png";
 import profileImg from "../../src/assets/logom.png";
-import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 
 function Navbar() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "ar" : "en";
@@ -19,7 +17,7 @@ function Navbar() {
       Cookies.remove("token");
       Cookies.remove("userId");
       Cookies.remove("userName");
-      navigate("/login")
+      navigate("/login");
       return true;
     } catch (error) {
       console.error("Logout error:", error);
@@ -37,7 +35,7 @@ function Navbar() {
             isRTL ? "flex-row-reverse" : "flex-row"
           }`}
         >
-          <Link to="/" title="Dashboard">
+          <Link to="/" title="Repos">
             <img className="w-[60px]" src={logo} alt="PRM Logo" />
           </Link>
           <div className={`flex items-center ${isRTL ? "mr-4" : "ml-4"}`}>
@@ -96,7 +94,7 @@ function Navbar() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
           </button>

@@ -313,7 +313,7 @@ const ReUsableTable = ({
       </div>
 
       {/* Main table element */}
-      <div className="table-wrapper">
+      <div className="table-wrapper ">
         <table>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -433,7 +433,13 @@ const ReUsableTable = ({
           </tbody>
         </table>
       </div>
-
+      {/* Add this after the table wrapper and before pagination */}
+      <div className="table-info flex justify-between items-center py-2 px-4 bg-gray-50 rounded text-sm text-gray-600">
+        <span>
+          Showing {table.getRowModel().rows.length} of {""}
+          {table.getFilteredRowModel().rows.length} entries
+        </span>
+      </div>
       {/* Pagination controls */}
       <PaginationControls table={table} pageSizeOptions={pageSizeOptions} />
 

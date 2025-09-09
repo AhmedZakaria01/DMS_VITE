@@ -189,3 +189,46 @@ export async function createNewUser(userData) {
     console.err("Failed to Create User", err);
   }
 }
+// Fetch Roles
+export async function getRoles() {
+  try {
+    const response = await api.get("Roles");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Roles", err);
+  }
+}
+// Create New Role
+export async function createNewRole(roleData) {
+  try {
+    const response = await api.post("/Roles", roleData);
+    return response;
+  } catch (err) {
+    console.err("Failed to Create Role", err);
+  }
+}
+
+// Update Role
+export async function updateRole(roleData) {
+  try {
+    const { id, ...updateData } = roleData;
+    const response = await api.put(`/Roles/${id}`, updateData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Update Role", err);
+    throw err;
+  }
+}
+  
+// Create New Repository
+export async function createNewRepository(repoData) {
+  try {
+    const response = await api.post(
+      "Repository/CreateRepositoryWithAttributes",
+      repoData
+    );
+    return response;
+  } catch (err) {
+    console.error("Failed To Create Repository ", err);
+  }
+}

@@ -1,26 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserRepos } from "./auditThunks";
+import { fetchAuditTrail } from "./auditThunks";
 
-const repoSlice = createSlice({
-  name: "repo",
-  initialState: {},
-  status: "idle",
-  error: null,
-
+const auditSlice = createSlice({
+  name: "audits",
+  initialState: {
+    audits: [],
+    status: "idle", // Move this inside initialState
+    error: null, // Move this inside initialState
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserRepos.pending, (state) => {
+      .addCase(fetchAuditTrail.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchUserRepos.fulfilled, (state, action) => {
+      .addCase(fetchAuditTrail.fulfilled, (state, action) => {
+        state.status = "succeeded"; // Add this line
+        state.audits = action.payload;
+        state.error = null; // Clear any previous errors
         console.log(action.payload);
       })
-      .addCase(fetchUserRepos.rejected, (state, action) => {
+      .addCase(fetchAuditTrail.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export default repoSlice.reducer;
+export default auditSlice.reducer;

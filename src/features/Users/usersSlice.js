@@ -1,26 +1,40 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserRepos } from "./auditThunks";
+import { fetchUsers } from "./usersThunks";
 
-const repoSlice = createSlice({
-  name: "repo",
-  initialState: {},
-  status: "idle",
-  error: null,
-
-  reducers: {},
+const usersSlice = createSlice({
+  name: "users",
+  initialState: {
+    users: [],
+    status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    error: null,
+    lastFetched: null,
+  },
+  reducers: {
+    // Add any sync actions here if needed
+    resetUsersState: (state) => {
+      state.data = [];
+      state.status = "idle";
+      state.error = null;
+      state.lastFetched = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserRepos.pending, (state) => {
+      .addCase(fetchUsers.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
-      .addCase(fetchUserRepos.fulfilled, (state, action) => {
-        console.log(action.payload);
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.users = action.payload;
+        state.error = null;
       })
-      .addCase(fetchUserRepos.rejected, (state, action) => {
+      .addCase(fetchUsers.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });
   },
 });
 
-export default repoSlice.reducer;
+export const { resetUsersState } = usersSlice.actions;
+export default usersSlice.reducer;

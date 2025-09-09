@@ -1,24 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserRepos } from "./repoThunks";
+import { fetchUserRepos, createNewRepo } from "./repoThunks";
 
 const repoSlice = createSlice({
   name: "repo",
-  initialState: {},
-  status: "idle",
-  error: null,
-
-  reducers: {},
+  initialState: {
+    repos: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {
+    clearRepos: (state) => {
+      state.repos = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch User Repos
       .addCase(fetchUserRepos.pending, (state) => {
         state.status = "loading";
       })
       .addCase(fetchUserRepos.fulfilled, (state, action) => {
-        console.log(action.payload);
+        state.status = "succeeded";
+        state.repos = action.payload?.response || [];
       })
       .addCase(fetchUserRepos.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+      })
+      // Create New Repo - ADD THIS BACK
+      .addCase(createNewRepo.fulfilled, (state, action) => {
+        // Add the new repo to the existing repos array
+        if (action.payload?.data) {
+          state.repos.push(action.payload.data);
+        }
       });
   },
 });

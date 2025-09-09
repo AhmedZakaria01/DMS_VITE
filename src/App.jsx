@@ -11,6 +11,8 @@ import { saveUserData } from "./features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import Audit from "./features/Audit/components/Audit";
 import Users from "./features/Users/components/Users";
+import RepoForm from "./features/Repos/components/RepoForm";
+import Roles from "./features/Roles/components/Roles";
 
 function App() {
   const dispatch = useDispatch();
@@ -33,6 +35,8 @@ function App() {
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/roles" element={<Roles />} />
+          <Route path="/createRepo" element={<RepoForm />} />
         </Route>
 
         {/* Routes without Layout  */}

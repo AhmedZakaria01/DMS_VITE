@@ -8,10 +8,12 @@ function Navbar() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
+
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "ar" : "en";
     i18n.changeLanguage(newLang);
   };
+
   const logoutRequest = async () => {
     try {
       Cookies.remove("token");
@@ -27,7 +29,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900 h-14 shadow">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-indigo-500   to-indigo-600 h-14 shadow-lg border-b border-gray-200">
       <div className="flex justify-between items-center h-full px-5">
         {/* Logo and Profile - RTL aware */}
         <div
@@ -53,7 +55,7 @@ function Navbar() {
           {/* Change Language */}
           <button
             onClick={toggleLanguage}
-            className={`flex items-center mx-2 px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 transition-colors duration-200 text-white border border-slate-600 ${
+            className={`flex items-center mx-2 px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 text-white border border-white/20 ${
               isRTL ? "space-x-reverse flex-row-reverse" : "space-x-2"
             }`}
             title={`Switch to ${i18n.language === "en" ? "Arabic" : "English"}`}
@@ -79,11 +81,11 @@ function Navbar() {
           {/* Logout */}
           <button
             onClick={logoutRequest}
-            className={`flex items-center mx-2 px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 transition-colors duration-200 text-white border border-slate-600 ${
+            className={`flex items-center mx-2 px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 text-white border border-white/20 ${
               isRTL ? "space-x-reverse flex-row-reverse" : "space-x-2"
             }`}
           >
-            <span className="text-sm font-medium"> Logout </span>
+            <span className="text-sm font-medium">Logout</span>
             <svg
               className="w-4 h-4"
               fill="none"

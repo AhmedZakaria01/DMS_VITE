@@ -4,29 +4,21 @@ import React, { useMemo, useState, useEffect } from "react";
 import { fetchAuditTrail } from "../auditThunks";
 
 function AuditTrail() {
-  const [data, setData] = useState([]);
-  const { user } = useSelector((state) => state.authReducer);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const { audits, status, error } = useSelector((state) => state.auditReducer);
 
   // Fetching Audit Trail Data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const auditData = await dispatch(fetchAuditTrail());
-        setData(auditData ? auditData.payload : []);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to fetch audit trail:", error);
-        setLoading(false);
-        setData([]);
-      }
-    };
-
-    if (user.id) {
-      fetchData();
+    if (status === "idle") {
+      dispatch(fetchAuditTrail());
     }
-  }, [dispatch, user.id]);
+
+    // Update loading based on status
+    if (status !== "loading") {
+      setLoading(false);
+    }
+  }, [dispatch, status]);
 
   // Define table columns for audit trail
   const columns = useMemo(
@@ -76,7 +68,7 @@ function AuditTrail() {
 
       <ReUsableTable
         columns={columns}
-        data={data}
+        data={audits}
         title="Audit Trail"
         isLoading={loading}
         onRowDoubleClick={handleRowDoubleClick}

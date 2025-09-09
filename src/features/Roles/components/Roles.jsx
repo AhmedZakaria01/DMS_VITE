@@ -1,69 +1,70 @@
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import UserForm from "./UserForm";
+
 import Popup from "../../../globalComponents/Popup";
 import { Plus, Edit2, Trash2 } from "lucide-react";
-import { fetchUsers } from "../usersThunks";
+import RoleForm from "./RoleForm";
+import { fetchRoles } from "../RolesThunks";
 
-function Users() {
+function Roles() {
   const dispatch = useDispatch();
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedRole, setselectedRole] = useState(null);
 
   // Get users data from Redux
-  const { users, status, error } = useSelector((state) => state.usersReducer);
+  const { roles, status, error } = useSelector((state) => state.rolesReducer);
 
   // Fetch users only if status is idle (no data yet)
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchUsers());
+      dispatch(fetchRoles());
     }
   }, [dispatch, status]);
 
   // Simplified refresh - just dispatch again
-  const refreshUsersData = useCallback(() => {
-    dispatch(fetchUsers());
+  const refreshRoleData = useCallback(() => {
+    dispatch(fetchRoles());
   }, [dispatch]);
 
-  // Handle Update User
-  const handleUpdateUser = useCallback((userData) => {
-    setSelectedUser(userData);
+  // Handle Update Role
+  const handleUpdateRole = useCallback((userData) => {
+    setselectedRole(userData);
     setIsEditModalOpen(true);
   }, []);
 
-  //Handle Delete User
-  const handleDeleteUser = useCallback((userData) => {
-    console.log("Delete user:", userData);
+  //Handle Delete Role
+  const handleDeleteRole = useCallback((userData) => {
+    console.log("Delete role:", userData);
   }, []);
 
-  // Handle User Created
-  const handleUserCreated = useCallback(() => {
+  // Handle Role Created
+  const handleRoleCreated = useCallback(() => {
     setIsCreateModalOpen(false);
-    refreshUsersData();
-  }, [refreshUsersData]);
+    refreshRoleData();
+  }, [refreshRoleData]);
 
-  // Handle Users Updated
-  const handleUserUpdated = useCallback(() => {
+  // Handle Roles Updated
+  const handleRoleUpdated = useCallback(() => {
     setIsEditModalOpen(false);
-    setSelectedUser(null);
-    refreshUsersData();
-  }, [refreshUsersData]);
+    setselectedRole(null);
+    refreshRoleData();
+  }, [refreshRoleData]);
 
   // Action Buttons
   const ActionButtons = useCallback(
-    ({ user: userData }) => (
+    ({ role: userData }) => (
       <div className="flex items-center gap-2">
         <button
           onClick={(e) => {
             e.stopPropagation();
-            handleUpdateUser(userData);
+            handleUpdateRole(userData);
           }}
           className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Edit user"
+          title="Edit role"
         >
           <Edit2 className="w-4 h-4" />
         </button>
@@ -71,31 +72,25 @@ function Users() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteUser(userData);
+            handleDeleteRole(userData);
           }}
           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-          title="Delete user"
+          title="Delete role"
         >
           <Trash2 className="w-4 h-4" />
         </button>
       </div>
     ),
-    [handleUpdateUser, handleDeleteUser]
+    [handleUpdateRole, handleDeleteRole]
   );
 
   const columns = useMemo(
     () => [
       {
-        id: "userName",
-        accessorKey: "userName",
-        header: "User Name",
+        id: "name",
+        accessorKey: "name",
+        header: "Name",
         size: 150,
-      },
-      {
-        id: "email",
-        accessorKey: "email",
-        header: "Email",
-        size: 200,
       },
       {
         id: "actions",
@@ -104,7 +99,7 @@ function Users() {
         size: 120,
         enableSorting: false,
         enableColumnFilter: false,
-        cell: ({ row }) => <ActionButtons user={row.original} />,
+        cell: ({ row }) => <ActionButtons role={row.original} />,
       },
     ],
     [ActionButtons]
@@ -112,29 +107,30 @@ function Users() {
 
   // Double Click
   const handleRowDoubleClick = useCallback((row) => {
-    console.log("User selected! User ID:", row.original.id);
-    console.log("Full user data:", row.original);
+    console.log("Role selected! Role ID:", row.original.id);
+    console.log("Full role data:", row.original);
   }, []);
 
-  // Handle  Create User
+  // Handle  Create Role
   const handleCreateClick = useCallback(() => {
     setIsCreateModalOpen(true);
   }, []);
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between">
+    <section className="p-6">
+      <div className="flex justify-between items-">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Roles</h1>
           <p className="text-gray-600">Manage and monitor system users</p>
         </div>
+
         <div>
           <button
             onClick={handleCreateClick}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
           >
             <Plus className="w-5 h-5" />
-            Create New User
+            Create New Role
           </button>
         </div>
       </div>
@@ -147,48 +143,50 @@ function Users() {
       )}
 
       {/* Table */}
-      <ReUsableTable
-        columns={columns}
-        data={users || []}
-        title="Users"
-        isLoading={status === "loading"}
-        onRowDoubleClick={handleRowDoubleClick}
-        showGlobalFilter={true}
-        pageSizeOptions={[10, 15, 25, 50, 100]}
-        defaultPageSize={10}
-        className="users-table"
-        enableSelection={false}
-      />
+      <div>
+        <ReUsableTable
+          columns={columns}
+          data={roles || []}
+          title="Roles"
+          isLoading={status === "loading"}
+          onRowDoubleClick={handleRowDoubleClick}
+          showGlobalFilter={true}
+          pageSizeOptions={[10, 15, 25, 50, 100]}
+          defaultPageSize={10}
+          className="users-table"
+          enableSelection={false}
+        />
+      </div>
 
-      {/* Create User Form Popoup */}
+      {/* Create Role Form Popoup */}
       <Popup
         isOpen={isCreateModalOpen}
         setIsOpen={setIsCreateModalOpen}
         component={
-          <UserForm
-            onSuccess={handleUserCreated}
+          <RoleForm
+            onSuccess={handleRoleCreated}
             onCancel={() => setIsCreateModalOpen(false)}
           />
         }
       />
-      {/* Update User Form Popup */}
+      {/* Update Role Form Popup */}
       <Popup
         isOpen={isEditModalOpen}
         setIsOpen={setIsEditModalOpen}
         component={
-          <UserForm
+          <RoleForm
             mode="edit"
-            initialData={selectedUser}
-            onSuccess={handleUserUpdated}
+            initialData={selectedRole}
+            onSuccess={handleRoleUpdated}
             onCancel={() => {
               setIsEditModalOpen(false);
-              setSelectedUser(null);
+              setselectedRole(null);
             }}
           />
         }
       />
-    </div>
+    </section>
   );
 }
 
-export default React.memo(Users);
+export default React.memo(Roles);

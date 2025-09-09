@@ -26,11 +26,11 @@ function Layout() {
 
       {/* Main content - RTL/LTR aware sidebar positioning */}
       <main
-        className={`pt-14 transition-all duration-300 ${
+        className={`pt-14 transition-all duration-300 w-[90%] mx-auto ${
           desktopSidebarExpanded
             ? isRTL
               ? "lg:pr-72"
-              : "lg:pl-72"  
+              : "lg:pl-72"
             : isRTL
             ? "lg:pr-16"
             : "lg:pl-16"

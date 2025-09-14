@@ -219,7 +219,7 @@ export async function updateRole(roleData) {
     throw err;
   }
 }
-  
+
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
@@ -230,5 +230,42 @@ export async function createNewRepository(repoData) {
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);
+  }
+}
+
+// Fetch Repo Contents
+export async function getRepoContents(id) {
+  try {
+    const response = await api.get(
+      `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
+    );
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Repos Contents", err);
+  }
+}
+// Fetch Folder Contents
+export async function getFolderContents(repoId, folderId) {
+  try {
+    const response = await api.get(
+      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
+    );
+    console.log(repoId, folderId);
+
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Folder Contents", err);
+  }
+}// Fetch Folder Contents
+export async function getDocumentFiles(repoId, folderId) {
+  try {
+    const response = await api.get(
+      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
+    );
+    console.log(repoId, folderId);
+
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Folder Contents", err);
   }
 }

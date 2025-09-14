@@ -13,6 +13,9 @@ import Audit from "./features/Audit/components/Audit";
 import Users from "./features/Users/components/Users";
 import RepoForm from "./features/Repos/components/RepoForm";
 import Roles from "./features/Roles/components/Roles";
+ import FolderContents from "./features/FolderContent/components/FolderContents";
+import DocumentViewer from "./features/Document/component/DocumentViewer";
+import RepoContents from "./features/RepoContents/components/RepoContents";
 
 function App() {
   const dispatch = useDispatch();
@@ -36,6 +39,12 @@ function App() {
           <Route path="/audit" element={<Audit />} />
           <Route path="/users" element={<Users />} />
           <Route path="/roles" element={<Roles />} />
+          <Route path="/repoContents/:repoId" element={<RepoContents />} />
+          <Route path="/documentViewer" element={<DocumentViewer />} />
+          <Route
+            path="/repoContents/:repoId/folderContent/*"
+            element={<FolderContents />}
+          />
           <Route path="/createRepo" element={<RepoForm />} />
         </Route>
 

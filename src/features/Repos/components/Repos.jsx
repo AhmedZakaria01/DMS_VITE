@@ -9,7 +9,7 @@ function Repos() {
   const { user } = useSelector((state) => state.authReducer);
   const { repos, status, error } = useSelector((state) => state.repoReducer);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Fixed typo
+  const navigate = useNavigate();
 
   // Fetch User Repos
   useEffect(() => {
@@ -18,6 +18,7 @@ function Repos() {
       dispatch(fetchUserRepos(user.id));
     }
   }, [dispatch, user.id, status]);
+
   // Define table columns using TanStack Table format
   const columns = useMemo(
     () => [
@@ -40,8 +41,15 @@ function Repos() {
   );
 
   const handleRowDoubleClick = (row) => {
-    console.log("Row double-clicked! Row ID:", row.original.id);
     console.log("Full row data:", row.original);
+
+    // Store repository name in sessionStorage
+    sessionStorage.setItem("currentRepoName", row.original.name);
+
+    // Navigate to repository contents and pass the repository name
+    navigate(`/repoContents/${row.original.id}`, {
+      state: { repoName: row.original.name }, // Keep this for immediate access
+    });
   };
 
   return (
@@ -67,9 +75,9 @@ function Repos() {
       <div className="mx-auto">
         <ReUsableTable
           columns={columns}
-          data={repos || []} // Use Redux state
+          data={repos || []}
           title="Repository Management"
-          isLoading={status === "loading"} // Use Redux loading state
+          isLoading={status === "loading"}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}
           pageSizeOptions={[5, 10, 20, 50]}

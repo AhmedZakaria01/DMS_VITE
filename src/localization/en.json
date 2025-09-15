@@ -1,11 +1,15 @@
 {
     "welcome": "Welcome",
     "login": {
-         "username": "Username",
+        "username": "Username",
         "password": "Password"
- 
     },
     "sidebar": {
-        "home": "Home"
+        "home": "Home",
+        "users": "Users",
+        "file_category": "File Category",
+        "audit_trail": "Audit Trail",
+        "advanced_search":"Advanced Search",
+        "roles":"Roles"
     }
 }

@@ -17,16 +17,16 @@ export default function Sidebar({
 
   const navigation = [
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
-    { name: t("users"), link: "/users", icon: "👤" },
-    { name: t("roles"), link: "/roles", icon: "👥" },
-    { name: t("audit_trail"), link: "/audit", icon: "📈" },
+    { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+    { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
+    { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
     {
-      name: t("advanced_search"),
+      name: t("sidebar.advanced_search"),
       link: "/advancesSearch",
       icon: "🔍",
     },
     {
-      name: t("file_category"),
+      name: t("sidebar.file_category"),
       link: "/category",
       icon: "📁",
     },
@@ -149,10 +149,13 @@ export default function Sidebar({
         } ${desktopSidebarExpanded ? "lg:w-72" : "lg:w-16"}`}
       >
         <div
+          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-slate-100 via-blue-50 to-slate-200 px-3 pb-4 ${isRTL ? "border-l" : "border-r"}`}
+        >
+          {/* <div
           className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-indigo-50 via-slate-200 to-indigo-400 px-3 pb-4 ${
             isRTL ? "border-l" : "border-r"
           }`}
-        >
+        > */}
           {/* Brand/Logo section */}
           <div className="flex h-12 shrink-0 items-center justify-center mt-4">
             <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -184,7 +187,7 @@ export default function Sidebar({
                         } ${
                           activeNavItem === item.name
                             ? "bg-gradient-to-r from-indigo-300 to-purple-200 text-black shadow-lg"
-                            : "text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-indigo-300 hover:to-purple-200 hover:shadow-md"
+                            : "text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-slate-400 hover:to-slate-500 hover:shadow-md"
                         } ${!desktopSidebarExpanded ? "justify-center" : ""}`}
                         title={!desktopSidebarExpanded ? item.name : ""}
                       >

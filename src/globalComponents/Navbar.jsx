@@ -29,7 +29,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-indigo-500 to-indigo-600 h-20 shadow-lg border-b border-gray-200">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-indigo-600 to-indigo-800 h-20 shadow-lg border-b border-gray-200">
       <div className="flex justify-between items-center h-full px-6">
         {/* Left Side - Brand Logo */}
         <div className="flex items-center">

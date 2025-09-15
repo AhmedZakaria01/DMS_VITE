@@ -16,6 +16,8 @@ export const createNewRepo = createAsyncThunk(
   "repo/createNewRepository",
   async (repoData) => {
     const response = await createNewRepository(repoData);
+    console.log(response.data);
+
     return response.data;
   }
 );

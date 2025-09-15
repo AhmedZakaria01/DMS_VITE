@@ -230,6 +230,25 @@ export async function createNewRepository(repoData) {
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);
+
+    // Extract the actual error message from the response
+    if (err.response?.data) {
+      const errorData = err.response.data;
+
+      // Check if there are specific error messages in the errors array
+      if (errorData.errors && errorData.errors.length > 0) {
+        const errorMessage = errorData.errors[0].message;
+        throw new Error(errorMessage);
+      }
+
+      // Fallback to general message if available
+      if (errorData.message) {
+        throw new Error(errorData.message);
+      }
+    }
+
+    // Fallback to generic error
+    throw new Error("Failed to create repository. Please try again.");
   }
 }
 
@@ -256,7 +275,7 @@ export async function getFolderContents(repoId, folderId) {
   } catch (err) {
     console.err("Failed to Fetch Folder Contents", err);
   }
-}// Fetch Folder Contents
+} // Fetch Folder Contents
 export async function getDocumentFiles(repoId, folderId) {
   try {
     const response = await api.get(

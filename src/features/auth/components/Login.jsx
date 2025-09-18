@@ -19,9 +19,9 @@ function Login() {
 
   // Login Schema Config
   const loginSchema = z.object({
-    username: z
+    email: z
       .string()
-      .min(1, t("usernameRequired") || "Username is required"),
+      .min(1, t("emailRequired") || "email is required"),
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -85,25 +85,25 @@ function Login() {
         />
         <div className="w-full max-w-lg p-8 rounded-lg shadow-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Username Field */}
+            {/* email Field */}
             <div>
-              <label htmlFor="username" className="block text-white mb-2">
-                {t("username") || "Username"}
+              <label htmlFor="email" className="block text-white mb-2">
+                {t("email") || "email"}
               </label>
               <input
                 autoComplete="true"
                 className={`w-full px-4 py-2 bg-gray-700 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  errors.username ? "border-red-500" : ""
+                  errors.email ? "border-red-500" : ""
                 }`}
                 type="text"
-                name="username"
-                id="username"
-                placeholder="Enter your username"
-                {...register("username")}
+                name="email"
+                id="email"
+                placeholder="Enter your email"
+                {...register("email")}
               />
-              {errors.username && (
+              {errors.email && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.username.message}
+                  {errors.email.message}
                 </p>
               )}
             </div>

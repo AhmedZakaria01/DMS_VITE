@@ -85,14 +85,14 @@ api.interceptors.response.use(
 // Login Method
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post("Authenticate/login", credentials);
-    const { token, id, userName } = response.data.response;
+    const response = await api.post("Authenticate/Login", credentials);
+    const { token, id, email } = response.data.response;
     console.log(response.data.response);
 
     Cookies.set("userId", id);
-    Cookies.set("userName", userName);
+    Cookies.set("email", email);
     console.log(id);
-    console.log(userName);
+    console.log(email);
 
     if (!token) {
       throw new Error("No token received from server");

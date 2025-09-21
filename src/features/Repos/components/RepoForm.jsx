@@ -478,7 +478,8 @@ function RepoForm() {
         <div className="p-8">
           <div className="space-y-8">
             {/* Basic Information */}
-            <div className="bg-gray-50 rounded-xl p-6">
+        <div className="marwa flex">
+              <div className="bg-gray-50 rounded-xl p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-blue-600" />
                 Repository Information
@@ -549,11 +550,7 @@ function RepoForm() {
                   </span>
                 </label>
               </div>
-            </div>
-
-            {/* Index Fields Section */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                   <Settings className="w-5 h-5 mr-2 text-blue-600" />
                   Index Fields Management
@@ -710,6 +707,12 @@ function RepoForm() {
                   </div>
                 </div>
               )}
+            </div>
+
+        
+    {/* Index Fields Section */}
+            <div className="bg-gray-50 rounded-xl p-6">
+          
 
               {/* Index Fields Table */}
               <IndexFieldsTable
@@ -720,7 +723,7 @@ function RepoForm() {
                 itemsPerPage={5}
               />
             </div>
-
+        </div>
             {/* Submit Button */}
             <div className="flex justify-end pt-6">
               <button

@@ -17,19 +17,19 @@ export default function Sidebar({
 
   const navigation = [
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
-    { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
-    { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
-    { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
-    {
-      name: t("sidebar.advanced_search"),
-      link: "/advancesSearch",
-      icon: "🔍",
-    },
-    {
-      name: t("sidebar.file_category"),
-      link: "/category",
-      icon: "📁",
-    },
+    // { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+    // { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
+    // { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
+    // {
+    //   name: t("sidebar.advanced_search"),
+    //   link: "/advancesSearch",
+    //   icon: "🔍",
+    // },
+    // {
+    //   name: t("sidebar.file_category"),
+    //   link: "/category",
+    //   icon: "📁",
+    // },
     // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
@@ -157,11 +157,11 @@ export default function Sidebar({
           }`}
         > */}
           {/* Brand/Logo section */}
-          <div className="flex h-12 shrink-0 items-center justify-center mt-4">
+          {/* <div className="flex h-12 shrink-0 items-center justify-center mt-4">
             <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
               <span className="text-white font-bold">DMS</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Toggle button */}
           <div className="flex justify-center">

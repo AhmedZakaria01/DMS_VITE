@@ -6,6 +6,7 @@ import rolesReducer from "../features/Roles/RolesSlice";
 import auditReducer from "../features/Audit/auditSlice";
 import repoContentReducer from "../features/RepoContents/repoContentSlice";
 import folderContentsReducer from "../features/FolderContent/folderContentsSlice";
+import categoryReducer from '../features/Category/categorySlice'
 export const store = configureStore({
   reducer: {
     // Auth
@@ -16,5 +17,6 @@ export const store = configureStore({
     auditReducer,
     repoContentReducer,
     folderContentsReducer,
+    categoryReducer
   },
 });

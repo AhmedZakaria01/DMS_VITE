@@ -288,3 +288,39 @@ export async function getDocumentFiles(repoId, folderId) {
     console.err("Failed to Fetch Folder Contents", err);
   }
 }
+
+
+
+
+//create a New Category
+export async function createNewCategory(categoryData) {
+  try {
+    const response = await api.post("Category/Create", categoryData);
+    return response.data;
+  } catch (err) {
+    console.error("Failed To Create a New Category ", err);
+    throw err; 
+  }
+}
+// Get Parent Categories
+export async function fetchParentCategories(documentTypeId) {
+  try {
+    const response = await api.get(`Category/GetCategoriesByDocumentType/${documentTypeId}`);
+    const data = response.data;
+    
+    if (data.statusCode === 200) {
+      return data.response;
+    } else {
+      throw new Error(data.message || "Failed to fetch parent categories");
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error; 
+  }
+}
+
+
+
+
+  
+  

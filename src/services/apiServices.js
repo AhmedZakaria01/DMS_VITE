@@ -85,14 +85,14 @@ api.interceptors.response.use(
 // Login Method
 export const loginUser = async (credentials) => {
   try {
-    const response = await api.post("Authenticate/login", credentials);
-    const { token, id, userName } = response.data.response;
+    const response = await api.post("Authenticate/Login", credentials);
+    const { token, id, email } = response.data.response;
     console.log(response.data.response);
 
     Cookies.set("userId", id);
-    Cookies.set("userName", userName);
+    Cookies.set("email", email);
     console.log(id);
-    console.log(userName);
+    console.log(email);
 
     if (!token) {
       throw new Error("No token received from server");
@@ -219,7 +219,7 @@ export async function updateRole(roleData) {
     throw err;
   }
 }
-  
+
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
@@ -230,6 +230,62 @@ export async function createNewRepository(repoData) {
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);
+
+    // Extract the actual error message from the response
+    if (err.response?.data) {
+      const errorData = err.response.data;
+
+      // Check if there are specific error messages in the errors array
+      if (errorData.errors && errorData.errors.length > 0) {
+        const errorMessage = errorData.errors[0].message;
+        throw new Error(errorMessage);
+      }
+
+      // Fallback to general message if available
+      if (errorData.message) {
+        throw new Error(errorData.message);
+      }
+    }
+
+    // Fallback to generic error
+    throw new Error("Failed to create repository. Please try again.");
+  }
+}
+
+// Fetch Repo Contents
+export async function getRepoContents(id) {
+  try {
+    const response = await api.get(
+      `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
+    );
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Repos Contents", err);
+  }
+}
+// Fetch Folder Contents
+export async function getFolderContents(repoId, folderId) {
+  try {
+    const response = await api.get(
+      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
+    );
+    console.log(repoId, folderId);
+
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Folder Contents", err);
+  }
+} // Fetch Folder Contents
+export async function getDocumentFiles(repoId, folderId) {
+  try {
+    const response = await api.get(
+      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
+    );
+    console.log(repoId, folderId);
+
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Folder Contents", err);
   }
 }
 

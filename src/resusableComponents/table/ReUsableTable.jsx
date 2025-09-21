@@ -282,6 +282,7 @@ const ReUsableTable = ({
       <div className="table-header flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
         <h2 className="table-title text-xl font-bold text-white">{title}</h2>
 
+        {/* View Selected */}
         <div className="table-controls flex items-center gap-4">
           {enableSelection && selectedRows.length > 0 && (
             <button

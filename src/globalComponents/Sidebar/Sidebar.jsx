@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Fragment } from "react";
 
 export default function Sidebar({
   desktopSidebarExpanded,
@@ -16,16 +17,16 @@ export default function Sidebar({
 
   const navigation = [
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
-    { name: t("users"), link: "/users", icon: "👤" },
-    { name: t("roles"), link: "/roles", icon: "👥" },
-    { name: t("audit_trail"), link: "/audit", icon: "📈" },
+    { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+    { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
+    { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
     {
-      name: t("advanced_search"),
+      name: t("sidebar.advanced_search"),
       link: "/advancesSearch",
       icon: "🔍",
     },
     {
-      name: t("file_category"),
+      name: t("sidebar.file_category"),
       link: "/category",
       icon: "📁",
     },
@@ -39,9 +40,10 @@ export default function Sidebar({
   return (
     <>
       {/* Mobile sidebar */}
-      <Transition show={sidebarOpen}>
+      <Transition show={sidebarOpen} as={Fragment}>
         <Dialog className="relative z-40 lg:hidden" onClose={setSidebarOpen}>
           <Transition.Child
+            as={Fragment}
             enter="transition-opacity ease-linear duration-300"
             enterFrom="opacity-0"
             enterTo="opacity-100"
@@ -54,6 +56,7 @@ export default function Sidebar({
 
           <div className="fixed inset-0 flex">
             <Transition.Child
+              as={Fragment}
               enter="transition ease-in-out duration-300 transform"
               enterFrom={isRTL ? "translate-x-full" : "-translate-x-full"}
               enterTo="translate-x-0"
@@ -67,6 +70,7 @@ export default function Sidebar({
                 }`}
               >
                 <Transition.Child
+                  as={Fragment}
                   enter="ease-in-out duration-300"
                   enterFrom="opacity-0"
                   enterTo="opacity-100"
@@ -92,7 +96,7 @@ export default function Sidebar({
                   </div>
                 </Transition.Child>
                 {/* Mobile sidebar content - positioned below navbar */}
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-6 pb-4 shadow-xl mt-14">
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-6 pb-4 shadow-xl ">
                   <div className="flex h-16 shrink-0 items-center">
                     <div className="h-8 w-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
                       <span className="text-white font-bold">A</span>
@@ -140,15 +144,18 @@ export default function Sidebar({
 
       {/* Desktop sidebar - RTL/LTR positioning */}
       <div
-        className={`hidden lg:fixed lg:top-14 lg:bottom-0 lg:z-40 lg:flex lg:flex-col transition-all duration-300 ${
+        className={`hidden lg:fixed lg:top-20 lg:bottom-0 lg:z-40 lg:flex lg:flex-col transition-all duration-300 ${
           isRTL ? "lg:right-0" : "lg:left-0"
         } ${desktopSidebarExpanded ? "lg:w-72" : "lg:w-16"}`}
       >
         <div
+          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-slate-100 via-blue-50 to-slate-200 px-3 pb-4 ${isRTL ? "border-l" : "border-r"}`}
+        >
+          {/* <div
           className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-indigo-50 via-slate-200 to-indigo-400 px-3 pb-4 ${
             isRTL ? "border-l" : "border-r"
           }`}
-        >
+        > */}
           {/* Brand/Logo section */}
           <div className="flex h-12 shrink-0 items-center justify-center mt-4">
             <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -180,7 +187,7 @@ export default function Sidebar({
                         } ${
                           activeNavItem === item.name
                             ? "bg-gradient-to-r from-indigo-300 to-purple-200 text-black shadow-lg"
-                            : "text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-indigo-300 hover:to-purple-200 hover:shadow-md"
+                            : "text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-slate-400 hover:to-slate-500 hover:shadow-md"
                         } ${!desktopSidebarExpanded ? "justify-center" : ""}`}
                         title={!desktopSidebarExpanded ? item.name : ""}
                       >
@@ -193,27 +200,6 @@ export default function Sidebar({
                   ))}
                 </ul>
               </li>
-
-              {/* <li className="mt-auto">
-                <Link
-                  to="/profile"
-                  className={`w-full group flex items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gradient-to-r hover:from-slate-400 hover:to-gray-500 hover:text-white hover:shadow-md transition-all duration-200 ${
-                    isRTL ? "flex-row-reverse text-right" : ""
-                  } ${!desktopSidebarExpanded ? "justify-center" : ""}`}
-                  title={
-                    !desktopSidebarExpanded
-                      ? t("your_profile") || "Your profile"
-                      : ""
-                  }
-                >
-                  <span className="text-lg shrink-0">👤</span>
-                  {desktopSidebarExpanded && (
-                    <span className="whitespace-nowrap">
-                      {t("your_profile") || "Your profile"}
-                    </span>
-                  )}
-                </Link>
-              </li> */}
             </ul>
           </nav>
         </div>
@@ -221,7 +207,7 @@ export default function Sidebar({
 
       {/* Mobile toggle button - RTL/LTR positioning */}
       <div
-        className={`lg:hidden fixed top-16 z-30 ${
+        className={`lg:hidden fixed top-24 z-30 ${
           isRTL ? "right-2" : "left-2"
         }`}
       >

@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import Navbar from "./globalComponents/Navbar";
 import Sidebar from "./globalComponents/Sidebar/Sidebar";
-
+import Breadcrumbs from "./globalComponents/Breadcrumbs";
+  
 function Layout() {
   const { i18n } = useTranslation();
   const [desktopSidebarExpanded, setDesktopSidebarExpanded] = useState(false);
@@ -26,7 +27,7 @@ function Layout() {
 
       {/* Main content - RTL/LTR aware sidebar positioning */}
       <main
-        className={`pt-14 transition-all duration-300 w-[90%] mx-auto ${
+        className={`pt-20 transition-all duration-300 w-[90%] mx-auto ${
           desktopSidebarExpanded
             ? isRTL
               ? "lg:pr-72"
@@ -37,6 +38,8 @@ function Layout() {
         }`}
       >
         <div className="p-4">
+          {/* Add breadcrumbs here */}
+          <Breadcrumbs />
           <Outlet />
         </div>
       </main>

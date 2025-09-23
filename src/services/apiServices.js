@@ -181,7 +181,6 @@ export async function getAuditTrail() {
   }
 }
 
-
 // Create User
 export async function createNewUser(userData) {
   try {
@@ -313,7 +312,7 @@ export async function fetchParentCategories(documentTypeId) {
 }
 
 // Get All Users
-  export async function getUsers() {
+export async function getUsers() {
   try {
     const response = await api.get("Users/GetAllUsers/GetAllUsers");
     return response;

@@ -216,7 +216,10 @@ export async function updateRole(roleData) {
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
-    const response = await api.post("Repository/CreateRepository", repoData);
+    const response = await api.post(
+      "Repository/CreateRepository",
+      repoData
+    );
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);

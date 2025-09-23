@@ -218,7 +218,7 @@ export async function updateRole(roleData) {
 export async function createNewRepository(repoData) {
   try {
     const response = await api.post(
-      "Repository/CreateRepositoryWithAttributes",
+      "Repository/CreateRepository",
       repoData
     );
     return response;

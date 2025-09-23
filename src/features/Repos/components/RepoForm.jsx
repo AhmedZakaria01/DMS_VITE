@@ -741,7 +741,7 @@ function RepoForm() {
 
         
     {/* Index Fields Section */}
-            <div className="bg-gray-50 rounded-xl p-6">
+            <div className="bg-gray-50 rounded-sm px-6 py-3">
               {/* Index Fields Table */}
               <IndexFieldsTable
                 indexFields={attributes}

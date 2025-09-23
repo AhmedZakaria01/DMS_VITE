@@ -170,15 +170,6 @@ export async function getAuditTrail() {
   }
 }
 
-// Fetch Users
-export async function getUsers() {
-  try {
-    const response = await api.get("Accounting/GetAllUsers");
-    return response;
-  } catch (err) {
-    console.err("Failed to Fetch Users", err);
-  }
-}
 
 // Create User
 export async function createNewUser(userData) {
@@ -319,8 +310,13 @@ export async function fetchParentCategories(documentTypeId) {
   }
 }
 
-
-
-
-  
+// Get All Users
+  export async function getUsers() {
+  try {
+    const response = await api.get("Users/GetAllUsers/GetAllUsers");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Users", err);
+  }
+}
   

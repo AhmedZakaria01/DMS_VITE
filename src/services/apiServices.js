@@ -181,7 +181,6 @@ export async function getAuditTrail() {
   }
 }
 
-
 // Create User
 export async function createNewUser(userData) {
   try {
@@ -217,10 +216,7 @@ export async function updateRole(roleData) {
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
-    const response = await api.post(
-      "Repository/CreateRepositoryWithAttributes",
-      repoData
-    );
+    const response = await api.post("Repository/CreateRepository", repoData);
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);
@@ -313,7 +309,7 @@ export async function fetchParentCategories(documentTypeId) {
 }
 
 // Get All Users
-  export async function getUsers() {
+export async function getUsers() {
   try {
     const response = await api.get("Users/GetAllUsers/GetAllUsers");
     return response;

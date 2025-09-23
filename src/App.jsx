@@ -16,6 +16,7 @@ import Roles from "./features/Roles/components/Roles";
  import FolderContents from "./features/FolderContent/components/FolderContents";
 import DocumentViewer from "./features/Document/component/DocumentViewer";
 import RepoContents from "./features/RepoContents/components/RepoContents";
+import Permissions from "./features/Permissions/Permissions";
 
 function App() {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function App() {
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/permissions" element={<Permissions />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />
           <Route path="/documentViewer" element={<DocumentViewer />} />

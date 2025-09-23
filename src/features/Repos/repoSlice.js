@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserRepos, createNewRepo } from "./repoThunks";
+import { fetchUserRepos, createNewRepo, fetchAllRepos } from "./repoThunks";
 
 const repoSlice = createSlice({
   name: "repo",
@@ -24,6 +24,19 @@ const repoSlice = createSlice({
         state.repos = action.payload?.response || [];
       })
       .addCase(fetchUserRepos.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      // Fetch All Repos
+      .addCase(fetchAllRepos.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAllRepos.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.repos = action.payload?.response || [];
+      })
+      .addCase(fetchAllRepos.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })

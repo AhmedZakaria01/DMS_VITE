@@ -1,9 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useEffect } from "react";
-import { fetchUserRepos } from "../repoThunks";
+import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Shield, Trash2 } from "lucide-react";
 
 function Repos() {
   const { user } = useSelector((state) => state.authReducer);
@@ -19,6 +20,75 @@ function Repos() {
     }
   }, [dispatch, user.id, status]);
 
+  // Fetch All Repos
+  useEffect(() => {
+    // Only fetch if we haven't fetched yet or failed
+    if (status === "idle") {
+      dispatch(fetchAllRepos());
+    }
+  }, [dispatch, status]);
+
+  // Action button handlers
+  const handleUpdateDetails = (repo) => {
+    console.log("Update details for:", repo.name);
+    // Navigate to update details page or open modal
+    navigate(`/repos/${repo.id}/update-details`);
+  };
+
+  const handleUpdatePermissions = (repo) => {
+    console.log("Update permissions for:", repo.name);
+    // Navigate to permissions page or open modal
+    navigate(`/repos/${repo.id}/permissions`);
+  };
+
+  const handleDelete = (repo) => {
+    console.log("Delete repo:", repo.name);
+    // Show confirmation dialog and handle delete
+    if (window.confirm(`Are you sure you want to delete "${repo.name}"?`)) {
+      // Dispatch delete action here
+      // dispatch(deleteRepo(repo.id));
+    }
+  };
+
+  // Action Buttons Component
+  const ActionButtons = ({ repo }) => (
+    <div className="flex gap-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleUpdateDetails(repo);
+        }}
+        className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+        title="Update Details"
+      >
+        <p> Update Details </p>
+        <Edit className="w-4 h-4" />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleUpdatePermissions(repo);
+        }}
+        className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
+        title="Update Permissions"
+      >
+        <p> Update Permissions </p>
+        <Shield className="w-4 h-4" />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(repo);
+        }}
+        className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+        title="Delete Repository"
+      >
+        <p> Delete </p>
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  );
+
   // Define table columns using TanStack Table format
   const columns = useMemo(
     () => [
@@ -27,15 +97,15 @@ function Repos() {
         accessorKey: "name",
         header: "Repository Name",
       },
-      // {
-      //   id: "actions",
-      //   accessorKey: "actions",
-      //   header: "Actions",
-      //   size: 120,
-      //   enableSorting: false,
-      //   enableColumnFilter: false,
-      //   cell: ({ row }) => <ActionButtons role={row.original} />,
-      // },
+      {
+        id: "actions",
+        accessorKey: "actions",
+        header: "Actions",
+        size: 140,
+        enableSorting: false,
+        enableColumnFilter: false,
+        cell: ({ row }) => <ActionButtons repo={row.original} />,
+      },
     ],
     []
   );

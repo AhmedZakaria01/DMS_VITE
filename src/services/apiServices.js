@@ -331,3 +331,13 @@ export async function getRoles() {
     console.err("Failed to Fetch Roles", err);
   }
 }
+
+// Fetch Permissions
+export async function getPermissions() {
+  try {
+    const response = await api.get("Permissions/GetRepositoryPermissions");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Roles", err);
+  }
+}

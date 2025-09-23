@@ -180,15 +180,7 @@ export async function createNewUser(userData) {
     console.err("Failed to Create User", err);
   }
 }
-// Fetch Roles
-export async function getRoles() {
-  try {
-    const response = await api.get("Roles");
-    return response;
-  } catch (err) {
-    console.err("Failed to Fetch Roles", err);
-  }
-}
+
 // Create New Role
 export async function createNewRole(roleData) {
   try {
@@ -319,4 +311,13 @@ export async function fetchParentCategories(documentTypeId) {
     console.err("Failed to Fetch Users", err);
   }
 }
-  
+
+// Fetch Roles
+export async function getRoles() {
+  try {
+    const response = await api.get("Roles/GetAllRoles");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Roles", err);
+  }
+}

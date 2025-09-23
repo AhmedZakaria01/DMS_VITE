@@ -143,7 +143,7 @@ const IndexFieldsTable = ({
   };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm border h-64">
+<div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="px-3 py-2 bg-gray-50 border-b">
         <h3 className="text-sm font-medium text-gray-900">Index Fields</h3>
         <p className="text-xs text-gray-600">
@@ -494,7 +494,7 @@ function RepoForm() {
           <div className="flex items-center gap-3">
             <Database className="w-6 h-6" />
             <div>
-              <h1 className="text-2xl font-bold">Create New Repository</h1>
+              <h1 className="text-2xl font-bold ">Create New Repository</h1>
               <p className="text-slate-200 text-sm">
                 Configure your repository settings and index fields
               </p>
@@ -579,12 +579,13 @@ function RepoForm() {
               </div>
             </div>
 
-            {/* Index Fields Section */}
+        <div>
+              {/* Index Fields Section */}
             <div className="bg-gray-50 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-6 gap-11">
                 <h2 className="text-xl font-semibold text-gray-900 flex items-center">
                   <Settings className="w-5 h-5 mr-2 text-blue-600" />
-                  Index Fields Management
+                  Index Fields Management 
                 </h2>
                 <button
                   type="button"
@@ -606,10 +607,10 @@ function RepoForm() {
                       : "Add Index Field"}
                   </h3>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     {/* Attribute Name */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Attribute Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -621,14 +622,13 @@ function RepoForm() {
                             attributeName: e.target.value,
                           }))
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                        placeholder="Enter attribute name"
+  className="w-full px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"                        placeholder="Enter attribute name"
                       />
                     </div>
 
                     {/* Attribute Type */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Attribute Type <span className="text-red-500">*</span>
                       </label>
                       <select
@@ -642,8 +642,8 @@ function RepoForm() {
                               e.target.value === "dropdown" ? [""] : [],
                           }))
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                      >
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white"
+                        >
                         <option value="">Select Type</option>
                         {ATTRIBUTE_TYPES.map((type) => (
                           <option key={type.value} value={type.value}>
@@ -669,8 +669,8 @@ function RepoForm() {
                             attributeSize: e.target.value,
                           }))
                         }
-                        className="w-full md:w-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                        placeholder="Enter size"
+                        className="w-full md:w-48 px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                                  placeholder="Enter size"
                         min="1"
                       />
                     </div>
@@ -678,38 +678,37 @@ function RepoForm() {
 
                   {/* Dropdown Values */}
                   {currentField.attributeType === "dropdown" && (
-                    <div className="mb-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-medium text-gray-700">
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <label className="block text-sm font-semibold text-gray-700">
                           Values of Memo Type
                         </label>
                         <button
                           type="button"
                           onClick={addValue}
-                          className="flex items-center gap-1 px-2 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded"
-                        >
+                          className="flex items-center gap-2 px-3 py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg transition-all duration-200 shadow hover:shadow-md"
+                          >
                           <Plus className="w-3 h-3" />
                           Add Value
                         </button>
                       </div>
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {currentField.valuesOfMemoType.map((value, index) => (
-                          <div key={index} className="flex items-center gap-2">
+                            <div key={index} className="flex items-center gap-3">
                             <input
                               type="text"
                               value={value}
                               onChange={(e) =>
                                 updateValue(index, e.target.value)
                               }
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                              placeholder={`Option ${index + 1}`}
+  className="w-full px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"                              placeholder={`Option ${index + 1}`}
                             />
                             {currentField.valuesOfMemoType.length > 1 && (
                               <button
                                 type="button"
                                 onClick={() => removeValue(index)}
-                                className="p-1 text-red-600 hover:bg-red-100 rounded"
-                              >
+                                 className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-all duration-200 hover:scale-110"
+                                >
                                 <X className="w-4 h-4" />
                               </button>
                             )}
@@ -724,15 +723,15 @@ function RepoForm() {
                     <button
                       type="button"
                       onClick={saveIndexField}
-                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
-                    >
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                      >
                       {editingIndex !== null ? "Update Field" : "Save Field"}
                     </button>
                     <button
                       type="button"
                       onClick={cancelAddField}
-                      className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm"
-                    >
+                     className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition-all duration-200 font-medium"
+                      >
                       Cancel
                     </button>
                   </div>
@@ -742,9 +741,7 @@ function RepoForm() {
 
         
     {/* Index Fields Section */}
-            <div className="bg-gray-50 rounded-xl p-6">
-          
-
+            <div className="bg-gray-50 rounded-sm px-6 py-3">
               {/* Index Fields Table */}
               <IndexFieldsTable
                 indexFields={attributes}
@@ -755,13 +752,14 @@ function RepoForm() {
               />
             </div>
         </div>
+        </div>
             {/* Submit Button */}
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-center pt-4">
               <button
                 type="button"
                 onClick={handleSubmit(onSubmit)}
                 disabled={!isValid || showAddField}
-                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
+                className="px-8 py-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-2xl font-semibold transition-all duration-200 shadow-2xl hover:shadow-3xl transform hover:scale-105 disabled:transform-none disabled:hover:scale-100 flex items-center gap-3"
               >
                 <Save className="w-4 h-4" />
                 Create Repository

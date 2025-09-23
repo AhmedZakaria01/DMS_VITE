@@ -88,7 +88,7 @@ function Roles() {
     () => [
       {
         id: "name",
-        accessorKey: "name",
+        accessorKey: "roleName",
         header: "Name",
         size: 150,
       },

@@ -465,7 +465,6 @@
 
 // export default React.memo(UserForm);
 
-
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -496,49 +495,55 @@ const ROLES = [
 ];
 
 // Dynamic validation schema based on mode
-const getValidationSchema = (isEditMode) => z.object({
-  userName: z
-    .string()
-    .min(1, "Username is required")
-    .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be less than 30 characters")
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      "Username can only contain letters, numbers, and underscores"
-    )
-    .trim(),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .toLowerCase(),
-  password: isEditMode 
-    ? z.string().optional().or(z.literal("")) // Optional in edit mode
-    : z
+const getValidationSchema = (isEditMode) =>
+  z.object({
+    userName: z
       .string()
-      .min(1, "Password is required")
-      .min(8, "Password must be at least 8 characters")
-      .max(100, "Password must be less than 100 characters")
+      .min(1, "Username is required")
+      .min(3, "Username must be at least 3 characters")
+      .max(30, "Username must be less than 30 characters")
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        /^[a-zA-Z0-9_]+$/,
+        "Username can only contain letters, numbers, and underscores"
+      )
+      .trim(),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address")
+      .toLowerCase(),
+    password: isEditMode
+      ? z.string().optional().or(z.literal("")) // Optional in edit mode
+      : z
+          .string()
+          .min(1, "Password is required")
+          .min(8, "Password must be at least 8 characters")
+          .max(100, "Password must be less than 100 characters")
+          .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+          ),
+    role: z
+      .array(z.string())
+      .min(1, "At least one role is required")
+      .refine(
+        (roles) => roles.every((role) => ROLES.some((r) => r.value === role)),
+        {
+          message: "Please select valid roles only",
+        }
       ),
-  role: z
-    .array(z.string())
-    .min(1, "At least one role is required")
-    .refine(
-      (roles) => roles.every((role) => ROLES.some((r) => r.value === role)),
-      {
-        message: "Please select valid roles only",
-      }
-    ),
-});
+  });
 
-const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) => {
+const UserForm = ({
+  mode = "create",
+  initialData = null,
+  onSuccess,
+  onCancel,
+}) => {
   const dispatch = useDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const isEditMode = mode === "edit";
 
   // Multi-select role states
@@ -586,16 +591,16 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
   useEffect(() => {
     if (isEditMode && initialData) {
       console.log("Initializing user form with data:", initialData);
-      
+
       // Set form values
       setValue("userName", initialData.userName || "");
       setValue("email", initialData.email || "");
       setValue("password", "");
       setValue("role", Array.isArray(initialData.role) ? initialData.role : []);
-      
+
       // Set selected roles state
       setSelectedRoles(Array.isArray(initialData.role) ? initialData.role : []);
-      
+
       // Trigger validation
       trigger();
     }
@@ -662,10 +667,10 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      
+
       // Prepare data for submission
       const submitData = { ...data };
-      
+
       // In edit mode, include the ID and handle password
       if (isEditMode && initialData) {
         submitData.id = initialData.id;
@@ -675,23 +680,27 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
         }
       }
 
-      console.log(`${isEditMode ? 'UPDATE' : 'CREATE'} User Data:`, submitData);
+      console.log(`${isEditMode ? "UPDATE" : "CREATE"} User Data:`, submitData);
 
       // TODO: Replace with actual API calls
       // For now, just simulate success
       setTimeout(() => {
-        console.log(`User ${isEditMode ? 'updated' : 'created'} successfully!`);
-        
+        console.log(`User ${isEditMode ? "updated" : "created"} successfully!`);
+
         // Call success callback to close modal and refresh data
         if (onSuccess) {
           onSuccess(submitData);
         }
         setIsSubmitting(false);
       }, 1000);
-
     } catch (error) {
-      console.error(`Failed to ${isEditMode ? 'update' : 'create'} user:`, error);
-      alert(`Failed to ${isEditMode ? 'update' : 'create'} user. Please try again.`);
+      console.error(
+        `Failed to ${isEditMode ? "update" : "create"} user:`,
+        error
+      );
+      alert(
+        `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`
+      );
       setIsSubmitting(false);
     }
   };
@@ -729,10 +738,9 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
           {isEditMode ? "Update User" : "Create New User"}
         </h2>
         <p className="text-lg text-gray-600">
-          {isEditMode 
-            ? "Update the user information below" 
-            : "Fill in the basic information to create a new user account"
-          }
+          {isEditMode
+            ? "Update the user information below"
+            : "Fill in the basic information to create a new user account"}
         </p>
       </div>
 
@@ -805,7 +813,8 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password {!isEditMode && <span className="text-red-500">*</span>}
+                  Password{" "}
+                  {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
                       (Leave empty to keep current password)
@@ -826,8 +835,8 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
                         : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                     }`}
                     placeholder={
-                      isEditMode 
-                        ? "Leave empty to keep current password" 
+                      isEditMode
+                        ? "Leave empty to keep current password"
                         : "Enter a strong password"
                     }
                   />
@@ -949,7 +958,8 @@ const UserForm = ({ mode = "create", initialData = null, onSuccess, onCancel }) 
                 )}
 
                 <p className="mt-1 text-xs text-gray-500">
-                  You can select multiple roles. Selected: {selectedRoles.length}
+                  You can select multiple roles. Selected:{" "}
+                  {selectedRoles.length}
                 </p>
               </div>
             </div>

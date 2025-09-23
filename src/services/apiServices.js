@@ -160,6 +160,17 @@ export async function getUserRepos(userId) {
   }
 }
 
+// Get All Repos
+export async function getAllRepos() {
+  try {
+    const response = await api.get(`Repository/GetAllRepositories`);
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw new error(error);
+  }
+}
+
 // Fetch Audit Trail
 export async function getAuditTrail() {
   try {
@@ -272,9 +283,6 @@ export async function getDocumentFiles(repoId, folderId) {
   }
 }
 
-
-
-
 //create a New Category
 export async function createNewCategory(categoryData) {
   try {
@@ -282,15 +290,17 @@ export async function createNewCategory(categoryData) {
     return response.data;
   } catch (err) {
     console.error("Failed To Create a New Category ", err);
-    throw err; 
+    throw err;
   }
 }
 // Get Parent Categories
 export async function fetchParentCategories(documentTypeId) {
   try {
-    const response = await api.get(`Category/GetCategoriesByDocumentType/${documentTypeId}`);
+    const response = await api.get(
+      `Category/GetCategoriesByDocumentType/${documentTypeId}`
+    );
     const data = response.data;
-    
+
     if (data.statusCode === 200) {
       return data.response;
     } else {
@@ -298,7 +308,7 @@ export async function fetchParentCategories(documentTypeId) {
     }
   } catch (error) {
     console.error("API Error:", error);
-    throw error; 
+    throw error;
   }
 }
 

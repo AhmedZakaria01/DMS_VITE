@@ -53,6 +53,7 @@ api.interceptors.request.use(
       } else {
         // Token decryption failed, remove invalid cookie
         Cookies.remove("token");
+        Cookies.remove("refreshToken");
         console.warn("Invalid token detected, removing cookie");
       }
     }
@@ -74,6 +75,7 @@ api.interceptors.response.use(
 
       // Token expired or invalid, clear cookie and redirect to login
       Cookies.remove("token");
+      Cookies.remove("refreshToken");
       console.warn("Token expired, redirecting to login");
       // redirect to login page
       navigate("/login");
@@ -216,10 +218,7 @@ export async function updateRole(roleData) {
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
-    const response = await api.post(
-      "Repository/CreateRepository",
-      repoData
-    );
+    const response = await api.post("Repository/CreateRepository", repoData);
     return response;
   } catch (err) {
     console.error("Failed To Create Repository ", err);
@@ -245,6 +244,62 @@ export async function createNewRepository(repoData) {
   }
 }
 
+// Update New Repository
+export async function updateRepository(id, repoData) {
+  try {
+    const response = await api.put(
+      `Repository/UpdateRepository?id=${id}`,
+      repoData
+    );
+    return response;
+  } catch (err) {
+    console.error("Failed To Update Repository ", err);
+
+    if (err.response?.data) {
+      const errorData = err.response.data;
+
+      if (errorData.errors && errorData.errors.length > 0) {
+        const errorMessage = errorData.errors[0].message;
+        throw new Error(errorMessage);
+      }
+
+      // Fallback to general message if available
+      if (errorData.message) {
+        throw new Error(errorData.message);
+      }
+    }
+
+    // Fallback to generic error
+    throw new Error("Failed to create repository. Please try again.");
+  }
+}
+export async function getRepositoryById(id) {
+  try {
+    const response = await api.get(
+      `Repository/GetRepositoryDetailsById?id=${id}`
+    );
+    return response;
+  } catch (err) {
+    console.error("Failed To Update Repository ", err);
+
+    if (err.response?.data) {
+      const errorData = err.response.data;
+
+      if (errorData.errors && errorData.errors.length > 0) {
+        const errorMessage = errorData.errors[0].message;
+        throw new Error(errorMessage);
+      }
+
+      // Fallback to general message if available
+      if (errorData.message) {
+        throw new Error(errorData.message);
+      }
+    }
+
+    // Fallback to generic error
+    throw new Error("Failed to create repository. Please try again.");
+  }
+}
 // Fetch Repo Contents
 export async function getRepoContents(id) {
   try {

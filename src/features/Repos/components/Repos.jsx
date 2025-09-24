@@ -1,12 +1,19 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Shield, Trash2 } from "lucide-react";
+import Popup from "../../../globalComponents/Popup";
+import UserForm from "../../Users/components/UserForm";
+import RepoForm from "./RepoForm";
+import UpdateRepo from "./UpdateRepo";
+import { id } from "zod/v4/locales";
 
 function Repos() {
+  const [isUpdateDetails, setIsUpdateDetails] = useState(false);
+  const [selectedRepo, setSelectedRepo] = useState(null);
   const { user } = useSelector((state) => state.authReducer);
   const { repos, status, error } = useSelector((state) => state.repoReducer);
   const dispatch = useDispatch();
@@ -31,8 +38,11 @@ function Repos() {
   // Action button handlers
   const handleUpdateDetails = (repo) => {
     console.log("Update details for:", repo.name);
+    setSelectedRepo(repo.id);
     // Navigate to update details page or open modal
-    navigate(`/repos/${repo.id}/update-details`);
+    // navigate(`/repos/${repo.id}/update-details`);
+
+    setIsUpdateDetails(true);
   };
 
   const handleUpdatePermissions = (repo) => {
@@ -155,6 +165,7 @@ function Repos() {
           className="repos-table"
           enableSelection={false}
         />
+        
       </div>
     </section>
   );

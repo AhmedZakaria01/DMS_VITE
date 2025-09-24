@@ -22,6 +22,10 @@ import { createNewRepo, fetchAllRepos, fetchUserRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../../../globalComponents/Alerts/SuccessAlert";
 import ErrorAlert from "../../../globalComponents/Alerts/ErrorAlert";
+import Popup from "../../../globalComponents/Popup";
+import UserForm from "../../Users/components/UserForm";
+import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
+import { tr } from "zod/v4/locales";
 
 // Form validation schema
 const validationSchema = z.object({
@@ -287,6 +291,7 @@ function RepoForm() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openPermissions, setOpenPermissions] = useState(false);
 
   const triggerSuccess = () => {
     setShowSuccessAlert(true);
@@ -441,6 +446,7 @@ function RepoForm() {
   // Handle permissions button click
   const handlePermissions = () => {
     // Add your permissions logic here
+    setOpenPermissions(true);
     console.log("Opening permissions modal/page");
     // You can navigate to a permissions page or open a modal
     // navigate('/permissions') or setShowPermissionsModal(true)
@@ -831,6 +837,13 @@ function RepoForm() {
                       isAddingField={showAddField}
                       itemsPerPage={3}
                     />
+                    {openPermissions && (
+                      <Popup
+                        isOpen={openPermissions}
+                        setIsOpen={setOpenPermissions}
+                        component={<UsersRolesPermissionsTable />}
+                      />
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,60 +1,85 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPermissions } from "./permissionsThunks";
-import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
-import { FileText, Folder } from "lucide-react";
-function Permissions() {
+import PropTypes from "prop-types";
+
+function Permissions({
+  targetId,
+  targetType,
+  onPermissionsChange,
+  initialSelectedPermissions = [],
+}) {
   const dispatch = useDispatch();
   const { permissions, loading, error } = useSelector(
     (state) => state.permissionsReducer
   );
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [selectedPermissions, setSelectedPermissions] = useState(
+    initialSelectedPermissions
+  );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
-    dispatch(fetchPermissions());
-  }, [dispatch]);
+    if (permissions.length === 0) {
+      dispatch(fetchPermissions());
+    }
+  }, [dispatch, permissions.length]);
 
-  // Debug: Check what data we're getting
   useEffect(() => {
-    console.log("Permissions data:", permissions);
-  }, [permissions]);
+    setSelectedPermissions(initialSelectedPermissions);
+  }, [initialSelectedPermissions]);
 
-  // Safely handle permissions data
-  const getPermissionsArray = () => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isDropdownOpen]);
+
+  const permissionsArray = useMemo(() => {
     if (!permissions) return [];
     if (Array.isArray(permissions)) return permissions;
     return [];
-  };
+  }, [permissions]);
 
-  const permissionsArray = getPermissionsArray();
-
-  // Filter permissions based on search term
-  const filteredPermissions = permissionsArray.filter((permission) => {
-    if (!permission) return false;
-    const displayName = permission.displayName || "";
-    return displayName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  // Handle checkbox change
-  const handleCheckboxChange = (permission) => {
-    setSelectedPermissions((prev) => {
-      const isSelected = prev.some((p) => p.id === permission.id);
-      if (isSelected) {
-        return prev.filter((p) => p.id !== permission.id);
-      } else {
-        return [...prev, permission];
-      }
+  const filteredPermissions = useMemo(() => {
+    return permissionsArray.filter((permission) => {
+      if (!permission) return false;
+      const displayName = permission.displayName || "";
+      return displayName.toLowerCase().includes(searchTerm.toLowerCase());
     });
+  }, [permissionsArray, searchTerm]);
+
+  const handleCheckboxChange = (permission) => {
+    const newSelectedPermissions = selectedPermissions.some(
+      (p) => p.id === permission.id
+    )
+      ? selectedPermissions.filter((p) => p.id !== permission.id)
+      : [...selectedPermissions, permission];
+
+    setSelectedPermissions(newSelectedPermissions);
+    onPermissionsChange(targetId, newSelectedPermissions);
   };
 
-  // Check if a permission is selected
   const isPermissionSelected = (permission) => {
     return selectedPermissions.some((p) => p.id === permission.id);
   };
 
-  // Toggle all permissions in current view
   const toggleAllPermissions = () => {
     if (filteredPermissions.length === 0) return;
 
@@ -62,287 +87,206 @@ function Permissions() {
       isPermissionSelected(permission)
     );
 
+    let newSelectedPermissions;
     if (allSelected) {
-      // Remove all filtered permissions from selected
-      setSelectedPermissions((prev) =>
-        prev.filter((p) => !filteredPermissions.some((fp) => fp.id === p.id))
+      newSelectedPermissions = selectedPermissions.filter(
+        (p) => !filteredPermissions.some((fp) => fp.id === p.id)
       );
     } else {
-      // Add all filtered permissions that aren't already selected
       const newPermissions = filteredPermissions.filter(
         (permission) => !isPermissionSelected(permission)
       );
-      setSelectedPermissions((prev) => [...prev, ...newPermissions]);
+      newSelectedPermissions = [...selectedPermissions, ...newPermissions];
+    }
+
+    setSelectedPermissions(newSelectedPermissions);
+    onPermissionsChange(targetId, newSelectedPermissions);
+  };
+
+  const getDisplayText = () => {
+    if (selectedPermissions.length === 0) {
+      return `Select ${targetType} permissions`;
+    }
+    if (selectedPermissions.length === 1) {
+      return selectedPermissions[0].displayName;
+    }
+    return `${selectedPermissions.length} permissions selected`;
+  };
+
+  const handleDropdownToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDropdownOpen(!isDropdownOpen);
+    if (!isDropdownOpen) {
+      setSearchTerm(""); // Reset search when opening
     }
   };
 
-  // Remove selected permission
-  const removeSelectedPermission = (permissionId) => {
-    setSelectedPermissions((prev) => prev.filter((p) => p.id !== permissionId));
-  };
-
-  // Clear all selections
-  const clearAllSelections = () => {
-    setSelectedPermissions([]);
-  };
-  // Define table columns
-  // const columns = useMemo(
-  //   () => [
-  //     {
-  //       id: "name",
-  //       accessorKey: "displayName",
-  //       header: "Name",
-  //       cell: ({ row }) => (
-  //         <div className="flex items-center gap-3">
-  //           {row.original.type === "folder" ? (
-  //             <Folder className="w-5 h-5 text-blue-500" />
-  //           ) : (
-  //             <FileText className="w-5 h-5 text-gray-500" />
-  //           )}
-  //           <span className="font-medium">{row.original.displayName}</span>
-  //         </div>
-  //       ),
-  //     },
-  //     {
-  //       id: "type",
-  //       accessorKey: "type",
-  //       header: "Type",
-  //       cell: ({ row }) => (
-  //         <span
-  //           className={`px-2 py-1 text-xs font-medium rounded-full ${
-  //             row.original.type === "folder"
-  //               ? "bg-blue-100 text-blue-800"
-  //               : "bg-gray-100 text-gray-800"
-  //           }`}
-  //         >
-  //           {row.original.type === "folder" ? "Folder" : "Document"}
-  //         </span>
-  //       ),
-  //     },
-  //   ],
-  //   []
-  // );
   return (
-    <>
-      <div className="max-w-2xl mx-auto p-4">
-        <div className="mb-6">
-          {/* <h1 className="text-2xl font-bold text-gray-800 mb-4">Permissions Manager</h1> */}
+    <div className="relative w-full">
+      {/* Dropdown Button */}
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={handleDropdownToggle}
+        className="w-full px-3 py-2 text-left border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-50 transition-colors duration-150 min-h-[38px]"
+        disabled={loading}
+      >
+        <div className="flex justify-between items-center">
+          <span className="truncate text-gray-700 flex-1 mr-2">
+            {loading ? "Loading..." : getDisplayText()}
+          </span>
+          <svg
+            className={`h-4 w-4 text-gray-500 transition-transform duration-200 flex-shrink-0 ${
+              isDropdownOpen ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+      </button>
 
-          {/* Debug info - you can remove this later */}
-          {/* <div className="mb-4 p-3 bg-blue-50 rounded-md">
-                    <p className="text-sm">Total permissions: {permissionsArray.length}</p>
-                    <p className="text-sm">Filtered permissions: {filteredPermissions.length}</p>
-                    <p className="text-sm">Selected permissions: {selectedPermissions.length}</p>
-                </div> */}
-
-          {/* Selected Permissions Display */}
-          {/* <div className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Selected Permissions ({selectedPermissions.length})
-                        </label>
-                        {selectedPermissions.length > 0 && (
-                            <button
-                                onClick={clearAllSelections}
-                                className="text-xs text-red-600 hover:text-red-800"
-                            >
-                                Clear All
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-md min-h-[50px]">
-                        {selectedPermissions.length === 0 ? (
-                            <span className="text-gray-500 text-sm">No permissions selected</span>
-                        ) : (
-                            selectedPermissions.map(permission => (
-                                <span
-                                    key={permission.id}
-                                    className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                                >
-                                    {permission.displayName}
-                                    <button
-                                        onClick={() => removeSelectedPermission(permission.id)}
-                                        className="ml-2 text-blue-600 hover:text-blue-800 text-lg"
-                                    >
-                                        ×
-                                    </button>
-                                </span>
-                            ))
-                        )}
-                    </div>
-                </div> */}
-
-          {/* Searchable Dropdown */}
-          <div className="relative">
-            {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Search and Select Permissions
-                    </label> */}
-
+      {/* Dropdown Portal-style positioning */}
+      {isDropdownOpen && (
+        <>
+          {/* Fixed backdrop to capture outside clicks */}
+          <div className="fixed inset-0 z-[9998]" />
+          
+          {/* Dropdown List with improved positioning */}
+          <div 
+            ref={dropdownRef}
+            className="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-72 overflow-hidden flex flex-col"
+            style={{
+              minWidth: buttonRef.current?.offsetWidth || 200,
+              left: 0,
+              top: '100%'
+            }}
+          >
             {/* Search Input */}
-            <div className="relative">
+            <div className="sticky top-0 bg-white p-3 border-b border-gray-200">
               <input
                 type="text"
                 placeholder="Search permissions..."
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setIsDropdownOpen(true);
-                }}
-                onFocus={() => setIsDropdownOpen(true)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
             </div>
 
-            {/* Dropdown List */}
-            {isDropdownOpen && permissionsArray.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                {/* Select All option */}
-                {filteredPermissions.length > 0 && (
-                  <div className="border-b border-gray-200">
-                    <label className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={
-                          filteredPermissions.length > 0 &&
-                          filteredPermissions.every((permission) =>
-                            isPermissionSelected(permission)
-                          )
-                        }
-                        onChange={toggleAllPermissions}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <span className="ml-3 text-sm font-medium text-gray-700">
-                        Select All ({filteredPermissions.length})
-                      </span>
-                    </label>
-                  </div>
-                )}
+            {/* Select All */}
+            {filteredPermissions.length > 0 && (
+              <div className="border-b border-gray-200 bg-gray-50">
+                <label 
+                  className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-150"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredPermissions.length > 0 &&
+                      filteredPermissions.every((permission) =>
+                        isPermissionSelected(permission)
+                      )
+                    }
+                    onChange={toggleAllPermissions}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <span className="ml-3 text-sm font-medium text-gray-700">
+                    Select All ({filteredPermissions.length})
+                  </span>
+                </label>
+              </div>
+            )}
 
-                {/* Permissions List */}
-                {filteredPermissions.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-gray-500">
-                    {searchTerm
-                      ? 'No permissions found for "' + searchTerm + '"'
-                      : "No permissions available"}
-                  </div>
-                ) : (
-                  <>
-                    {/* Selection count header */}
-                    <div className="sticky top-0 bg-gray-50 px-4 py-2 border-b border-gray-200">
-                      <div className="flex justify-between items-center text-xs text-gray-600">
-                        <span>
-                          Showing {filteredPermissions.length} of{" "}
-                          {permissionsArray.length} permissions
-                        </span>
-                        <span className="font-medium">
-                          Selected:{" "}
-                          {
-                            filteredPermissions.filter((permission) =>
-                              isPermissionSelected(permission)
-                            ).length
-                          }{" "}
-                          of {filteredPermissions.length}
-                        </span>
-                      </div>
-                    </div>
+            {/* Permissions List */}
+            <div className="flex-1 overflow-auto" style={{ maxHeight: "180px" }}>
+              {filteredPermissions.length === 0 ? (
+                <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                  {searchTerm
+                    ? `No permissions found for "${searchTerm}"`
+                    : "No permissions available"}
+                </div>
+              ) : (
+                filteredPermissions.map((permission) => (
+                  <label
+                    key={permission.id}
+                    className="flex items-center px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isPermissionSelected(permission)}
+                      onChange={() => handleCheckboxChange(permission)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <span className="ml-3 text-sm text-gray-700 truncate flex-1">
+                      {permission.displayName}
+                    </span>
+                  </label>
+                ))
+              )}
+            </div>
 
-                    {filteredPermissions.map((permission) => (
-                      <label
-                        key={permission.id}
-                        className="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isPermissionSelected(permission)}
-                          onChange={() => {
-                            handleCheckboxChange(permission);
-                            // Log the action immediately
-                            const newSelected = isPermissionSelected(permission)
-                              ? selectedPermissions.filter(
-                                  (p) => p.id !== permission.id
-                                )
-                              : [...selectedPermissions, permission];
-
-                            // console.log(` Permission Selection Update:`);
-                            // console.log(` ${permission.displayName} - ${isPermissionSelected(permission) ? 'DESELECTED' : 'SELECTED'}`);
-                            // console.log(` Total selected: ${newSelected.length}`);
-                            console.log(
-                              " Selected permissions:",
-                              newSelected.map((p) => ({
-                                id: p.id,
-                                displayName: p.displayName,
-                                code: p.code,
-                              }))
-                            );
-                          }}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="ml-3 text-sm text-gray-700">
-                          {permission.displayName}
-                        </span>
-                      </label>
-                    ))}
-                  </>
-                )}
+            {/* Selection Summary */}
+            {filteredPermissions.length > 0 && (
+              <div className="sticky bottom-0 bg-gray-50 px-3 py-2 border-t border-gray-200">
+                <div className="flex justify-between items-center text-sm text-gray-600">
+                  <span className="font-medium">
+                    Total: {selectedPermissions.length}
+                  </span>
+                  <span className="text-gray-500">
+                    {
+                      filteredPermissions.filter((permission) =>
+                        isPermissionSelected(permission)
+                      ).length
+                    }
+                    /{filteredPermissions.length} in view
+                  </span>
+                </div>
               </div>
             )}
           </div>
+        </>
+      )}
 
-          {/* Close dropdown when clicking outside */}
-          {isDropdownOpen && (
-            <div
-              className="fixed inset-0 z-0"
-              onClick={() => setIsDropdownOpen(false)}
-            />
-          )}
-
-          {/* Loading State */}
-          {loading && (
-            <div className="mt-4 p-4 bg-gray-100 rounded-md">
-              <p className="text-gray-600">Loading permissions...</p>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="mt-4 p-4 bg-red-100 rounded-md">
-              <p className="text-red-600">Error loading permissions: {error}</p>
-            </div>
-          )}
+      {/* Error State */}
+      {error && (
+        <div className="text-sm text-red-600 mt-1">
+          Error loading permissions
         </div>
-      </div>
-
-      {/* <div className="mx-auto">
-        <ReUsableTable
-          columns={columns}
-          data={permissions}
-          title="Permissions Contents"
-          isLoading={status === "loading"}
-          // onRowDoubleClick={handleRowDoubleClick}
-          showGlobalFilter={true}
-          pageSizeOptions={[5, 10, 20, 50]}
-          defaultPageSize={10}
-          className="Permissions-table"
-          enableSelection={false}
-        />
-      </div> */}
-    </>
-  )
+      )}
+    </div>
+  );
 }
 
-export default Permissions
+Permissions.propTypes = {
+  targetId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  targetType: PropTypes.oneOf(["user", "role"]).isRequired,
+  onPermissionsChange: PropTypes.func.isRequired,
+  initialSelectedPermissions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      displayName: PropTypes.string.isRequired,
+      code: PropTypes.string,
+    })
+  ),
+};
+
+Permissions.defaultProps = {
+  initialSelectedPermissions: [],
+};
+
+export default Permissions;

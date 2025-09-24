@@ -28,9 +28,12 @@ const authSlice = createSlice({
         state.status = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
+        console.log(action.payload);
+
         state.status = "succeeded";
         state.user.name = action.payload.name;
         state.user.id = action.payload.id;
+        Cookies.set("refreshToken", action.payload.refreshToken);
       })
       .addCase(login.rejected, (state, action) => {
         state.status = "failed";

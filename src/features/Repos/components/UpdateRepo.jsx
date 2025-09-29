@@ -544,7 +544,7 @@ function UpdateRepo({ id, setIsOpen }) {
 
     try {
       const response = await dispatch(
-        editRepositoryDetails(id, backendData)
+        editRepositoryDetails({repoId, backendData})
       ).unwrap();
       console.log("Repository updated successfully:", response);
       triggerSuccess();

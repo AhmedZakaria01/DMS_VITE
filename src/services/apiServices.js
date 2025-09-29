@@ -245,11 +245,11 @@ export async function createNewRepository(repoData) {
 }
 
 // Update New Repository
-export async function updateRepositoryDetails(id, repoData) {
+export async function updateRepositoryDetails(repoId, backendData) {
   try {
     const response = await api.put(
-      `Repository/UpdateRepositoryDetails?id=${id}`,
-      repoData
+      `Repository/UpdateRepositoryDetails?id=${repoId}`,
+      backendData
     );
     return response;
   } catch (err) {

@@ -37,8 +37,11 @@ export const createNewRepo = createAsyncThunk(
 // Update Repository
 export const editRepositoryDetails = createAsyncThunk(
   "repo/updateRepositoryDetails",
-  async (id, repoData) => {
-    const response = await updateRepositoryDetails(id, repoData);
+  async ({repoId, backendData}) => {
+    console.log(repoId);
+    console.log(backendData);
+
+    const response = await updateRepositoryDetails(repoId, backendData);
     console.log(response.data);
 
     return response.data;

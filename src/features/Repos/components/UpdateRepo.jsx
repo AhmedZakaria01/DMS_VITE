@@ -315,9 +315,9 @@ function UpdateRepo({ id, setIsOpen }) {
   const [repositoryData, setRepositoryData] = useState(null);
   const params = useParams();
 
-  const repoId = params.repoId
+  const repoId = params.repoId;
   console.log(repoId);
-  
+
   // Fetch repository data when component mounts
   useEffect(() => {
     const fetchRepoData = async () => {
@@ -544,7 +544,7 @@ function UpdateRepo({ id, setIsOpen }) {
 
     try {
       const response = await dispatch(
-        editRepositoryDetails({repoId, backendData})
+        editRepositoryDetails({ repoId, backendData })
       ).unwrap();
       console.log("Repository updated successfully:", response);
       triggerSuccess();
@@ -646,9 +646,10 @@ function UpdateRepo({ id, setIsOpen }) {
                         </label>
                         <select
                           {...register("categoryOption")}
+                          required
                           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                         >
-                          <option value="">Select Category (Optional)</option>
+                          <option value="">Select Category</option>
                           <option value="per_repository">Per Repository</option>
                           <option value="per_document">
                             Per Document Type

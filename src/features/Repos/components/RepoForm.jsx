@@ -584,9 +584,10 @@ function RepoForm() {
                       </label>
                       <select
                         {...register("categoryOption")}
+                        required
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                       >
-                        <option value="">Select Category (Optional)</option>
+                        <option value="">Select Category</option>
                         <option value="per_repository">Per Repository</option>
                         <option value="per_document">Per Document Type</option>
                       </select>

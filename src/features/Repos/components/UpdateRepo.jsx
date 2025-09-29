@@ -19,7 +19,11 @@ import {
   Loader,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateRepo, fetchRepositoryById, fetchAllRepos } from "../repoThunks";
+import {
+  editRepositoryDetails,
+  fetchRepositoryById,
+  fetchAllRepos,
+} from "../repoThunks";
 import { useNavigate, useParams } from "react-router-dom";
 import SuccessAlert from "../../../globalComponents/Alerts/SuccessAlert";
 import ErrorAlert from "../../../globalComponents/Alerts/ErrorAlert";
@@ -309,16 +313,24 @@ function UpdateRepo({ id, setIsOpen }) {
   });
   const [editingIndex, setEditingIndex] = useState(null);
   const [repositoryData, setRepositoryData] = useState(null);
+  const params = useParams();
 
+  const repoId = params.repoId
+  console.log(repoId);
+  
   // Fetch repository data when component mounts
   useEffect(() => {
     const fetchRepoData = async () => {
-      if (id) {
+      if (repoId) {
         try {
           setIsLoading(true);
-          console.log("Fetching repo with ID:", id);
+          console.log("Fetching repo with repoId:", repoId);
+          console.log(repoId);
 
-          const { response } = await dispatch(fetchRepositoryById(id)).unwrap();
+          const { response } = await dispatch(
+            fetchRepositoryById(repoId)
+          ).unwrap();
+          setIsLoading(false);
           console.log("Fetched Response:", response);
           console.log("Category Option:", response.categoryOption);
           console.log("Attributes:", response.attributes);
@@ -531,7 +543,9 @@ function UpdateRepo({ id, setIsOpen }) {
     };
 
     try {
-      const response = await dispatch(updateRepo(id, backendData)).unwrap();
+      const response = await dispatch(
+        editRepositoryDetails(id, backendData)
+      ).unwrap();
       console.log("Repository updated successfully:", response);
       triggerSuccess();
       // Refresh repositories list

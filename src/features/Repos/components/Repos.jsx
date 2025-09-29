@@ -19,14 +19,6 @@ function Repos() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Fetch User Repos
-  useEffect(() => {
-    // Only fetch if we haven't fetched yet or failed
-    if (user.id && status === "idle") {
-      dispatch(fetchUserRepos(user.id));
-    }
-  }, [dispatch, user.id, status]);
-
   // Fetch All Repos
   useEffect(() => {
     // Only fetch if we haven't fetched yet or failed
@@ -40,7 +32,7 @@ function Repos() {
     console.log("Update details for:", repo.name);
     setSelectedRepo(repo.id);
     // Navigate to update details page or open modal
-    // navigate(`/repos/${repo.id}/update-details`);
+    navigate(`/repos/${repo.id}/update-details`);
 
     setIsUpdateDetails(true);
   };
@@ -165,7 +157,6 @@ function Repos() {
           className="repos-table"
           enableSelection={false}
         />
-        
       </div>
     </section>
   );

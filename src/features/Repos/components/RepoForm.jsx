@@ -293,6 +293,12 @@ function RepoForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [openPermissions, setOpenPermissions] = useState(false);
 
+  // State to store permissions data
+  const [permissionsData, setPermissionsData] = useState({
+    clearanceRules: [],
+    aclRules: [],
+  });
+
   const triggerSuccess = () => {
     setShowSuccessAlert(true);
     setTimeout(() => {
@@ -445,12 +451,19 @@ function RepoForm() {
 
   // Handle permissions button click
   const handlePermissions = () => {
-    // Add your permissions logic here
     setOpenPermissions(true);
     console.log("Opening permissions modal/page");
-    // You can navigate to a permissions page or open a modal
-    // navigate('/permissions') or setShowPermissionsModal(true)
   };
+
+  // Handle permissions data from UsersRolesPermissionsTable
+  const handlePermissionsDataChange = (data) => {
+    console.log("Received permissions data:", data);
+    setPermissionsData(data);
+    setOpenPermissions(false); // Close the popup
+  };
+
+  const aclRules = permissionsData.aclRules.map((per) => per);
+  console.log(aclRules);
 
   // Submit form with backend-compatible data structure
   const onSubmit = async (data) => {
@@ -459,7 +472,15 @@ function RepoForm() {
       description: data.description || undefined,
       isEncrypted: data.isEncrypted,
       categoryOption: data.categoryOption || undefined,
-      attributes: attributes.map((field) => ({
+      clearanceRules: permissionsData.clearanceRules || [],
+      aclRules:
+        permissionsData.aclRules.map((rule) => ({
+          principalId: rule.principalId,
+          principalType: rule.principalType,
+          permissions: rule.permissions.map((perm) => perm.code), // Extract codes from permission objects
+          accessType: rule.accessType,
+        })) || [],
+      indexFiels: attributes.map((field) => ({
         attributeName: field.attributeName,
         attributeType: field.attributeType,
         ...(field.attributeSize && { attributeSize: field.attributeSize }),
@@ -476,6 +497,11 @@ function RepoForm() {
       await dispatch(fetchAllRepos());
       reset();
       setAttributes([]);
+      // Clear permissions data after successful creation
+      setPermissionsData({
+        clearanceRules: [],
+        aclRules: [],
+      });
     } catch (error) {
       console.error("Failed to create repository:", error);
       const errorMsg =
@@ -532,8 +558,7 @@ function RepoForm() {
                     {/* Repository Name */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Repository Name{" "}
-                        <span className="text-red-500">*</span>
+                        Repository Name <span className="text-red-500">*</span>
                       </label>
                       <input
                         {...register("name")}
@@ -563,9 +588,7 @@ function RepoForm() {
                       >
                         <option value="">Select Category (Optional)</option>
                         <option value="per_repository">Per Repository</option>
-                        <option value="per_document">
-                          Per Document Type
-                        </option>
+                        <option value="per_document">Per Document Type</option>
                       </select>
                     </div>
                   </div>
@@ -789,8 +812,7 @@ function RepoForm() {
                                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                     placeholder={`Option ${index + 1}`}
                                   />
-                                  {currentField.valuesOfMemoType.length >
-                                    1 && (
+                                  {currentField.valuesOfMemoType.length > 1 && (
                                     <button
                                       type="button"
                                       onClick={() => removeValue(index)}
@@ -828,27 +850,32 @@ function RepoForm() {
                     </div>
                   )}
 
-                    {/* Index Fields Table */}
-                    <IndexFieldsTable
-                      indexFields={attributes}
-                      onEdit={editIndexField}
-                      onDelete={deleteIndexField}
-                      isAddingField={showAddField}
-                      itemsPerPage={3}
+                  {/* Index Fields Table */}
+                  <IndexFieldsTable
+                    indexFields={attributes}
+                    onEdit={editIndexField}
+                    onDelete={deleteIndexField}
+                    isAddingField={showAddField}
+                    itemsPerPage={3}
+                  />
+                  {openPermissions && (
+                    <Popup
+                      isOpen={openPermissions}
+                      setIsOpen={setOpenPermissions}
+                      component={
+                        <UsersRolesPermissionsTable
+                          onDone={handlePermissionsDataChange}
+                          savedData={permissionsData}
+                        />
+                      }
                     />
-                    {openPermissions && (
-                      <Popup
-                        isOpen={openPermissions}
-                        setIsOpen={setOpenPermissions}
-                        component={<UsersRolesPermissionsTable />}
-                      />
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Sticky Action Bar - Better positioned for UX */}
+          {/* Sticky Action Bar - Better positioned for UX */}
           <div className="bg-white border-t border-gray-200  py-3 mx-4 sm:-mx-6 lg:-mx-8">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-4">
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">

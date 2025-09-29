@@ -245,15 +245,15 @@ export async function createNewRepository(repoData) {
 }
 
 // Update New Repository
-export async function updateRepository(id, repoData) {
+export async function updateRepositoryDetails(id, repoData) {
   try {
     const response = await api.put(
-      `Repository/UpdateRepository?id=${id}`,
+      `Repository/UpdateRepositoryDetails?id=${id}`,
       repoData
     );
     return response;
   } catch (err) {
-    console.error("Failed To Update Repository ", err);
+    console.error("Failed To Update Repository Details ", err);
 
     if (err.response?.data) {
       const errorData = err.response.data;

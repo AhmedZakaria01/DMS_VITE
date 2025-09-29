@@ -18,6 +18,7 @@ import DocumentViewer from "./features/Document/component/DocumentViewer";
 import RepoContents from "./features/RepoContents/components/RepoContents";
 import Permissions from "./features/Permissions/Permissions";
 import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermissionsTable";
+import UpdateRepo from "./features/Repos/components/UpdateRepo";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,12 +45,16 @@ function App() {
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />
           <Route path="/documentViewer" element={<DocumentViewer />} />
-          <Route path="/usersRolesPermissionsTable" element={<UsersRolesPermissionsTable />} />
+          <Route
+            path="/usersRolesPermissionsTable"
+            element={<UsersRolesPermissionsTable />}
+          />
           <Route
             path="/repoContents/:repoId/folderContent/*"
             element={<FolderContents />}
           />
           <Route path="/createRepo" element={<RepoForm />} />
+          <Route path="/repos/:repoId/update-details" element={<UpdateRepo />} />
         </Route>
 
         {/* Routes without Layout  */}

@@ -103,15 +103,6 @@ function Breadcrumbs() {
     breadcrumbs[breadcrumbs.length - 1].isLast = true;
   }
 
-  console.log("Breadcrumbs with folder names:", breadcrumbs);
-  console.log("Folder history from state:", location.state?.folderHistory);
-  console.log(
-    "Repository name from state:",
-    location.state?.repoName || sessionStorage.getItem("currentRepoName")
-  );
-  console.log("Full location state:", location.state);
-  console.log("Current path:", currentPath);
-
   return (
     <nav className="flex mb-4 text-sm text-gray-600" aria-label="Breadcrumb">
       {breadcrumbs.map((crumb, index) => (

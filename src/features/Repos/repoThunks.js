@@ -5,7 +5,7 @@ import {
   getAllRepos,
   getRepositoryById,
   getUserRepos,
-  updateRepository,
+  updateRepositoryDetails,
 } from "../../services/apiServices";
 
 // Fetch User Repositories
@@ -35,10 +35,10 @@ export const createNewRepo = createAsyncThunk(
   }
 );
 // Update Repository
-export const updateRepo = createAsyncThunk(
-  "repo/updateRepository",
+export const editRepositoryDetails = createAsyncThunk(
+  "repo/updateRepositoryDetails",
   async (id, repoData) => {
-    const response = await updateRepository(id, repoData);
+    const response = await updateRepositoryDetails(id, repoData);
     console.log(response.data);
 
     return response.data;

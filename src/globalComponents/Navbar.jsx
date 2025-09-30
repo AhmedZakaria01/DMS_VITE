@@ -56,13 +56,7 @@ function Navbar() {
 
         {/* Center - Profile Section */}
         <div className="flex items-center">
-          <div className="relative">
-            <img
-              src={profileImg}
-              className="w-14 h-14 rounded-full border-2 border-white/30 shadow-lg hover:border-white/50 transition-all duration-300 object-cover"
-              alt="Profile"
-            />
-          </div>
+          <div className="relative">{/* // Insert LOGO Here */}</div>
         </div>
 
         {/* Right Side - Controls */}

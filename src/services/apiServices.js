@@ -186,7 +186,7 @@ export async function getAuditTrail() {
 // Create User
 export async function createNewUser(userData) {
   try {
-    const response = await api.post("Authenticate/register", userData);
+    const response = await api.post("Users/AddUser/AddUser", userData);
     return response;
   } catch (err) {
     console.err("Failed to Create User", err);

@@ -19,6 +19,7 @@ import RepoContents from "./features/RepoContents/components/RepoContents";
 import Permissions from "./features/Permissions/Permissions";
 import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermissionsTable";
 import UpdateRepo from "./features/Repos/components/UpdateRepo";
+// import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
   const dispatch = useDispatch();
@@ -55,6 +56,8 @@ function App() {
           />
           <Route path="/createRepo" element={<RepoForm />} />
           <Route path="/repos/:repoId/update-details" element={<UpdateRepo />} />
+          {/* <Route path="/repos/:repoId/update-Permissions" element={<UpdatePermissions />} /> */}
+
         </Route>
 
         {/* Routes without Layout  */}

@@ -4,11 +4,18 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Fragment } from "react";
+import { hasAdminRole } from "../../features/auth/roleUtils";
+import { useSelector } from "react-redux";
 
 export default function Sidebar({
   desktopSidebarExpanded,
   setDesktopSidebarExpanded,
 }) {
+
+  // check admin or user 
+    const { user } = useSelector((state) => state.authReducer);
+  const userRoles = user?.roles || [];
+
   const { i18n, t } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -17,20 +24,23 @@ export default function Sidebar({
 
   const navigation = [
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
-    // { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
-    // { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
-    // { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
-    // {
-    //   name: t("sidebar.advanced_search"),
-    //   link: "/advancesSearch",
-    //   icon: "🔍",
-    // },
-    // {
-    //   name: t("sidebar.file_category"),
-    //   link: "/category",
-    //   icon: "📁",
-    // },
-    // { name: t("settings"), link: "/settings", icon: "⚙️" },
+       // Admin only items
+    ...(hasAdminRole(userRoles) ? [
+      { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+      { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
+    ] : []),
+    { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
+    {
+      name: t("sidebar.advanced_search"),
+      link: "/advancesSearch",
+      icon: "🔍",
+    },
+    {
+      name: t("sidebar.file_category"),
+      link: "/category",
+      icon: "📁",
+    },
+    { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {

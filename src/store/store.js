@@ -8,11 +8,8 @@ import repoContentReducer from "../features/RepoContents/repoContentSlice";
 import folderContentsReducer from "../features/FolderContent/folderContentsSlice";
 import categoryReducer from '../features/Category/categorySlice'
 import permissionsReducer from '../features/Permissions/permissionsSlice'
-
-
 export const store = configureStore({
   reducer: {
-    // Auth
     authReducer,
     repoReducer,
     usersReducer,

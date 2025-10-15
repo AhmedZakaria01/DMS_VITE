@@ -19,6 +19,7 @@ import RepoContents from "./features/RepoContents/components/RepoContents";
 import Permissions from "./features/Permissions/Permissions";
 import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermissionsTable";
 import UpdateRepo from "./features/Repos/components/UpdateRepo";
+import AdminRoute from "./resusableComponents/ProtectedRoute";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -41,8 +42,22 @@ function App() {
           {/* Nested routes -  Outlet */}
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/permissions" element={<Permissions />} />
+<Route 
+  path="/users" 
+  element={
+    <AdminRoute>
+      <Users />
+    </AdminRoute>
+  } 
+/>
+<Route 
+  path="/roles" 
+  element={
+    <AdminRoute>
+      <Roles />
+    </AdminRoute>
+  } 
+/>          <Route path="/permissions" element={<Permissions />} />
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />
           <Route path="/documentViewer" element={<DocumentViewer />} />

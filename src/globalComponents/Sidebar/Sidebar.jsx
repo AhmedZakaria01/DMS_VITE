@@ -26,21 +26,21 @@ export default function Sidebar({
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
        // Admin only items
     ...(hasAdminRole(userRoles) ? [
-      { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
-      { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
+      // { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+      // { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
     ] : []),
-    { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
-    {
-      name: t("sidebar.advanced_search"),
-      link: "/advancesSearch",
-      icon: "🔍",
-    },
-    {
-      name: t("sidebar.file_category"),
-      link: "/category",
-      icon: "📁",
-    },
-    { name: t("settings"), link: "/settings", icon: "⚙️" },
+    // { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
+    // {
+    //   name: t("sidebar.advanced_search"),
+    //   link: "/advancesSearch",
+    //   icon: "🔍",
+    // },
+    // {
+    //   name: t("sidebar.file_category"),
+    //   link: "/category",
+    //   icon: "📁",
+    // },
+    // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {

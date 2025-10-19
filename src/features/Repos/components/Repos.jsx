@@ -21,12 +21,28 @@ function Repos() {
 
   // Fetch All Repos
   useEffect(() => {
-    // Only fetch if we haven't fetched yet or failed
-    if (status === "idle") {
-      dispatch(fetchAllRepos());
-    }
-  }, [dispatch, status]);
+// Only fetch if we haven't fetched yet or failed
+if (status === "idle") {
+  dispatch(fetchAllRepos());
+}
+}, [dispatch, status]);
 
+
+
+
+
+
+//////////////////////marwa////////////////////////////
+// useEffect(() => {
+// //marwa////////////////////////////////
+// console.log(dispatch(fetchUserRepos()));
+// ////////////////////////////////
+// }, [dispatch])
+// console.log('====================================');
+// console.log("Repos dataaaa:", repos);
+// console.log('====================================');
+
+///////////////////////////////////////////////////////
   // Action button handlers
   const handleUpdateDetails = (repo) => {
     console.log("Update details for:", repo.name);
@@ -123,6 +139,7 @@ function Repos() {
       state: { repoName: row.original.name }, // Keep this for immediate access
     });
   };
+  
 
   return (
     <section className="p-6">
@@ -157,6 +174,7 @@ function Repos() {
           className="repos-table"
           enableSelection={false}
         />
+        {console.log("Repos data:", repos)}
       </div>
     </section>
   );

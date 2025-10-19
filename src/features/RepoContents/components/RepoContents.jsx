@@ -21,7 +21,13 @@ function RepoContents() {
       console.log("dispatched in Repo Content with:", { repoId });
     }
   }, [dispatch, repoId]);
-
+  
+ // ✅ Store repoId in localStorage when it becomes available
+  useEffect(() => {
+    if (repoId) {
+      localStorage.setItem("repoId", repoId);
+    }
+  }, [repoId]);
   // Combine folders and documents into one array
   const folders_documents = useMemo(() => {
     if (!repoContents) return [];

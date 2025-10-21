@@ -21,16 +21,13 @@ function Login() {
   const loginSchema = z.object({
     email: z
       .string()
-      .min(1, t("emailRequired") || "email is required"),
+      .min(1, t("auth.emailRequired")),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Must include at least one uppercase letter")
-      .regex(
-        /[!@#$%^&*(),.?":{}|<>]/,
-        "Must include at least one special character"
-      )
-      .regex(/[0-9]/, "Must include at least one number"),
+      .min(8, t("auth.passwordMin"))
+      .regex(/[A-Z]/, t("auth.passwordUppercase"))
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, t("auth.passwordSpecial"))
+      .regex(/[0-9]/, t("auth.passwordNumber")),
   });
 
   // Use Form
@@ -88,7 +85,7 @@ function Login() {
             {/* email Field */}
             <div>
               <label htmlFor="email" className="block text-white mb-2">
-                {t("email") || "email"}
+                {t("users.email")}
               </label>
               <input
                 autoComplete="true"
@@ -98,7 +95,7 @@ function Login() {
                 type="text"
                 name="email"
                 id="email"
-                placeholder="Enter your email"
+                placeholder={t("auth.emailPlaceholder")}
                 {...register("email")}
               />
               {errors.email && (
@@ -111,7 +108,7 @@ function Login() {
             {/* Password Field */}
             <div className="pb-4">
               <label htmlFor="password" className="block text-white mb-2">
-                {t("password") || "Password"}
+                {t("users.password")}
               </label>
               <input
                 className={`w-full px-4 py-2 bg-gray-700 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -121,7 +118,7 @@ function Login() {
                 name="password"
                 id="password"
                 autoComplete="true"
-                placeholder="Enter your password"
+                placeholder={t("auth.passwordPlaceholder")}
                 {...register("password")}
               />
               {errors.password && (
@@ -142,14 +139,14 @@ function Login() {
                 className="w-full py-2 bg-purple-600 text-white rounded-md cursor-not-allowed"
                 disabled
               >
-                <i className="fas fa-spinner fa-spin"></i> {t("Loading...")}
+                <i className="fas fa-spinner fa-spin"></i> {t("system.loading")}
               </button>
             ) : (
               <button
                 className="w-full py-2 px-4 bg-purple-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition hover:bg-purple-900"
                 type="submit"
               >
-                {t("Sign in")}
+                {t("login")}
               </button>
             )}
           </form>

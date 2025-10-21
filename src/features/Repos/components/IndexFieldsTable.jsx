@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const ATTRIBUTE_TYPES = [
   { value: "string", label: "String" },
@@ -24,6 +25,7 @@ const IndexFieldsTable = ({
   isAddingField = false,
   itemsPerPage = 5,
 }) => {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
 
   // Pagination logic
@@ -112,27 +114,27 @@ const IndexFieldsTable = ({
   const columns = [
     {
       name: "index",
-      header: "#",
+      header: t("repos.columns.index"),
       accessor: "index",
     },
     {
       id: "attributeType",
-      header: "Type",
+      header: t("system.type"),
       accessor: "attributeType",
     },
     {
       id: "attributeType",
-      header: "Type",
+      header: t("system.type"),
       accessor: "attributeType",
     },
     {
       id: "attributeSize",
-      header: "Size",
+      header: t("system.size"),
       accessor: "attributeSize",
     },
     {
       id: "valuesOfMemoType",
-      header: "Values",
+      header: t("system.values"),
       accessor: "valuesOfMemoType",
     },
   ];
@@ -141,10 +143,11 @@ const IndexFieldsTable = ({
     <div className="bg-white rounded-lg overflow-hidden shadow-sm border">
       {/* Table Header */}
       <div className="px-4 py-3 bg-gray-50 border-b">
-        <h3 className="text-lg font-medium text-gray-900">Index Fields</h3>
+        <h3 className="text-lg font-medium text-gray-900">{t("repos.indexFields")}</h3>
         <p className="text-sm text-gray-600">
-          {indexFields.length} field{indexFields.length !== 1 ? "s" : ""}{" "}
-          configured
+          {indexFields.length === 1
+            ? t("repos.fieldConfigured")
+            : t("repos.fieldsConfigured", { count: indexFields.length })}
         </p>
       </div>
 

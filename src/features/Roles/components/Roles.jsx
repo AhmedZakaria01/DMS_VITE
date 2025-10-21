@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-
+import { useTranslation } from "react-i18next";
 import Popup from "../../../globalComponents/Popup";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import RoleForm from "./RoleForm";
@@ -9,6 +9,7 @@ import { fetchRoles } from "../RolesThunks";
 
 function Roles() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -120,8 +121,8 @@ function Roles() {
     <section className="p-6">
       <div className="flex justify-between items-">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Roles</h1>
-          <p className="text-gray-600">Manage and monitor system users</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("roles.title")}</h1>
+          <p className="text-gray-600">{t("roles.description")}</p>
         </div>
 
         <div>
@@ -138,7 +139,7 @@ function Roles() {
       {/* Show error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">Error loading users: {error}</p>
+          <p className="text-red-600">{t("system.error")}: {error}</p>
         </div>
       )}
 

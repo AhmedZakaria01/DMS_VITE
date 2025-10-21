@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPermissions } from "./permissionsThunks";
 import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 function Permissions({
   targetId,
@@ -9,6 +10,7 @@ function Permissions({
   onPermissionsChange,
   initialSelectedPermissions = [],
 }) {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { permissions, loading, error } = useSelector(
     (state) => state.permissionsReducer

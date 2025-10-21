@@ -2,8 +2,10 @@ import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect } from "react";
 import { fetchAuditTrail } from "../auditThunks";
+import { useTranslation } from "react-i18next";
 
 function AuditTrail() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const { audits, status, error } = useSelector((state) => state.auditReducer);
@@ -26,28 +28,28 @@ function AuditTrail() {
       {
         id: "action",
         accessorKey: "action",
-        header: "Status",
+        header: t("system.status"),
         size: 150,
       },
       {
         id: "entityName",
         accessorKey: "entityName",
-        header: "Entity Type",
+        header: t("system.entityType"),
         size: 120,
       },
       {
         id: "actionDate",
         accessorKey: "actionDate",
-        header: "Action Date",
+        header: t("system.actionDate"),
         size: 150,
       },
       {
         id: "userId",
         accessorKey: "userId",
-        header: "Created By",
+        header: t("system.createdBy"),
       },
     ],
-    []
+    [t]
   );
 
   // Handle double click - view audit log details
@@ -60,9 +62,9 @@ function AuditTrail() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Audit Trail</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("audit.title")}</h1>
         <p className="text-gray-600">
-          Track and monitor system activities and changes
+          {t("audit.description")}
         </p>
       </div>
 

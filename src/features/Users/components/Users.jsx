@@ -5,9 +5,11 @@ import UserForm from "./UserForm";
 import Popup from "../../../globalComponents/Popup";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { fetchUsers } from "../usersThunks";
+import { useTranslation } from "react-i18next";
 
 function Users() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -125,8 +127,8 @@ function Users() {
     <div className="p-6">
       <div className="flex justify-between">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Users</h1>
-          <p className="text-gray-600">Manage and monitor system users</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("users.title")}</h1>
+          <p className="text-gray-600">{t("users.description")}</p>
         </div>
         <div>
           <button
@@ -134,7 +136,7 @@ function Users() {
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
           >
             <Plus className="w-5 h-5" />
-            Create New User
+            {t("users.createNew")}
           </button>
         </div>
       </div>
@@ -142,7 +144,7 @@ function Users() {
       {/* Show error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">Error loading users: {error}</p>
+          <p className="text-red-600">{t("system.error")}: {error}</p>
         </div>
       )}
 

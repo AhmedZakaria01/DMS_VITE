@@ -6,7 +6,7 @@ import Sidebar from "./globalComponents/Sidebar/Sidebar";
 import Breadcrumbs from "./globalComponents/Breadcrumbs";
   
 function Layout() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [desktopSidebarExpanded, setDesktopSidebarExpanded] = useState(false);
   const isRTL = i18n.language === "ar";
 

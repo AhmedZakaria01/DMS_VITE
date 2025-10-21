@@ -4,8 +4,10 @@ import React, { useMemo, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Plus, Folder, FileText } from "lucide-react";
 import { fetchFolderContents } from "../folderContentsThunks";
+import { useTranslation } from "react-i18next";
 
 function FolderContents() {
+  const { t } = useTranslation();
   const { folderContents, status, error } = useSelector(
     (state) => state.folderContentsReducer
   );
@@ -135,7 +137,7 @@ function FolderContents() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Folder Contents
           </h1>
-          <p className="text-gray-600">Browse folders and documents</p>
+          <p className="text-gray-600">{t("folderContent.description")}</p>
         </div>
         <div>
           <button

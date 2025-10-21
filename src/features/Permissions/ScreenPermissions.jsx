@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   Shield,
   CheckCircle,
@@ -14,6 +15,7 @@ import { createNewRole } from "../../services/apiServices";
 
 function ScreenPermissions() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const { screenPermissions = [] } = useSelector(
     (state) => state.permissionsReducer
   );
@@ -144,7 +146,7 @@ function ScreenPermissions() {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-sm">Loading permissions...</p>
+                <p className="text-gray-500 text-sm">{t("permissions.loading")}</p>
               )}
             </div>
           </div>

@@ -18,14 +18,15 @@ import {
   Users,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { createNewRepo, fetchAllRepos, fetchUserRepos } from "../repoThunks";
+import { createNewRepo, fetchAllRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../../../globalComponents/Alerts/SuccessAlert";
 import ErrorAlert from "../../../globalComponents/Alerts/ErrorAlert";
 import Popup from "../../../globalComponents/Popup";
-import UserForm from "../../Users/components/UserForm";
+
 import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
-import { tr } from "zod/v4/locales";
+
+import { useTranslation } from "react-i18next";
 
 // Form validation schema
 const validationSchema = z.object({
@@ -60,6 +61,7 @@ const IndexFieldsTable = ({
   itemsPerPage = 3,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const { t } = useTranslation();
 
   // Calculate pagination values
   const totalPages = Math.ceil(indexFields.length / itemsPerPage);
@@ -149,10 +151,11 @@ const IndexFieldsTable = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Index Fields</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t("repos.indexFields")}</h3>
         <p className="text-sm text-gray-600 mt-1">
-          {indexFields.length} field{indexFields.length !== 1 ? "s" : ""}{" "}
-          configured
+          {indexFields.length === 1
+            ? t("repos.fieldConfigured")
+            : t("repos.fieldsConfigured", { count: indexFields.length })}
         </p>
       </div>
       <div className="flex-1 overflow-hidden">
@@ -163,19 +166,19 @@ const IndexFieldsTable = ({
                 #
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Name
+                {t("system.name")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Type
+                {t("system.type")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Size
+                {t("system.size")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Values
+                {t("system.values")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-20">
-                Actions
+                {t("system.actions")}
               </th>
             </tr>
           </thead>
@@ -229,7 +232,7 @@ const IndexFieldsTable = ({
                         onClick={() => onEdit(startIndex + index)}
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         disabled={isAddingField}
-                        title="Edit field"
+                        title={t("system.edit")}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -238,7 +241,7 @@ const IndexFieldsTable = ({
                         onClick={() => onDelete(startIndex + index)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         disabled={isAddingField}
-                        title="Delete field"
+                        title={t("system.delete")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -252,10 +255,10 @@ const IndexFieldsTable = ({
                   <div className="text-gray-400">
                     <Database className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                     <p className="text-base font-medium mb-1">
-                      No index fields added yet
+                      {t("repos.noIndexFields")}
                     </p>
                     <p className="text-sm">
-                      Click Add Index Field to create your first field
+                      {t("repos.addIndexFieldHint")}
                     </p>
                   </div>
                 </td>
@@ -270,6 +273,7 @@ const IndexFieldsTable = ({
 };
 
 function RepoForm() {
+  const { t } = useTranslation();
   // Initialize form with validation
   const {
     register,
@@ -325,7 +329,7 @@ function RepoForm() {
     valuesOfMemoType: [""],
   });
   const [editingIndex, setEditingIndex] = useState(null);
-  const { user } = useSelector((state) => state.authReducer);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -526,10 +530,10 @@ function RepoForm() {
             </div>
             <div className="text-left">
               <h1 className="text-xl font-bold text-gray-900">
-                Create New Repository
+                {t("repos.createNew")}
               </h1>
               <p className="text-gray-600 text-sm mt-1">
-                Configure your repository settings and index fields
+                {t("repos.setupDescription")}
               </p>
             </div>
           </div>
@@ -548,7 +552,7 @@ function RepoForm() {
                       <FileText className="w-5 h-5 text-blue-600" />
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Repository Information
+                      {t("repos.information")}
                     </h2>
                   </div>
                 </div>
@@ -558,7 +562,7 @@ function RepoForm() {
                     {/* Repository Name */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Repository Name <span className="text-red-500">*</span>
+                        {t("repos.name")} <span className="text-red-500">*</span>
                       </label>
                       <input
                         {...register("name")}
@@ -568,7 +572,7 @@ function RepoForm() {
                             ? "border-red-300 bg-red-50"
                             : "border-gray-300"
                         }`}
-                        placeholder="Enter repository name"
+                        placeholder={t("repos.namePlaceholder")}
                       />
                       {errors.name && (
                         <p className="text-red-600 text-sm mt-2">
@@ -580,16 +584,16 @@ function RepoForm() {
                     {/* Category Option */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Category Option
+                        {t("categoryOptions")}
                       </label>
                       <select
                         {...register("categoryOption")}
                         required
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                       >
-                        <option value="">Select Category</option>
-                        <option value="per_repository">Per Repository</option>
-                        <option value="per_document">Per Document Type</option>
+                        <option value="">{t("selectCategory")}</option>
+                        <option value="per_repository">{t("repos.perRepository")}</option>
+                        <option value="per_document">{t("repos.perDocumentType")}</option>
                       </select>
                     </div>
                   </div>
@@ -597,13 +601,13 @@ function RepoForm() {
                   {/* Description */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Description <span className="text-red-500">*</span>
+                      {t("repos.descriptionLabel")} <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       {...register("description")}
                       rows={4}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
-                      placeholder="Enter repository description"
+                      placeholder={t("repos.descriptionPlaceholder")}
                     />
                     {errors.description && (
                       <p className="text-red-600 text-sm mt-2">
@@ -620,7 +624,7 @@ function RepoForm() {
                       </div>
                       <div>
                         <label className="text-sm font-semibold text-gray-700 cursor-pointer">
-                          Enable Encryption
+                          {t("repos.enableEncryption")}
                         </label>
                         <p className="text-xs text-gray-600 mt-1">
                           Secure your repository with encryption
@@ -646,7 +650,7 @@ function RepoForm() {
                       <Users className="w-5 h-5 text-orange-600" />
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Access & Permissions
+                      {t("repos.accessPermissions")}
                     </h2>
                   </div>
                 </div>
@@ -748,7 +752,7 @@ function RepoForm() {
                             }
                             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                           >
-                            <option value="">Select Type</option>
+                            <option value="">{t("system.selectType")}</option>
                             {ATTRIBUTE_TYPES.map((type) => (
                               <option key={type.value} value={type.value}>
                                 {type.label}

@@ -26,7 +26,7 @@ export default function Sidebar({
     { name: t("sidebar.home"), link: "/", icon: "🏠" },
        // Admin only items
     ...(hasAdminRole(userRoles) ? [
-      // { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
+      { name: t("sidebar.users"), link: "/users", icon: "🙍‍♂️" },
       // { name: t("sidebar.roles"), link: "/roles", icon: "👥" },
     ] : []),
     // { name: t("sidebar.audit_trail"), link: "/audit", icon: "📈" },
@@ -40,7 +40,7 @@ export default function Sidebar({
     //   link: "/category",
     //   icon: "📁",
     // },
-    // { name: t("settings"), link: "/settings", icon: "⚙️" },
+    // { name: t("system.settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {
@@ -99,7 +99,7 @@ export default function Sidebar({
                       onClick={() => setSidebarOpen(false)}
                     >
                       <span className="sr-only">
-                        {t("close_sidebar") || "Close sidebar"}
+                        {t("system.close_sidebar")}
                       </span>
                       <div className="h-6 w-6 text-white">✕</div>
                     </button>
@@ -116,7 +116,7 @@ export default function Sidebar({
                         isRTL ? "mr-3" : "ml-3"
                       }`}
                     >
-                      {t("menu") || "Menu"}
+                      {t("system.menu")}
                     </span>
                   </div>
                   <nav className="flex flex-1 flex-col">
@@ -226,7 +226,7 @@ export default function Sidebar({
           className="p-2 rounded-md bg-gradient-to-r from-white to-gray-50 shadow-lg text-gray-700 hover:from-indigo-500 hover:to-purple-600 hover:text-white transition-all duration-200"
           onClick={() => setSidebarOpen(true)}
         >
-          <span className="sr-only">{t("open_sidebar") || "Open sidebar"}</span>
+          <span className="sr-only">{t("system.open_sidebar")}</span>
           <div className="h-5 w-5 font-bold">☰</div>
         </button>
       </div>

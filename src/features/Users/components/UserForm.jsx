@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   User,
   Mail,
@@ -17,10 +17,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { createUser } from "../usersThunks";
-import { useTranslation } from "react-i18next";
-
-// Array of available roleIds with UUID values
-// ROLES will be defined inside the component to access t function
+import { fetchRoles } from "../../Roles/RolesThunks";
 
 // Permission IDs array (you can modify this as needed)
 const permissionIds = [
@@ -32,47 +29,59 @@ const permissionIds = [
 ];
 
 // Dynamic validation schema based on mode
-const getValidationSchema = (isEditMode, t) =>
+const getValidationSchema = (isEditMode) =>
   z.object({
     firstName: z
       .string()
-      .min(1, t("users.validation.firstNameRequired"))
-      .min(3, t("users.validation.firstNameMin"))
-      .max(30, t("users.validation.firstNameMax"))
-      .regex(/^[a-zA-Z0-9_]+$/, t("users.validation.firstNamePattern"))
+      .min(1, "First name is required")
+      .min(3, "First name must be at least 3 characters")
+      .max(30, "First name must be less than 30 characters")
+      .regex(
+        /^[a-zA-Z0-9_]+$/,
+        "First name can only contain letters, numbers, and underscores"
+      )
       .trim(),
     lastName: z
       .string()
-      .min(1, t("users.validation.lastNameRequired"))
-      .min(3, t("users.validation.lastNameMin"))
-      .max(30, t("users.validation.lastNameMax"))
-      .regex(/^[a-zA-Z0-9_]+$/, t("users.validation.lastNamePattern"))
+      .min(1, "Last name is required")
+      .min(3, "Last name must be at least 3 characters")
+      .max(30, "Last name must be less than 30 characters")
+      .regex(
+        /^[a-zA-Z0-9_]+$/,
+        "Last name can only contain letters, numbers, and underscores"
+      )
       .trim(),
     userName: z
       .string()
-      .min(1, t("users.validation.usernameRequired"))
-      .min(3, t("users.validation.usernameMin"))
-      .max(30, t("users.validation.usernameMax"))
-      .regex(/^[a-zA-Z0-9_]+$/, t("users.validation.usernamePattern"))
+      .min(1, "Username is required")
+      .min(3, "Username must be at least 3 characters")
+      .max(30, "Username must be less than 30 characters")
+      .regex(
+        /^[a-zA-Z0-9_]+$/,
+        "Username can only contain letters, numbers, and underscores"
+      )
       .trim(),
     email: z
       .string()
-      .min(1, t("users.validation.emailRequired"))
-      .email(t("users.validation.emailInvalid"))
+      .min(1, "Email is required")
+      .email("Please enter a valid email address")
       .toLowerCase(),
     password: isEditMode
-      ? z.string().optional().or(z.literal(""))
+      ? z.string().optional().or(z.literal("")) // Optional in edit mode
       : z
           .string()
-          .min(1, t("users.validation.passwordRequired"))
-          .min(8, t("users.validation.passwordMin"))
-          .max(100, t("users.validation.passwordMax"))
-          .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, t("users.validation.passwordPattern")),
+          .min(1, "Password is required")
+          .min(8, "Password must be at least 8 characters")
+          .max(100, "Password must be less than 100 characters")
+          .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+          ),
     confirmPassword: isEditMode
-      ? z.string().optional().or(z.literal(""))
-      : z.string().min(1, t("users.validation.confirmPasswordRequired")),
+      ? z.string().optional().or(z.literal("")) // Optional in edit mode
+      : z.string().min(1, "Confirm password is required"),
   }).refine((data) => data.password === data.confirmPassword, {
-    message: t("users.validation.passwordMismatch"),
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
@@ -83,17 +92,6 @@ const UserForm = ({
   onCancel,
 }) => {
   const dispatch = useDispatch();
-  const { t } = useTranslation();
-  
-  // Localized roles array
-  const ROLES = [
-    { value: "c3563db9-99ce-43fd-9396-adcc0a455862", label: t("administrator") },
-    { value: "ecc0e6d4-6ef6-4447-9e3f-2ad01c210545", label: t("manager") },
-    { value: "a1b2c3d4-5e6f-7g8h-9i0j-k1l2m3n4o5p6", label: t("editor") },
-    { value: "b2c3d4e5-6f7g-8h9i-0j1k-l2m3n4o5p6q7", label: t("user") },
-    { value: "c3d4e5f6-7g8h-9i0j-1k2l-m3n4o5p6q7r8", label: t("viewer") },
-  ];
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -101,7 +99,7 @@ const UserForm = ({
   const isEditMode = mode === "edit";
 
   // Multi-select states
-  const [selectedRoleIds, setSelectedRoleIds] = useState([]);
+  const [selectedRoles, setSelectedRoles] = useState([]); // Changed from selectedRoleIds
   const [selectedPermissionIds, setSelectedPermissionIds] = useState([]);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [permissionSearchTerm, setPermissionSearchTerm] = useState("");
@@ -143,14 +141,23 @@ const UserForm = ({
     setValue,
     trigger,
   } = useForm({
-    resolver: zodResolver(getValidationSchema(isEditMode, t)),
+    resolver: zodResolver(getValidationSchema(isEditMode)),
     mode: "onChange",
     defaultValues: getDefaultValues(),
   });
 
-  // Filter roles and permissions based on search terms
-  const filteredRoleIds = ROLES.filter((role) =>
-    role.label.toLowerCase().includes(roleSearchTerm.toLowerCase())
+  // Get roles from Redux store
+  const { roles } = useSelector((state) => state.rolesReducer);
+  
+  useEffect(() => {
+    dispatch(fetchRoles());
+  }, [dispatch]);
+
+  console.log('Roles from Redux:', roles);
+
+  // Filter roles based on search terms
+  const filteredRoles = roles.filter((role) =>
+    role.roleName.toLowerCase().includes(roleSearchTerm.toLowerCase())
   );
 
   const filteredPermissionIds = permissionIds.filter((permission) =>
@@ -170,10 +177,14 @@ const UserForm = ({
       setValue("password", "");
       setValue("confirmPassword", "");
 
-      // Set selected roleIds and permissionIds from initial data
-      if (initialData.roleIds) {
-        setSelectedRoleIds(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
+      // Set selected roles and permissionIds from initial data
+      if (initialData.roles) {
+        setSelectedRoles(Array.isArray(initialData.roles) ? initialData.roles : []);
+      } else if (initialData.roleIds) {
+        // Fallback for backward compatibility
+        setSelectedRoles(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
       }
+      
       if (initialData.permissionIds) {
         setSelectedPermissionIds(Array.isArray(initialData.permissionIds) ? initialData.permissionIds : []);
       }
@@ -200,15 +211,15 @@ const UserForm = ({
     };
   }, []);
 
-  // Handle role selection
-  const handleRoleToggle = (roleValue) => {
-    let updatedRoleIds;
-    if (selectedRoleIds.includes(roleValue)) {
-      updatedRoleIds = selectedRoleIds.filter((role) => role !== roleValue);
+  // Handle role selection - using roleId instead of roleName
+  const handleRoleToggle = (roleId) => {
+    let updatedRoles;
+    if (selectedRoles.includes(roleId)) {
+      updatedRoles = selectedRoles.filter((role) => role !== roleId);
     } else {
-      updatedRoleIds = [...selectedRoleIds, roleValue];
+      updatedRoles = [...selectedRoles, roleId];
     }
-    setSelectedRoleIds(updatedRoleIds);
+    setSelectedRoles(updatedRoles);
   };
 
   // Handle permission selection
@@ -223,9 +234,9 @@ const UserForm = ({
   };
 
   // Remove role
-  const removeRole = (roleValue) => {
-    const updatedRoleIds = selectedRoleIds.filter((role) => role !== roleValue);
-    setSelectedRoleIds(updatedRoleIds);
+  const removeRole = (roleId) => {
+    const updatedRoles = selectedRoles.filter((role) => role !== roleId);
+    setSelectedRoles(updatedRoles);
   };
 
   // Remove permission
@@ -234,9 +245,10 @@ const UserForm = ({
     setSelectedPermissionIds(updatedPermissionIds);
   };
 
-  // Get role label by value
-  const getRoleLabel = (value) => {
-    return ROLES.find((role) => role.value === value)?.label || value;
+  // Get role name by roleId
+  const getRoleName = (roleId) => {
+    const role = roles.find((r) => r.roleId === roleId);
+    return role ? role.roleName : roleId;
   };
 
   // Get permission label by value
@@ -267,7 +279,7 @@ const UserForm = ({
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
-        roleIds: selectedRoleIds,
+        roleIds: selectedRoles,
         permissionIds: selectedPermissionIds,
       };
 
@@ -316,17 +328,20 @@ const UserForm = ({
       setValue("password", "");
       setValue("confirmPassword", "");
 
-      // Reset selected roleIds and permissionIds
-      if (initialData.roleIds) {
-        setSelectedRoleIds(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
+      // Reset selected roles and permissionIds
+      if (initialData.roles) {
+        setSelectedRoles(Array.isArray(initialData.roles) ? initialData.roles : []);
+      } else if (initialData.roleIds) {
+        setSelectedRoles(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
       }
+      
       if (initialData.permissionIds) {
         setSelectedPermissionIds(Array.isArray(initialData.permissionIds) ? initialData.permissionIds : []);
       }
     } else {
       // Reset to empty in create mode
       reset();
-      setSelectedRoleIds([]);
+      setSelectedRoles([]);
       setSelectedPermissionIds([]);
     }
     setRoleSearchTerm("");
@@ -347,7 +362,7 @@ const UserForm = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          {isEditMode ? t("users.update") : t("users.createNew")}
+          {isEditMode ? "Update User" : "Create New User"}
         </h2>
         <p className="text-lg text-gray-600">
           {isEditMode
@@ -372,7 +387,7 @@ const UserForm = ({
               {/* First Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.firstName")} <span className="text-red-500">*</span>
+                  First Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("firstName")}
@@ -383,7 +398,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder={t("users.firstNamePlaceholder")}
+                  placeholder="Enter first name"
                 />
                 {errors.firstName && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -396,7 +411,7 @@ const UserForm = ({
               {/* Last Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.lastName")} <span className="text-red-500">*</span>
+                  Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("lastName")}
@@ -407,7 +422,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder={t("users.lastNamePlaceholder")}
+                  placeholder="Enter last name"
                 />
                 {errors.lastName && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -420,7 +435,7 @@ const UserForm = ({
               {/* Username */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.username")} <span className="text-red-500">*</span>
+                  Username <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("userName")}
@@ -431,7 +446,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder={t("users.usernamePlaceholder")}
+                  placeholder="Enter username"
                 />
                 {errors.userName && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -444,7 +459,7 @@ const UserForm = ({
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.email")} <span className="text-red-500">*</span>
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -459,7 +474,7 @@ const UserForm = ({
                         ? "border-red-300 bg-red-50"
                         : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                     }`}
-                    placeholder={t("auth.emailPlaceholder")}
+                    placeholder="john@example.com"
                   />
                 </div>
                 {errors.email && (
@@ -473,11 +488,11 @@ const UserForm = ({
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.password")} {" "}
+                  Password{" "}
                   {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
-                      ({t("users.passwordLeaveEmpty")})
+                      (Leave empty to keep current password)
                     </span>
                   )}
                 </label>
@@ -496,8 +511,8 @@ const UserForm = ({
                     }`}
                     placeholder={
                       isEditMode
-                        ? t("users.passwordLeaveEmpty")
-                        : t("users.passwordStrongHint")
+                        ? "Leave empty to keep current password"
+                        : "Enter a strong password"
                     }
                   />
                   <button
@@ -520,7 +535,8 @@ const UserForm = ({
                 )}
                 {!isEditMode && (
                   <p className="mt-1 text-xs text-gray-500">
-                    {t("users.passwordRequirements")}
+                    Password must contain at least 8 characters with uppercase,
+                    lowercase, and numbers
                   </p>
                 )}
               </div>
@@ -528,11 +544,11 @@ const UserForm = ({
               {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("users.confirmPassword")} {" "}
+                  Confirm Password{" "}
                   {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
-                      ({t("users.passwordLeaveEmpty")})
+                      (Leave empty to keep current password)
                     </span>
                   )}
                 </label>
@@ -551,8 +567,8 @@ const UserForm = ({
                     }`}
                     placeholder={
                       isEditMode
-                        ? t("users.passwordLeaveEmpty")
-                        : t("users.confirmPasswordPlaceholder")
+                        ? "Leave empty to keep current password"
+                        : "Confirm your password"
                     }
                   />
                   <button
@@ -575,24 +591,24 @@ const UserForm = ({
                 )}
               </div>
 
-              {/* RoleIds - Multi Select */}
+              {/* Roles - Multi Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("roles.title")} <span className="text-red-500">*</span>
+                  Roles <span className="text-red-500">*</span>
                 </label>
 
-                {/* Selected RoleIds Display */}
-                {selectedRoleIds.length > 0 && (
+                {/* Selected Roles Display */}
+                {selectedRoles.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
-                    {selectedRoleIds.map((roleValue) => (
+                    {selectedRoles.map((roleId) => (
                       <span
-                        key={roleValue}
+                        key={roleId}
                         className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
                       >
-                        {getRoleLabel(roleValue)}
+                        {getRoleName(roleId)}
                         <button
                           type="button"
-                          onClick={() => removeRole(roleValue)}
+                          onClick={() => removeRole(roleId)}
                           className="ml-1 hover:text-blue-600"
                         >
                           ×
@@ -613,42 +629,42 @@ const UserForm = ({
                     onChange={(e) => setRoleSearchTerm(e.target.value)}
                     onFocus={() => setIsRoleDropdownOpen(true)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
-                    placeholder={t("users.roles.searchPlaceholder")}
+                    placeholder="Search and select roles..."
                   />
 
                   {/* Role Dropdown */}
                   {isRoleDropdownOpen && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                      {filteredRoleIds.length > 0 ? (
-                        filteredRoleIds.map((role) => (
+                      {filteredRoles.length > 0 ? (
+                        filteredRoles.map((role) => (
                           <div
-                            key={role.value}
+                            key={role.roleId}
                             className={`flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer ${
-                              selectedRoleIds.includes(role.value)
+                              selectedRoles.includes(role.roleId)
                                 ? "bg-blue-50"
                                 : ""
                             }`}
-                            onClick={() => handleRoleToggle(role.value)}
+                            onClick={() => handleRoleToggle(role.roleId)}
                           >
                             <div className="flex items-center">
                               <input
                                 type="checkbox"
-                                checked={selectedRoleIds.includes(role.value)}
+                                checked={selectedRoles.includes(role.roleId)}
                                 onChange={() => {}} // Handled by onClick
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
                               />
                               <span className="text-sm font-medium text-gray-700">
-                                {role.label}
+                                {role.roleName}
                               </span>
                             </div>
-                            {selectedRoleIds.includes(role.value) && (
+                            {selectedRoles.includes(role.roleId) && (
                               <CheckCircle className="h-4 w-4 text-blue-600" />
                             )}
                           </div>
                         ))
                       ) : (
                         <div className="px-4 py-2 text-sm text-gray-500">
-                          {t("users.roles.noResults", { query: roleSearchTerm })}
+                          No roles found matching &quot;{roleSearchTerm}&quot;
                         </div>
                       )}
                     </div>
@@ -656,7 +672,7 @@ const UserForm = ({
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  {t("users.roles.selectedCount", { count: selectedRoleIds.length })}
+                  You can select multiple roles. Selected: {selectedRoles.length}
                 </p>
               </div>
 
@@ -698,7 +714,7 @@ const UserForm = ({
                     onChange={(e) => setPermissionSearchTerm(e.target.value)}
                     onFocus={() => setIsPermissionDropdownOpen(true)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
-                    placeholder={t("users.permissions.searchPlaceholder")}
+                    placeholder="Search and select permissions..."
                   />
 
                   {/* Permission Dropdown */}
@@ -733,7 +749,7 @@ const UserForm = ({
                         ))
                       ) : (
                         <div className="px-4 py-2 text-sm text-gray-500">
-                          {t("users.permissions.noResults", { query: permissionSearchTerm })}
+                          No permissions found matching &quot;{permissionSearchTerm}&quot;
                         </div>
                       )}
                     </div>
@@ -741,7 +757,7 @@ const UserForm = ({
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  {t("users.permissions.selectedCount", { count: selectedPermissionIds.length })}
+                  You can select multiple permissions. Selected: {selectedPermissionIds.length}
                 </p>
               </div>
             </div>
@@ -752,18 +768,18 @@ const UserForm = ({
             <button
               type="button"
               onClick={handleSubmit(onSubmit)}
-              disabled={isSubmitting || !isValid || selectedRoleIds.length === 0}
+              disabled={isSubmitting || !isValid || selectedRoles.length === 0}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  {isEditMode ? t("users.updating") : t("users.creating")}
+                  {isEditMode ? "Updating User..." : "Creating User..."}
                 </>
               ) : (
                 <>
                   <CheckCircle className="w-5 h-5 mr-2" />
-                  {isEditMode ? t("users.update") : t("users.create")}
+                  {isEditMode ? "Update User" : "Create User"}
                 </>
               )}
             </button>
@@ -775,7 +791,7 @@ const UserForm = ({
               className="flex-none bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              {t("reset")}
+              Reset
             </button>
 
             <button
@@ -784,7 +800,7 @@ const UserForm = ({
               disabled={isSubmitting}
               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
-              {t("cancel")}
+              Cancel
             </button>
           </div>
         </div>

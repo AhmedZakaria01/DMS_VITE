@@ -178,7 +178,7 @@ function ScreenPermissions() {
               className="flex-none bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
+              {t("reset")}
             </button>
 
             <button
@@ -187,7 +187,7 @@ function ScreenPermissions() {
               disabled={isSubmitting}
               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </form>

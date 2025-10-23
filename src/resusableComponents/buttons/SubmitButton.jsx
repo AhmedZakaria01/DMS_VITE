@@ -8,7 +8,7 @@ function SubmitButton({ textColor, bgColor }) {
       type="submit"
       className={`w-full border text-${textColor} bg-${bgColor} py-2 px-4 rounded-md hover:opacity-90 transition duration-200`}
     >
-      {t("system.submit")}
+      {t("submit")}
     </button>
   );
 }

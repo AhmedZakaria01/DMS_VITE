@@ -21,7 +21,7 @@ import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermiss
 import UpdateRepo from "./features/Repos/components/UpdateRepo";
 import AdminRoute from "./resusableComponents/ProtectedRoute";
 import ScreenPermissions from "./features/Permissions/screenPermissions";
-// import CreateFolder from "./features/FolderContent/components/CreateFolder";
+import CreateFolder from "./features/FolderContent/components/CreateFolder";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -77,7 +77,7 @@ function App() {
           <Route path="/createRepo" element={<RepoForm />} />
           <Route path="/repos/:repoId/update-details" element={<UpdateRepo />} />
           {/* <Route path="/repos/:repoId/update-Permissions" element={<UpdatePermissions />} /> */}
-          {/* <Route path="/createFolder" element={<CreateFolder />} /> */}
+          <Route path="/createFolder" element={<CreateFolder />} />
 
 
         </Route>

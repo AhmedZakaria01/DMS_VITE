@@ -41,7 +41,7 @@ function SuccessAlert({ show, onClose, title, message }) {
                     className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
                     onClick={onClose}
                   >
-                    <span className="sr-only">{t("system.closeButton")}</span>
+                    <span className="sr-only">{t("closeButton")}</span>
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>

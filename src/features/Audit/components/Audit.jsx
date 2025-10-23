@@ -28,25 +28,25 @@ function AuditTrail() {
       {
         id: "action",
         accessorKey: "action",
-        header: t("system.status"),
+        header: t("status"),
         size: 150,
       },
       {
         id: "entityName",
         accessorKey: "entityName",
-        header: t("system.entityType"),
+        header: t("entityType"),
         size: 120,
       },
       {
         id: "actionDate",
         accessorKey: "actionDate",
-        header: t("system.actionDate"),
+        header: t("actionDate"),
         size: 150,
       },
       {
         id: "userId",
         accessorKey: "userId",
-        header: t("system.createdBy"),
+        header: t("createdBy"),
       },
     ],
     [t]
@@ -62,9 +62,9 @@ function AuditTrail() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("audit.title")}</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("auditTitle")}</h1>
         <p className="text-gray-600">
-          {t("audit.description")}
+          {t("auditDescription")}
         </p>
       </div>
 

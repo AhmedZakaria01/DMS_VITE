@@ -114,27 +114,27 @@ const IndexFieldsTable = ({
   const columns = [
     {
       name: "index",
-      header: t("repos.columns.index"),
+      header: t("index"),
       accessor: "index",
     },
     {
       id: "attributeType",
-      header: t("system.type"),
+      header: t("type"),
       accessor: "attributeType",
     },
     {
       id: "attributeType",
-      header: t("system.type"),
+      header: t("type"),
       accessor: "attributeType",
     },
     {
       id: "attributeSize",
-      header: t("system.size"),
+      header: t("size"),
       accessor: "attributeSize",
     },
     {
       id: "valuesOfMemoType",
-      header: t("system.values"),
+      header: t("values"),
       accessor: "valuesOfMemoType",
     },
   ];
@@ -143,11 +143,11 @@ const IndexFieldsTable = ({
     <div className="bg-white rounded-lg overflow-hidden shadow-sm border">
       {/* Table Header */}
       <div className="px-4 py-3 bg-gray-50 border-b">
-        <h3 className="text-lg font-medium text-gray-900">{t("repos.indexFields")}</h3>
+        <h3 className="text-lg font-medium text-gray-900">{t("indexFields")}</h3>
         <p className="text-sm text-gray-600">
           {indexFields.length === 1
-            ? t("repos.fieldConfigured")
-            : t("repos.fieldsConfigured", { count: indexFields.length })}
+            ? t("fieldConfigured")
+            : t("fieldsConfigured", { count: indexFields.length })}
         </p>
       </div>
 

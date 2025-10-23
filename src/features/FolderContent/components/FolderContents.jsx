@@ -63,7 +63,7 @@ function FolderContents() {
       {
         id: "name",
         accessorKey: "name",
-        header: "Name",
+        header: t("name"),
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             {row.original.type === "folder" ? (
@@ -78,7 +78,7 @@ function FolderContents() {
       {
         id: "type",
         accessorKey: "type",
-        header: "Type",
+        header: t("type"),
         cell: ({ row }) => (
           <span
             className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -87,12 +87,12 @@ function FolderContents() {
                 : "bg-gray-100 text-gray-800"
             }`}
           >
-            {row.original.type === "folder" ? "Folder" : "Document"}
+            {row.original.type === "folder" ? t("folder") : t("document")}
           </span>
         ),
       },
     ],
-    []
+    [t]
   );
 
   const handleRowDoubleClick = (row) => {
@@ -135,9 +135,9 @@ function FolderContents() {
       <div className="flex justify-between ">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Folder Contents
+            {t("folderContentsTitle")}
           </h1>
-          <p className="text-gray-600">{t("folderContent.description")}</p>
+          <p className="text-gray-600">{t("folderContentsDescription")}</p>
         </div>
         <div>
           <button
@@ -145,7 +145,7 @@ function FolderContents() {
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
           >
             <Plus className="w-5 h-5" />
-            Create Repository
+            {t("createRepository")}
           </button>
         </div>
       </div>
@@ -154,7 +154,7 @@ function FolderContents() {
         <ReUsableTable
           columns={columns}
           data={folders_documents}
-          title="Folder Contents"
+          title={t("folderContentsTitle")}
           isLoading={status === "loading"}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}

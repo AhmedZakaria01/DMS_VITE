@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Breadcrumbs() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -15,7 +17,7 @@ function Breadcrumbs() {
   // Always start with Home if we're not on home page
   if (currentPath !== "/") {
     breadcrumbs.push({
-      name: "Home",
+      name: t("home"),
       path: "/",
       isLast: false,
     });
@@ -26,20 +28,20 @@ function Breadcrumbs() {
     // Home page only
     return null;
   } else if (currentPath.match(/^\/audit$/)) {
-    breadcrumbs.push({ name: "Audit", path: "/audit", isLast: true });
+    breadcrumbs.push({ name: t("auditTrail"), path: "/audit", isLast: true });
   } else if (currentPath.match(/^\/users$/)) {
-    breadcrumbs.push({ name: "Users", path: "/users", isLast: true });
+    breadcrumbs.push({ name: t("users"), path: "/users", isLast: true });
   } else if (currentPath.match(/^\/roles$/)) {
-    breadcrumbs.push({ name: "Roles", path: "/roles", isLast: true });
+    breadcrumbs.push({ name: t("roles"), path: "/roles", isLast: true });
   } else if (currentPath.match(/^\/createRepo$/)) {
     breadcrumbs.push({
-      name: "Create Repository",
+      name: t("createRepo"),
       path: "/createRepo",
       isLast: true,
     });
   } else if (currentPath.match(/^\/documentViewer$/)) {
     breadcrumbs.push({
-      name: "Document Viewer",
+      name: t("documentViewer"),
       path: "/documentViewer",
       isLast: true,
     });
@@ -47,7 +49,7 @@ function Breadcrumbs() {
     // Repository contents (root level)
     const repoId = currentPath.match(/^\/repoContents\/(\d+)$/)[1];
     breadcrumbs.push({
-      name: repoName, // Use the consistent repoName variable
+      name: repoName,
       path: `/repoContents/${repoId}`,
       isLast: true,
     });
@@ -61,7 +63,7 @@ function Breadcrumbs() {
 
     // Add repository breadcrumb with actual name
     breadcrumbs.push({
-      name: repoName, // Use the consistent repoName variable from top
+      name: repoName,
       path: `/repoContents/${repoId}`,
       isLast: false,
     });
@@ -73,9 +75,8 @@ function Breadcrumbs() {
       // Use actual folder names from history
       folderHistory.forEach((folder, index) => {
         const isLast = index === folderHistory.length - 1;
-
         breadcrumbs.push({
-          name: folder.name, // Use actual folder name
+          name: folder.name,
           path: folder.path,
           isLast: isLast,
         });
@@ -85,12 +86,11 @@ function Breadcrumbs() {
       const folderIds = folderPath.split("/");
       folderIds.forEach((folderId, index) => {
         const isLast = index === folderIds.length - 1;
-
         // Build the path up to this folder level
         const pathToFolder = folderIds.slice(0, index + 1).join("/");
 
         breadcrumbs.push({
-          name: `Folder ${index + 1}`, // Fallback to generic name
+          name: t("breadcrumb.folderGeneric", { number: index + 1 }),
           path: `/repoContents/${repoId}/folderContent/${pathToFolder}`,
           isLast: isLast,
         });
@@ -114,18 +114,16 @@ function Breadcrumbs() {
           ) : (
             <button
               onClick={() => {
-                console.log("Navigating to:", crumb.path);
                 // Navigate with preserved state
                 navigate(crumb.path, {
                   state: {
-                    repoName: repoName, // Always preserve repository name
+                    repoName: repoName,
                     folderHistory: crumb.path.includes("/folderContent/")
                       ? location.state?.folderHistory?.slice(
                           0,
-                          breadcrumbs.findIndex((b) => b.path === crumb.path) -
-                            1
+                          breadcrumbs.findIndex((b) => b.path === crumb.path) - 1
                         )
-                      : [], // Empty for repository root
+                      : [],
                   },
                 });
               }}

@@ -21,13 +21,13 @@ function Login() {
   const loginSchema = z.object({
     email: z
       .string()
-      .min(1, t("auth.emailRequired")),
+      .min(1, t("emailRequired")),
     password: z
       .string()
-      .min(8, t("auth.passwordMin"))
-      .regex(/[A-Z]/, t("auth.passwordUppercase"))
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, t("auth.passwordSpecial"))
-      .regex(/[0-9]/, t("auth.passwordNumber")),
+      .min(8, t("passwordMin"))
+      .regex(/[A-Z]/, t("passwordUppercase"))
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, t("passwordSpecial"))
+      .regex(/[0-9]/, t("passwordNumber")),
   });
 
   // Use Form
@@ -85,7 +85,7 @@ function Login() {
             {/* email Field */}
             <div>
               <label htmlFor="email" className="block text-white mb-2">
-                {t("users.email")}
+                {t("email")}
               </label>
               <input
                 autoComplete="true"
@@ -95,7 +95,7 @@ function Login() {
                 type="text"
                 name="email"
                 id="email"
-                placeholder={t("auth.emailPlaceholder")}
+                placeholder={t("emailPlaceholder")}
                 {...register("email")}
               />
               {errors.email && (
@@ -108,7 +108,7 @@ function Login() {
             {/* Password Field */}
             <div className="pb-4">
               <label htmlFor="password" className="block text-white mb-2">
-                {t("users.password")}
+                {t("password")}
               </label>
               <input
                 className={`w-full px-4 py-2 bg-gray-700 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
@@ -118,7 +118,7 @@ function Login() {
                 name="password"
                 id="password"
                 autoComplete="true"
-                placeholder={t("auth.passwordPlaceholder")}
+                placeholder={t("passwordPlaceholder")}
                 {...register("password")}
               />
               {errors.password && (
@@ -139,7 +139,7 @@ function Login() {
                 className="w-full py-2 bg-purple-600 text-white rounded-md cursor-not-allowed"
                 disabled
               >
-                <i className="fas fa-spinner fa-spin"></i> {t("system.loading")}
+                <i className="fas fa-spinner fa-spin"></i> {t("loading")}
               </button>
             ) : (
               <button

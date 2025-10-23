@@ -1,6 +1,6 @@
 // redux/thunks/repoThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getPermissions } from "../../services/apiServices";
+import { getPermissions, getScreensPermissions } from "../../services/apiServices";
 
 // Fetch User Repositories
 export const fetchPermissions = createAsyncThunk(
@@ -10,3 +10,15 @@ export const fetchPermissions = createAsyncThunk(
     return response.data;
   }
 );
+
+
+
+// Fetch screen permissions
+export const fetchScreensPermissions = createAsyncThunk(
+  "permissions/fetchScreensPermissions",
+  async () => {
+    const response = await getScreensPermissions();
+    return response.data;
+  }
+);
+

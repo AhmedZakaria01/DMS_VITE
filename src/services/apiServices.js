@@ -196,7 +196,7 @@ export async function createNewUser(userData) {
 // Create New Role
 export async function createNewRole(roleData) {
   try {
-    const response = await api.post("/Roles", roleData);
+    const response = await api.post("Roles/CreateRolePermissions", roleData);
     return response;
   } catch (err) {
     console.err("Failed to Create Role", err);
@@ -304,7 +304,8 @@ export async function getRepositoryById(id) {
 export async function getRepoContents(id) {
   try {
     const response = await api.get(
-      `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
+      // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
+            `Repository/GetRepositoryContentById/${id}`
     );
     return response;
   } catch (err) {
@@ -386,12 +387,23 @@ export async function getRoles() {
   }
 }
 
-// Fetch Permissions
+// Fetch Permissions for Repository
 export async function getPermissions() {
   try {
     const response = await api.get("Permissions/GetRepositoryPermissions");
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Roles", err);
+    console.err("Failed to Repository Permissions", err);
+  }
+}
+
+
+// fetch all External Permissions
+export async function getScreensPermissions() {
+  try {
+    const response = await api.get("Permissions/GetScreensPermissions");
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch screen Permissions", err);
   }
 }

@@ -1,21 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchPermissions } from "./permissionsThunks";
+import { fetchPermissions, fetchScreensPermissions } from "./permissionsThunks";
 
-const permissionslice = createSlice({
+const permissionSlice = createSlice({
   name: "permissions",
   initialState: {
     permissions: [],
     status: "idle",
     error: null,
+    screenPermissions: [],
+    screenStatus: "idle",
+    screenError: null,
   },
   reducers: {
-    clearpermissions: (state) => {
+    clearPermissions: (state) => {
       state.permissions = [];
+      state.screenPermissions = [];
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch User permissions
+      // Fetch User Permissions
       .addCase(fetchPermissions.pending, (state) => {
         state.status = "loading";
       })
@@ -27,7 +31,21 @@ const permissionslice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+
+      // Fetch Screen Permissions
+      .addCase(fetchScreensPermissions.pending, (state) => {
+        state.screenStatus = "loading";
+      })
+      .addCase(fetchScreensPermissions.fulfilled, (state, action) => {
+        state.screenStatus = "succeeded";
+        state.screenPermissions = action.payload?.response || [];
+      })
+      .addCase(fetchScreensPermissions.rejected, (state, action) => {
+        state.screenStatus = "failed";
+        state.screenError = action.error.message;
+      });
   },
 });
 
-export default permissionslice.reducer;
+export const { clearPermissions } = permissionSlice.actions;
+export default permissionSlice.reducer;

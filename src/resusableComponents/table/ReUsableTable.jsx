@@ -14,18 +14,20 @@ import "./Table.css";
 
 import Popup from "../../globalComponents/Popup";
 import DisplaySelectedItems from "./DisplaySelectedItems";
+import { useTranslation } from "react-i18next";
 
 /**
  * Default column filter component
  */
 const DefaultColumnFilter = ({ column }) => {
+  const { t } = useTranslation();
   const columnFilterValue = column.getFilterValue();
 
   return (
     <input
       value={columnFilterValue ?? ""}
       onChange={(e) => column.setFilterValue(e.target.value)}
-      placeholder="Search..."
+      placeholder={t("searchPlaceholder")}
       className="filter-input"
     />
   );
@@ -38,16 +40,19 @@ DefaultColumnFilter.propTypes = {
 /**
  * Global filter component for searching across all table data
  */
-const GlobalFilter = ({ value, onChange }) => (
-  <span className="global-filter-container">
-    <input
-      value={value || ""}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder="Type to search"
-      className="global-filter-input"
-    />
-  </span>
-);
+const GlobalFilter = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <span className="global-filter-container">
+      <input
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={t("typeToSearch")}
+        className="global-filter-input"
+      />
+    </span>
+  );
+};
 
 GlobalFilter.propTypes = {
   value: PropTypes.string,
@@ -155,7 +160,7 @@ PaginationControls.propTypes = {
 const ReUsableTable = ({
   columns: userColumns,
   data,
-  title = "Data Table",
+  title,
   initialState = {},
   onRowDoubleClick,
   showGlobalFilter = true,
@@ -166,6 +171,7 @@ const ReUsableTable = ({
   className = "",
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
 

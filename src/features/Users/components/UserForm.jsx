@@ -20,13 +20,7 @@ import { createUser } from "../usersThunks";
 import { useTranslation } from "react-i18next";
 
 // Array of available roleIds with UUID values
-const roleIds = [
-  { value: "c3563db9-99ce-43fd-9396-adcc0a455862", label: "Administrator" },
-  { value: "ecc0e6d4-6ef6-4447-9e3f-2ad01c210545", label: "Manager" },
-  { value: "a1b2c3d4-5e6f-7g8h-9i0j-k1l2m3n4o5p6", label: "Editor" },
-  { value: "b2c3d4e5-6f7g-8h9i-0j1k-l2m3n4o5p6q7", label: "User" },
-  { value: "c3d4e5f6-7g8h-9i0j-1k2l-m3n4o5p6q7r8", label: "Viewer" },
-];
+// ROLES will be defined inside the component to access t function
 
 // Permission IDs array (you can modify this as needed)
 const permissionIds = [
@@ -90,6 +84,16 @@ const UserForm = ({
 }) => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  
+  // Localized roles array
+  const ROLES = [
+    { value: "c3563db9-99ce-43fd-9396-adcc0a455862", label: t("administrator") },
+    { value: "ecc0e6d4-6ef6-4447-9e3f-2ad01c210545", label: t("manager") },
+    { value: "a1b2c3d4-5e6f-7g8h-9i0j-k1l2m3n4o5p6", label: t("editor") },
+    { value: "b2c3d4e5-6f7g-8h9i-0j1k-l2m3n4o5p6q7", label: t("user") },
+    { value: "c3d4e5f6-7g8h-9i0j-1k2l-m3n4o5p6q7r8", label: t("viewer") },
+  ];
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -145,7 +149,7 @@ const UserForm = ({
   });
 
   // Filter roles and permissions based on search terms
-  const filteredRoleIds = roleIds.filter((role) =>
+  const filteredRoleIds = ROLES.filter((role) =>
     role.label.toLowerCase().includes(roleSearchTerm.toLowerCase())
   );
 
@@ -232,7 +236,7 @@ const UserForm = ({
 
   // Get role label by value
   const getRoleLabel = (value) => {
-    return roleIds.find((role) => role.value === value)?.label || value;
+    return ROLES.find((role) => role.value === value)?.label || value;
   };
 
   // Get permission label by value
@@ -771,7 +775,7 @@ const UserForm = ({
               className="flex-none bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              {t("system.reset")}
+              {t("reset")}
             </button>
 
             <button
@@ -780,7 +784,7 @@ const UserForm = ({
               disabled={isSubmitting}
               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
-              {t("system.cancel")}
+              {t("cancel")}
             </button>
           </div>
         </div>

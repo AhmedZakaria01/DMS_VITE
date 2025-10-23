@@ -223,7 +223,8 @@
 // //               disabled={isSubmitting}
 // //               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 // //             >
-// //               Cancel
+// //                                 {t("cancel")}
+
 // //             </button>
 // //           </div>
 // //         </div>
@@ -479,7 +480,8 @@
 //               disabled={isSubmitting}
 //               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 //             >
-//               Cancel
+//                                 {t("cancel")}
+
 //             </button>
 //           </div>
 //         </div>

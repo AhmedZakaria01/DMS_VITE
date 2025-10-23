@@ -65,7 +65,7 @@ function Users() {
             handleUpdateUser(userData);
           }}
           className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Edit user"
+          title={t("editUser")}
         >
           <Edit2 className="w-4 h-4" />
         </button>
@@ -76,7 +76,7 @@ function Users() {
             handleDeleteUser(userData);
           }}
           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-          title="Delete user"
+          title={t("deleteUser")}
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -90,26 +90,26 @@ function Users() {
       {
         id: "userName",
         accessorKey: "userName",
-        header: "User Name",
+        header: t("userName"),
         size: 150,
       },
       {
         id: "email",
         accessorKey: "email",
-        header: "Email",
+        header: t("email"),
         size: 200,
       },
       {
         id: "actions",
         accessorKey: "actions",
-        header: "Actions",
+        header: t("actions"),
         size: 120,
         enableSorting: false,
         enableColumnFilter: false,
         cell: ({ row }) => <ActionButtons user={row.original} />,
       },
     ],
-    [ActionButtons]
+    [ActionButtons, t]
   );
 
   // Double Click
@@ -127,8 +127,8 @@ function Users() {
     <div className="p-6">
       <div className="flex justify-between">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("users.title")}</h1>
-          <p className="text-gray-600">{t("users.description")}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("users")}</h1>
+          <p className="text-gray-600">{t("usersDescription")}</p>
         </div>
         <div>
           <button
@@ -136,7 +136,7 @@ function Users() {
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
           >
             <Plus className="w-5 h-5" />
-            {t("users.createNew")}
+            {t("createNewUser")}
           </button>
         </div>
       </div>
@@ -144,7 +144,7 @@ function Users() {
       {/* Show error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{t("system.error")}: {error}</p>
+          <p className="text-red-600">{t("error")}: {error}</p>
         </div>
       )}
 

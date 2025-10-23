@@ -253,9 +253,9 @@ function Repos() {
           handleUpdateDetails(repo);
         }}
         className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-        title={t("system.update")}
+        title={t("update")}
       >
-        <p>{t("system.update")}</p>
+        <p>{t("update")}</p>
         <Edit className="w-4 h-4" />
       </button>
       <button
@@ -264,9 +264,9 @@ function Repos() {
           handleUpdatePermissions(repo);
         }}
         className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
-        title={t("permissions.manage")}
+        title={t("managePermissions")}
       >
-        <p>{t("permissions.manage")}</p>
+        <p>{t("managePermissions")}</p>
         <Shield className="w-4 h-4" />
       </button>
       <button
@@ -275,9 +275,9 @@ function Repos() {
           handleDelete(repo);
         }}
         className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
-        title={t("system.delete")}
+        title={t("delete")}
       >
-        <p>{t("system.delete")}</p>
+        <p>{t("delete")}</p>
         <Trash2 className="w-4 h-4" />
       </button>
     </div>
@@ -294,7 +294,7 @@ function Repos() {
       {
         id: "actions",
         accessorKey: "actions",
-        header: t("documents.actions"),
+        header: t("actions"),
         size: 140,
         enableSorting: false,
         enableColumnFilter: false,
@@ -323,7 +323,7 @@ function Repos() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {t("repositories")}
           </h1>
-          <p className="text-gray-600">{t("repos.description")}</p>
+          <p className="text-gray-600">{t("reposDescription")}</p>
         </div>
         <div>
           <button

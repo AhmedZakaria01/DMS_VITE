@@ -65,7 +65,7 @@ function Roles() {
             handleUpdateRole(userData);
           }}
           className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Edit role"
+          title={t("editRole")}
         >
           <Edit2 className="w-4 h-4" />
         </button>
@@ -76,7 +76,7 @@ function Roles() {
             handleDeleteRole(userData);
           }}
           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-          title="Delete role"
+          title={t("deleteRole")}
         >
           <Trash2 className="w-4 h-4" />
         </button>
@@ -90,13 +90,13 @@ function Roles() {
       {
         id: "name",
         accessorKey: "roleName",
-        header: "Name",
+        header: t("name"),
         size: 150,
       },
       {
         id: "actions",
         accessorKey: "actions",
-        header: "Actions",
+        header: t("actions"),
         size: 120,
         enableSorting: false,
         enableColumnFilter: false,
@@ -121,8 +121,8 @@ function Roles() {
     <section className="p-6">
       <div className="flex justify-between items-">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("roles.title")}</h1>
-          <p className="text-gray-600">{t("roles.description")}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("rolesTitle")}</h1>
+          <p className="text-gray-600">{t("rolesDescription")}</p>
         </div>
 
         <div>
@@ -139,7 +139,7 @@ function Roles() {
       {/* Show error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{t("system.error")}: {error}</p>
+          <p className="text-red-600">{t("error")}: {error}</p>
         </div>
       )}
 

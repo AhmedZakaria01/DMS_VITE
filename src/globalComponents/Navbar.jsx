@@ -44,9 +44,9 @@ function Navbar() {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-white font-bold text-xl tracking-wide">
-                {t("navbar.documentManagement")}
+                {t("documentManagement")}
               </h1>
-              <p className="text-indigo-100 text-xs -mt-1">{t("navbar.system")}</p>
+              <p className="text-indigo-100 text-xs -mt-1">{t("system")}</p>
             </div>
           </Link>
         </div>
@@ -71,7 +71,7 @@ function Navbar() {
             className={`flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-red-500/80 backdrop-blur-sm transition-all duration-200 text-white border border-white/20 hover:border-red-400/50 ${
               isRTL ? "flex-row-reverse gap-2" : "gap-2"
             }`}
-            title="Sign out"
+            title={t("logout")}
           >
             <svg
               className="w-4 h-4"
@@ -86,7 +86,7 @@ function Navbar() {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
-            <span className="text-sm font-medium">{t("navbar.logout")}</span>
+            <span className="text-sm font-medium">{t("logout")}</span>
           </button>
         </div>
       </div>

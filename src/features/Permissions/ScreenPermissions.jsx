@@ -10,7 +10,7 @@ import {
   AlertCircle,
   RotateCcw,
 } from "lucide-react";
-// import { fetchScreensPermissions } from "./permissionsThunks";
+import { fetchScreensPermissions } from "./permissionsThunks";
 import { createNewRole } from "../../services/apiServices";
 
 function ScreenPermissions() {
@@ -28,9 +28,9 @@ function ScreenPermissions() {
     formState: { errors },
   } = useForm();
 
-  // useEffect(() => {
-  //   dispatch(fetchScreensPermissions());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchScreensPermissions());
+  }, [dispatch]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);

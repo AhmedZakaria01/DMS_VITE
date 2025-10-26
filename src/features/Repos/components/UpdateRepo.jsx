@@ -885,8 +885,7 @@
 //                             onClick={cancelAddField}
 //                             className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
 //                           >
-//                                               {t("cancel")}
-
+// cancel
 //                           </button>
 //                         </div>
 //                       </div>
@@ -914,8 +913,7 @@
 //                     onClick={() => navigate("/")}
 //                     className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
 //                   >
-//                                       {t("cancel")}
-
+// cancel
 //                   </button>
 //                   <button
 //                     type="submit"
@@ -957,7 +955,6 @@
 // }
 
 // export default UpdateRepo;
-import React from 'react'
 
 export default function UpdateRepo() {
   return (

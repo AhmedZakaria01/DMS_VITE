@@ -22,8 +22,8 @@
   "createRepo": "Create Repository",
   "createNewRepository": "Create New Repository",
   "repositoryName": "Repository Name",
-    "password":"Password",
-      "saveField": "Save Field",
+  "password":"Password",
+  "saveField": "Save Field",
   "updateField": "Update Field",
   "description": "Description",
   "categoryOptions": "Category Options",
@@ -161,6 +161,24 @@
     "minThreeChars": "Must be at least 3 characters",
     "maxThirtyChars": "Must be less than 30 characters",
     "onlyLettersNumbersUnderscore": "Can only contain letters, numbers, and underscores",
-    "passwordsNotMatch": "Passwords don't match"
+    "passwordsNotMatch": "Passwords don't match",
+  "roleCreatedSuccessfully": "Role created successfully!",
+  "assignScreenPermissions": "Assign Screen Permissions",
+  "selectRoleAndScreens": "Select the role and choose which screens it can access.",
+  "roleInformation": "Role Information",
+  "roleName": "Role Name",
+  "roleNamePlaceholder": "Enter role name (e.g., Admin, Editor)",
+  "screenAccessPermissions": "Screen Access Permissions",
+  "selectedPermissionsCount": "Selected Permissions",
+  "selectPermissions": "Select Permissions",
+  "selectAll": "Select All",
+  "clearAll": "Clear All",
+  "permissionsSelected": "{{count}} permission(s) selected",
+  "clickToSelect": "Click to select permissions",
+  "clickDropdownHint": "Click the dropdown to view and select available permissions",
+  "savingPermissions": "Saving Permissions...",
+  "savePermissions": "Save Permissions",
+    "roleNameRequired": "Role name is required"
+       
   
 }

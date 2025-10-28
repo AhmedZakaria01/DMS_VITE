@@ -191,18 +191,18 @@ export async function createNewUser(userData) {
   } catch (err) {
     console.err("Failed to Create User", err);
   }
-}
+}  
 
 // Create New Role
 export async function createNewRole(roleData) {
   try {
     const response = await api.post("Roles/CreateRolePermissions", roleData);
-    return response;
+    return response; 
   } catch (err) {
-    console.err("Failed to Create Role", err);
+    console.error("Failed to Create Role", err);
+    throw err;
   }
 }
-
 // Update Role
 export async function updateRole(roleData) {
   try {

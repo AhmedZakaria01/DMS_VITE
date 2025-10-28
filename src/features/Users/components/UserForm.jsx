@@ -867,9 +867,9 @@ const UserForm = ({
   useEffect(() => {
     dispatch(fetchScreensPermissions());
   }, [dispatch]);
-  console.log('====================================');
-  console.log('marwa',screenPermissions);
-  console.log('====================================');
+  // console.log('====================================');
+  // console.log('marwa',screenPermissions);
+  // console.log('====================================');
 
   const isEditMode = mode === "edit";
 
@@ -1057,9 +1057,9 @@ const UserForm = ({
         roleIds: selectedRoles,
         permissionIds: selectedPermissionIds,
       };
-console.log('====================================');
-console.log('marwa submitData',submitData);
-console.log('====================================');
+// console.log('====================================');
+// console.log('marwa submitData',submitData);
+// console.log('====================================');
       // In edit mode, include the ID and handle password
       if (isEditMode && initialData) {
         submitData.id = initialData.id;

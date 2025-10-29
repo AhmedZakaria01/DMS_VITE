@@ -49,7 +49,7 @@ const authSlice = createSlice({
         state.status = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
-        console.log(action.payload);
+        // console.log(action.payload);
 
         state.status = "succeeded";
         state.user.name = action.payload.name;

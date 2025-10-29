@@ -191,11 +191,11 @@ import React, { useMemo, useEffect, useState } from "react";
 import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Shield, Trash2 } from "lucide-react";
-import Popup from "../../../globalComponents/Popup";
-import UserForm from "../../Users/components/UserForm";
-import RepoForm from "./RepoForm";
-import UpdateRepo from "./UpdateRepo";
-import { id } from "zod/v4/locales";
+// import Popup from "../../../globalComponents/Popup";
+// import UserForm from "../../Users/components/UserForm";
+// import RepoForm from "./RepoForm";
+// import UpdateRepo from "./UpdateRepo";
+// import { id } from "zod/v4/locales";
 import { useTranslation } from "react-i18next";
 
 function Repos() {
@@ -340,7 +340,7 @@ function Repos() {
         <ReUsableTable
           columns={columns}
           data={repos || []}
-          title={t("repos.title")}
+          title={t("Repositories")}
           isLoading={status === "loading"}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}
@@ -349,7 +349,7 @@ function Repos() {
           className="repos-table"
           enableSelection={false}
         />
-        {console.log("Repos data:", repos)}
+        {/* {console.log("Repos data:", repos)} */}
       </div>
     </section>
   );

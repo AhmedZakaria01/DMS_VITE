@@ -29,6 +29,12 @@ function Breadcrumbs() {
     return null;
   } else if (currentPath.match(/^\/audit$/)) {
     breadcrumbs.push({ name: t("auditTrail"), path: "/audit", isLast: true });
+    } else if (currentPath.match(/^\/advancesSearch$/)) {
+    breadcrumbs.push({ name: t("advancesSearch"), path: "/advancesSearch", isLast: true });
+    } else if (currentPath.match(/^\/category$/)) {
+    breadcrumbs.push({ name: t("category"), path: "/category", isLast: true });
+    } else if (currentPath.match(/^\/settings$/)) {
+    breadcrumbs.push({ name: t("settings"), path: "/settings", isLast: true });
   } else if (currentPath.match(/^\/users$/)) {
     breadcrumbs.push({ name: t("users"), path: "/users", isLast: true });
   } else if (currentPath.match(/^\/roles$/)) {

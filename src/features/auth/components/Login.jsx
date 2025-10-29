@@ -24,7 +24,7 @@ function Login() {
       .min(1, t("emailRequired")),
     password: z
       .string()
-      .min(8, t("passwordMin"))
+      .min(8, t("passwordMinLength"))
       .regex(/[A-Z]/, t("passwordUppercase"))
       .regex(/[!@#$%^&*(),.?":{}|<>]/, t("passwordSpecial"))
       .regex(/[0-9]/, t("passwordNumber")),
@@ -118,7 +118,7 @@ function Login() {
                 name="password"
                 id="password"
                 autoComplete="true"
-                placeholder={t("passwordPlaceholder")}
+                placeholder={t("passwordPlaceholderCreate")}
                 {...register("password")}
               />
               {errors.password && (

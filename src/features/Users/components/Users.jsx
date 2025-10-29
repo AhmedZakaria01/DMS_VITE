@@ -152,7 +152,7 @@ function Users() {
       <ReUsableTable
         columns={columns}
         data={users || []}
-        title="Users"
+        title={t("users")}
         isLoading={status === "loading"}
         onRowDoubleClick={handleRowDoubleClick}
         showGlobalFilter={true}

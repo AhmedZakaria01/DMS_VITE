@@ -89,12 +89,11 @@ export const loginUser = async (credentials) => {
   try {
     const response = await api.post("Authenticate/Login", credentials);
     const { token, id, email } = response.data.response;
-    console.log(response.data.response);
-
+    // console.log(response.data.response);
     Cookies.set("userId", id);
     Cookies.set("email", email);
-    console.log(id);
-    console.log(email);
+    // console.log(id);
+    // console.log(email);
 
     if (!token) {
       throw new Error("No token received from server");
@@ -166,7 +165,7 @@ export async function getUserRepos(userId) {
 export async function getAllRepos() {
   try {
     const response = await api.get(`Repository/GetAllRepositories`);
-    console.log(response);
+    // console.log(response);
     return response;
   } catch (error) {
     throw new error(error);
@@ -407,3 +406,7 @@ export async function getScreensPermissions() {
     console.err("Failed to Fetch screen Permissions", err);
   }
 }
+
+
+
+

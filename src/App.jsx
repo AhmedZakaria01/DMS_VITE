@@ -20,8 +20,10 @@ import Permissions from "./features/Permissions/Permissions";
 import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermissionsTable";
 import UpdateRepo from "./features/Repos/components/UpdateRepo";
 import AdminRoute from "./resusableComponents/ProtectedRoute";
-// import ScreenPermissions from "./features/Permissions/screenPermissions";
 import CreateFolder from "./features/FolderContent/components/CreateFolder";
+import { Search, Settings } from "lucide-react";
+import Category from "./features/Category/Category";
+import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -44,6 +46,9 @@ function App() {
           {/* Nested routes -  Outlet */}
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
+          <Route path="/advancesSearch" element={<Search />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/settings" element={<Settings />} />
 <Route 
   path="/users" 
   element={
@@ -61,7 +66,7 @@ function App() {
   } 
 />         
  <Route path="/permissions" element={<Permissions />} />
-  {/* <Route path="/ScreenPermissions" element={<ScreenPermissions />} /> */}
+  <Route path="/ScreenPermissions" element={<ScreenPermissions />} />
 
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />

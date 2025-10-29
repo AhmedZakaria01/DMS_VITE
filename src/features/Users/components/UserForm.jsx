@@ -848,6 +848,7 @@ import {
 import { createUser } from "../usersThunks";
 import { fetchRoles } from "../../Roles/RolesThunks";
 import { fetchScreensPermissions } from "../../Permissions/permissionsThunks";
+import { useTranslation } from "react-i18next";
 
 const UserForm = ({
   mode = "create",
@@ -859,6 +860,8 @@ const UserForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const { t } = useTranslation();
+  
 
   const { screenPermissions = [] } = useSelector(
     (state) => state.permissionsReducer
@@ -916,7 +919,7 @@ const UserForm = ({
     setValue,
     trigger,
   } = useForm({
-    resolver: zodResolver(getValidationSchema(isEditMode)),
+    resolver: zodResolver(getValidationSchema(isEditMode,t)),
     mode: "onChange",
     defaultValues: getDefaultValues(),
   });
@@ -1139,12 +1142,12 @@ const UserForm = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          {isEditMode ? "Update User" : "Create New User"}
+          {isEditMode ? t("updateUser") : t("createUser")}
         </h2>
         <p className="text-lg text-gray-600">
           {isEditMode
-            ? "Update the user information below"
-            : "Fill in the basic information to create a new user account"}
+            ? t("updateUserDescription")
+            : t("createUserDescription")}
         </p>
       </div>
 
@@ -1157,14 +1160,14 @@ const UserForm = ({
               <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                 <User className="w-4 h-4 text-blue-600" />
               </span>
-              Account Information
+              {t("accountInformation")}
             </h3>
 
             <div className="space-y-4">
               {/* First Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name <span className="text-red-500">*</span>
+                  {t("firstName")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("firstName")}
@@ -1175,7 +1178,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder="Enter first name"
+                  placeholder={t("firstNamePlaceholder")}
                 />
                 {errors.firstName && (
                   <p className="mt-1 text-text-red-600 flex items-center">
@@ -1188,7 +1191,7 @@ const UserForm = ({
               {/* Last Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name <span className="text-red-500">*</span>
+                  {t("lastName")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("lastName")}
@@ -1199,7 +1202,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder="Enter last name"
+                  placeholder={t("lastNamePlaceholder")}
                 />
                 {errors.lastName && (
                   <p className="mt-1 text-text-red-600 flex items-center">
@@ -1212,7 +1215,7 @@ const UserForm = ({
               {/* Username */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Username <span className="text-red-500">*</span>
+                  {t("userName")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("userName")}
@@ -1223,7 +1226,7 @@ const UserForm = ({
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
-                  placeholder="Enter username"
+                  placeholder={t("usernamePlaceholder")}
                 />
                 {errors.userName && (
                   <p className="mt-1 text-text-red-600 flex items-center">
@@ -1236,7 +1239,7 @@ const UserForm = ({
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
+                  {t("emailAddress")} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1251,7 +1254,7 @@ const UserForm = ({
                         ? "border-red-300 bg-red-50"
                         : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                     }`}
-                    placeholder="john@example.com"
+                    placeholder={t("emailPlaceholder")}
                   />
                 </div>
                 {errors.email && (
@@ -1265,7 +1268,7 @@ const UserForm = ({
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password{" "}
+                  {t("password")}{" "}
                   {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
@@ -1288,8 +1291,8 @@ const UserForm = ({
                     }`}
                     placeholder={
                       isEditMode
-                        ? "Leave empty to keep current password"
-                        : "Enter a strong password"
+                        ? t("passwordPlaceholderEdit")
+                        : t("passwordPlaceholderCreate")
                     }
                   />
                   <button
@@ -1312,8 +1315,7 @@ const UserForm = ({
                 )}
                 {!isEditMode && (
                   <p className="mt-1 text-xs text-gray-500">
-                    Password must contain at least 8 characters with uppercase,
-                    lowercase, and numbers
+                    {t("passwordRequirements")}
                   </p>
                 )}
               </div>
@@ -1321,11 +1323,11 @@ const UserForm = ({
               {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password{" "}
+                  {t("confirmPassword")}{" "}
                   {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
-                      (Leave empty to keep current password)
+                      {t("confirmPasswordPlaceholderEdit")}
                     </span>
                   )}
                 </label>
@@ -1344,8 +1346,8 @@ const UserForm = ({
                     }`}
                     placeholder={
                       isEditMode
-                        ? "Leave empty to keep current password"
-                        : "Confirm your password"
+                        ? t("confirmPasswordPlaceholderEdit")
+                        : t("confirmPasswordPlaceholderCreate")
                     }
                   />
                   <button
@@ -1371,7 +1373,7 @@ const UserForm = ({
               {/* Roles - Multi Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Roles <span className="text-red-500">*</span>
+                  {t("roles")} <span className="text-red-500">*</span>
                 </label>
 
                 {/* Selected Roles Display */}
@@ -1406,7 +1408,7 @@ const UserForm = ({
                     onChange={(e) => setRoleSearchTerm(e.target.value)}
                     onFocus={() => setIsRoleDropdownOpen(true)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
-                    placeholder="Search and select roles..."
+                    placeholder={t("rolesPlaceholder")}
                   />
 
                   {/* Role Dropdown */}
@@ -1441,7 +1443,7 @@ const UserForm = ({
                         ))
                       ) : (
                         <div className="px-4 py-2 text-sm text-gray-500">
-                          No roles found matching &quot;{roleSearchTerm}&quot;
+                          {t("noRolesFound")} &quot;{roleSearchTerm}&quot;
                         </div>
                       )}
                     </div>
@@ -1449,14 +1451,14 @@ const UserForm = ({
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  You can select multiple roles. Selected: {selectedRoles.length}
+                  {t("rolesSelectionHint")} {selectedRoles.length}
                 </p>
               </div>
 
               {/* Permissions - Multi Select */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Permissions
+                  {t("permissions")}
                 </label>
 
                 {/* Selected Permissions Display */}
@@ -1491,7 +1493,7 @@ const UserForm = ({
                     onChange={(e) => setPermissionSearchTerm(e.target.value)}
                     onFocus={() => setIsPermissionDropdownOpen(true)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
-                    placeholder="Search and select permissions..."
+                    placeholder={t("permissionsPlaceholder")}
                   />
 
                   {/* Permission Dropdown */}
@@ -1526,7 +1528,7 @@ const UserForm = ({
                         ))
                       ) : (
                         <div className="px-4 py-2 text-sm text-gray-500">
-                          No permissions found matching &quot;{permissionSearchTerm}&quot;
+                          {t("noPermissionsFound")} &quot;{permissionSearchTerm}&quot;
                         </div>
                       )}
                     </div>
@@ -1534,7 +1536,7 @@ const UserForm = ({
                 </div>
 
                 <p className="mt-1 text-xs text-gray-500">
-                  You can select multiple permissions. Selected: {selectedPermissionIds.length}
+                  {t("permissionsSelectionHint")} {selectedPermissionIds.length}
                 </p>
               </div>
             </div>
@@ -1551,12 +1553,12 @@ const UserForm = ({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  {isEditMode ? "Updating User..." : "Creating User..."}
+                  {isEditMode ? t("updatingUser") : t("creatingUser")}
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  {isEditMode ? "Update User" : "Create User"}
+                  {/* <CheckCircle className="w-5 h-5 mr-2" /> */}
+                  {isEditMode ? t("updateUser") : t("createUser")}
                 </>
               )}
             </button>
@@ -1567,8 +1569,8 @@ const UserForm = ({
               disabled={isSubmitting}
               className="flex-none bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
+              {/* <RotateCcw className="w-4 h-4 mr-2" /> */}
+              {t("reset")}
             </button>
 
             <button
@@ -1577,7 +1579,7 @@ const UserForm = ({
               disabled={isSubmitting}
               className="flex-none bg-red-200 hover:bg-red-300 disabled:bg-red-100 text-red-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </div>
@@ -1587,59 +1589,60 @@ const UserForm = ({
 };
 
 // Dynamic validation schema based on mode
-const getValidationSchema = (isEditMode) =>
+// Dynamic validation schema based on mode
+const getValidationSchema = (isEditMode, t) =>
   z.object({
     firstName: z
       .string()
-      .min(1, "First name is required")
-      .min(3, "First name must be at least 3 characters")
-      .max(30, "First name must be less than 30 characters")
+      .min(1, t("firstNameRequired"))
+      .min(3, t("minThreeChars"))
+      .max(30, t("maxThirtyChars"))
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        "First name can only contain letters, numbers, and underscores"
+        t("onlyLettersNumbersUnderscore")
       )
       .trim(),
     lastName: z
       .string()
-      .min(1, "Last name is required")
-      .min(3, "Last name must be at least 3 characters")
-      .max(30, "Last name must be less than 30 characters")
+      .min(1, t("lastNameRequired"))
+      .min(3, t("minThreeChars"))
+      .max(30, t("maxThirtyChars"))
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        "Last name can only contain letters, numbers, and underscores"
+        t("onlyLettersNumbersUnderscore")
       )
       .trim(),
     userName: z
       .string()
-      .min(1, "Username is required")
-      .min(3, "Username must be at least 3 characters")
-      .max(30, "Username must be less than 30 characters")
+      .min(1, t("userNameRequired"))
+      .min(3, t("minThreeChars"))
+      .max(30, t("maxThirtyChars"))
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        "Username can only contain letters, numbers, and underscores"
+        t("onlyLettersNumbersUnderscore")
       )
       .trim(),
     email: z
       .string()
-      .min(1, "Email is required")
-      .email("Please enter a valid email address")
+      .min(1, t("emailRequired"))
+      .email(t("emailInvalid"))
       .toLowerCase(),
     password: isEditMode
       ? z.string().optional().or(z.literal("")) // Optional in edit mode
       : z
           .string()
-          .min(1, "Password is required")
-          .min(8, "Password must be at least 8 characters")
-          .max(100, "Password must be less than 100 characters")
+          .min(1, t("passwordRequired"))
+          .min(8, t("passwordMinLength"))
+          .max(100, t("passwordMaxLength"))
           .regex(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-            "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+            t("passwordRequirements")
           ),
     confirmPassword: isEditMode
-      ? z.string().optional().or(z.literal("")) // Optional in edit mode
-      : z.string().min(1, "Confirm password is required"),
+      ? z.string().optional().or(z.literal("")) 
+      : z.string().min(1, t("confirmPasswordRequired")),
   }).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: t("passwordsNotMatch"),
     path: ["confirmPassword"],
   });
 

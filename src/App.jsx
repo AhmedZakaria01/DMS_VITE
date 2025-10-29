@@ -20,7 +20,7 @@ import Permissions from "./features/Permissions/Permissions";
 import UsersRolesPermissionsTable from "./features/Permissions/UsersRolesPermissionsTable";
 import UpdateRepo from "./features/Repos/components/UpdateRepo";
 import AdminRoute from "./resusableComponents/ProtectedRoute";
-import ScreenPermissions from "./features/Permissions/screenPermissions";
+// import ScreenPermissions from "./features/Permissions/screenPermissions";
 import CreateFolder from "./features/FolderContent/components/CreateFolder";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -61,7 +61,7 @@ function App() {
   } 
 />         
  <Route path="/permissions" element={<Permissions />} />
-  <Route path="/ScreenPermissions" element={<ScreenPermissions />} />
+  {/* <Route path="/ScreenPermissions" element={<ScreenPermissions />} /> */}
 
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />

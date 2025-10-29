@@ -40,7 +40,7 @@ export default function Sidebar({
         link: "/category",
         icon: "📁",
       },
-      { name: t("settings"), link: "/settings", icon: "⚙️" },
+      // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {

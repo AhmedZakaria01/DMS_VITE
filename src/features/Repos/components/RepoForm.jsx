@@ -59,17 +59,17 @@ const IndexFieldsTable = ({
     }
   };
 
-  // Get display label for attribute type
+  // Get display label for attribute type - FIXED
   const getTypeLabel = (type) => {
     const ATTRIBUTE_TYPES = [
-      { value: "string", label: t("attributeType.string"), hasSize: true },
-      { value: "int", label: t("attributeType.integer"), hasSize: true },
-      { value: "date", label: t("attributeType.date"), hasSize: false },
-      { value: "datetime", label: t("attributeType.dateTime"), hasSize: false },
-      { value: "memo", label: t("attributeType.memo"), hasSize: true },
-      { value: "dropdown", label: t("attributeType.dropdown"), hasSize: false },
+      { value: "string", label: t("string"), hasSize: true },
+      { value: "int", label: t("integer"), hasSize: true },
+      { value: "date", label: t("date"), hasSize: false },
+      { value: "datetime", label: t("dateTime"), hasSize: false },
+      { value: "memo", label: t("memo"), hasSize: true },
+      { value: "dropdown", label: t("dropdown"), hasSize: false },
     ];
-    return ATTRIBUTE_TYPES.find((t) => t.value === type)?.label || type;
+    return ATTRIBUTE_TYPES.find((attrType) => attrType.value === type)?.label || type;
   };
 
   // Render pagination controls
@@ -93,8 +93,8 @@ const IndexFieldsTable = ({
     return (
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
         <div className="text-sm text-gray-600">
-          {t("pagination.showing")} {startIndex + 1} {t("pagination.to")} {Math.min(endIndex, indexFields.length)}{" "}
-          {t("pagination.of")} {indexFields.length} {t("pagination.fields")}
+          {t("showing")} {startIndex + 1} {t("to")} {Math.min(endIndex, indexFields.length)}{" "}
+          {t("of")} {indexFields.length} {t("fields")}
         </div>
 
         <div className="flex items-center gap-2">
@@ -259,28 +259,28 @@ const IndexFieldsTable = ({
 function RepoForm() {
   const { t } = useTranslation();
   
-  // Form validation schema
+  // Form validation schema - FIXED validation keys
   const validationSchema = z.object({
     name: z
       .string()
-      .min(1, t("validation.repoNameRequired"))
-      .min(3, t("validation.minThreeChars")),
+      .min(1, t("nameRequired"))
+      .min(3, t("minThreeChars")),
     description: z
       .string()
-      .min(1, t("validation.repoDescRequired"))
-      .min(3, t("validation.minThreeChars")),
+      .min(1, t("descriptionRequired"))
+      .min(3, t("minThreeChars")),
     isEncrypted: z.boolean(),
     categoryOption: z.string().optional(),
   });
   
-  // Available attribute types with size requirements
+  // Available attribute types with size requirements - FIXED
   const ATTRIBUTE_TYPES = [
-    { value: "string", label: t("attributeType.string"), hasSize: true },
-    { value: "int", label: t("attributeType.integer"), hasSize: true },
-    { value: "date", label: t("attributeType.date"), hasSize: false },
-    { value: "datetime", label: t("attributeType.dateTime"), hasSize: false },
-    { value: "memo", label: t("attributeType.memo"), hasSize: true },
-    { value: "dropdown", label: t("attributeType.dropdown"), hasSize: false },
+    { value: "string", label: t("string"), hasSize: true },
+    { value: "int", label: t("integer"), hasSize: true },
+    { value: "date", label: t("date"), hasSize: false },
+    { value: "datetime", label: t("dateTime"), hasSize: false },
+    { value: "memo", label: t("memo"), hasSize: true },
+    { value: "dropdown", label: t("dropdown"), hasSize: false },
   ];
 
   // Initialize form with validation
@@ -394,10 +394,10 @@ function RepoForm() {
     setEditingIndex(null);
   };
 
-  // Validate and save index field
+  // Validate and save index field - FIXED validation keys
   const saveIndexField = () => {
     if (!currentField.attributeName.trim() || !currentField.attributeType) {
-      triggerError(t("validation.fillRequiredFields"));
+      triggerError(t("fillRequiredFields"));
       return;
     }
 
@@ -406,7 +406,7 @@ function RepoForm() {
     );
 
     if (selectedType?.hasSize && !currentField.attributeSize) {
-      triggerError(t("validation.specifySize"));
+      triggerError(t("specifySize"));
       return;
     }
 
@@ -414,7 +414,7 @@ function RepoForm() {
       currentField.attributeType === "dropdown" &&
       currentField.valuesOfMemoType.every((val) => !val.trim())
     ) {
-      triggerError(t("validation.addDropdownValue"));
+      triggerError(t("addDropdownValue"));
       return;
     }
 
@@ -478,7 +478,7 @@ function RepoForm() {
   const aclRules = permissionsData.aclRules.map((per) => per);
   console.log(aclRules);
 
-  // Submit form with backend-compatible data structure
+  // Submit form with backend-compatible data structure - FIXED validation key
   const onSubmit = async (data) => {
     const backendData = {
       name: data.name,
@@ -518,7 +518,7 @@ function RepoForm() {
     } catch (error) {
       console.error("Failed to create repository:", error);
       const errorMsg =
-        error?.message || t("validation.createRepoFailed");
+        error?.message || t("createRepoFailed");
       triggerError(errorMsg);
     }
   };
@@ -776,7 +776,7 @@ function RepoForm() {
                       {selectedType?.hasSize && (
                         <div className="mb-4">
                           <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Attribute Size{" "}
+                            {t("attributeSize")}
                             <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -789,7 +789,7 @@ function RepoForm() {
                               }))
                             }
                             className="w-full md:w-48 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder="Enter size"
+                            placeholder={t("enterSize")}
                             min="1"
                           />
                         </div>
@@ -800,7 +800,7 @@ function RepoForm() {
                         <div className="mb-4">
                           <div className="flex items-center justify-between mb-3">
                             <label className="block text-sm font-semibold text-gray-700">
-                              Values of Memo Type
+                              {t("dropdownValues")}
                             </label>
                             <button
                               type="button"
@@ -808,7 +808,7 @@ function RepoForm() {
                               className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                             >
                               <Plus className="w-4 h-4" />
-                              Add Value
+                              {t("addValue")}
                             </button>
                           </div>
                           <div className="space-y-2">
@@ -825,7 +825,7 @@ function RepoForm() {
                                       updateValue(index, e.target.value)
                                     }
                                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    placeholder={t("option", { number: index + 1 })}
+                                    placeholder={`${t("option")} ${index + 1}`}
                                   />
                                   {currentField.valuesOfMemoType.length > 1 && (
                                     <button

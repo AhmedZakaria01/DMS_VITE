@@ -230,6 +230,22 @@
   "enterFolderName": "Enter folder name",
   "enterSecurityLevel": "Enter security level",
   "enterPrincipalId": "Enter principal ID",
-  "folderCreatedSuccess": "Folder created successfully!"
+  "folderCreatedSuccess": "Folder created successfully",
+  "selectAttributeType": "Select Field Type",
+    "string": "Text",
+    "integer": "Number", 
+    "date": "Date",
+    "dateTime": "Date & Time",
+    "memo": "Text Area",
+    "dropdown": "Dropdown List",
+  "enterFieldName": "Enter field name",
+"showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "fields": "fields",
+    "fillRequiredFields": "Please fill all required fields",
+    "specifySize": "Please specify size for this field type",
+    "addDropdownValue": "Please add at least one dropdown value",
+    "createRepoFailed": "Failed to create repository"
 
 }

@@ -230,5 +230,22 @@
   "enterFolderName": "أدخل اسم المجلد",
   "enterSecurityLevel": "أدخل مستوى الأمان",
   "enterPrincipalId": "أدخل المعرف الأساسي",
-  "folderCreatedSuccess": "تم إنشاء المجلد بنجاح!"
+  "folderCreatedSuccess": "تم إنشاء المجلد بنجاح!",
+    "selectAttributeType": "اختر نوع الحقل",
+     "string": "نص",
+    "integer": "رقم",
+    "date": "تاريخ", 
+    "dateTime": "تاريخ ووقت",
+    "memo": "مساحة نصية",
+    "dropdown": "قائمة منسدلة",
+ "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "specifySize": "يرجى تحديد الحجم لنوع الحقل هذا",
+    "addDropdownValue": "يرجى إضافة قيمة واحدة على الأقل للقائمة المنسدلة",
+    "createRepoFailed": "فشل إنشاء المخزن",
+  "showing": "عرض",
+    "to": "إلى", 
+    "of": "من",
+    "fields": "حقول"
+
+
 }

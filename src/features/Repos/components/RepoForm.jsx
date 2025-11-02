@@ -916,25 +916,25 @@ function RepoForm() {
       </div>
 
       {/* Alert Components */}
-      {showSuccessAlert && (
-        <SuccessAlert
-          show={showSuccessAlert}
-          onClose={() => setShowSuccessAlert(false)}
-          title="Successfully saved!"
-          message="Your repository has been created successfully."
-        />
-      )}
+  {showSuccessAlert && (
+  <SuccessAlert
+    show={showSuccessAlert}
+    onClose={() => setShowSuccessAlert(false)}
+    title={t("successfullySaved")}
+    message={t("repositoryCreatedSuccessfully")}
+  />
+)}
 
-      {showErrorAlert && (
-        <ErrorAlert
-          show={showErrorAlert}
-          onClose={() => setShowErrorAlert(false)}
-          title="Creation Failed!"
-          message={errorMessage}
-          autoClose={true}
-          duration={6000}
-        />
-      )}
+     {showErrorAlert && (
+  <ErrorAlert
+    show={showErrorAlert}
+    onClose={() => setShowErrorAlert(false)}
+    title={t("creationFailed")}
+    message={t(errorMessage)}
+    autoClose={true}
+    duration={6000}
+  />
+)}
     </div>
   );
 }

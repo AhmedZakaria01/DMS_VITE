@@ -713,9 +713,6 @@
 
 // export default UsersRolesPermissionsTable;
 
-
-
-
 /* eslint-disable react/prop-types */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
@@ -728,8 +725,7 @@ import { useTranslation } from "react-i18next";
 function UsersRolesPermissionsTable({ onDone, savedData }) {
   const dispatch = useDispatch();
   const [activeTable, setActiveTable] = useState("users");
-    const { t } = useTranslation();
-
+  const { t } = useTranslation();
 
   // State to track ONLY actual changes made by user
   const [dataChanges, setDataChanges] = useState(() => {
@@ -940,12 +936,12 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
             principalId: id,
             principalType: type,
             [nameField]: originalData?.[nameField] || "",
-            accessType: checked ? "Allow" : "Deny",
+            accessType: checked ? t("allow") : t("deny"),
           },
         },
       }));
     },
-    [users, roles]
+    [users, roles, t]
   );
 
   // Handler for security level changes
@@ -1054,7 +1050,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
         [item.principalType === "user" ? "userName" : "roleName"]:
           item.userName || item.roleName,
         permissions: item.permissions || [],
-        accessType: item.accessType || "Allow",
+        accessType: item.accessType || t("allow"),
       }));
 
     const result = {
@@ -1075,7 +1071,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
     }
 
     return result;
-  }, [dataChanges, users, roles, onDone]);
+  }, [dataChanges, users, roles, onDone, t]);
 
   // Access Type Cell Component
   const AccessTypeCell = ({ row, type }) => {
@@ -1088,7 +1084,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
     // Only use the changed accessType if it exists, otherwise use original
     const isChecked =
       currentData?.accessType !== undefined
-        ? currentData.accessType === "Allow"
+        ? currentData.accessType === t("allow")
         : getOriginalAccessType(row.original) === "Allow";
 
     const handleToggle = (checked) => {
@@ -1098,7 +1094,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
     };
 
     if (!rowId) {
-      return <div className="text-red-500 text-sm">No ID found</div>;
+      return <div className="text-red-500 text-sm">{t("noIdFound")}</div>;
     }
 
     return (
@@ -1112,7 +1108,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
           />
           <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
           <span className="ml-3 text-sm font-medium text-gray-700">
-            {isChecked ? "Allow" : "Deny"}
+            {isChecked ? t("allow") : t("deny")}
           </span>
         </label>
       </div>
@@ -1160,13 +1156,13 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       const numValue = parseInt(inputValue, 10);
 
       if (isNaN(numValue)) {
-        setError("Numbers only");
+        setError(t("numbersOnly"));
         setValue(inputValue);
         return;
       }
 
       if (numValue < 0 || numValue > 99) {
-        setError("Range: 0-99");
+        setError(t("range0to99"));
         setValue(inputValue);
         return;
       }
@@ -1190,7 +1186,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
     };
 
     if (!rowId) {
-      return <div className="text-red-500 text-sm">No ID found</div>;
+      return <div className="text-red-500 text-sm">{t("noIdFound")}</div>;
     }
 
     return (
@@ -1207,7 +1203,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
               ? "border-red-300 focus:ring-red-500 focus:border-red-500"
               : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
           }`}
-          placeholder="0-99"
+          placeholder={t("range0to99")}
         />
         {error && <span className="text-xs text-red-500 mt-1">{error}</span>}
       </div>
@@ -1220,14 +1216,14 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "name",
         accessorKey: "roleName",
-        header: "Role Name",
+        header: t("roleName"),
         size: 150,
         minSize: 120,
       },
       {
         id: "permissions",
         accessorKey: "permissions",
-        header: "Permissions",
+        header: t("permissions"),
         size: 300,
         minSize: 250,
         cell: ({ row }) => (
@@ -1251,7 +1247,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "accessType",
         accessorKey: "accessType",
-        header: "Access Type",
+        header: t("accessType"),
         size: 180,
         minSize: 150,
         cell: ({ row }) => <AccessTypeCell row={row} type="role" />,
@@ -1259,7 +1255,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "clearanceLevel",
         accessorKey: "clearanceLevel",
-        header: "Security Level",
+        header: t("securityLevel"),
         size: 180,
         minSize: 150,
         cell: ({ row }) => <SecurityLevelCell row={row} type="role" />,
@@ -1270,6 +1266,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       handleAccessTypeChange,
       handleSecurityLevelChange,
       dataChanges,
+      t
     ]
   );
 
@@ -1278,14 +1275,14 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "userName",
         accessorKey: "userName",
-        header: "Username",
+        header: t("username"),
         size: 150,
         minSize: 120,
       },
       {
         id: "permissions",
         accessorKey: "permissions",
-        header: "Permissions",
+        header: t("permissions"),
         size: 300,
         minSize: 250,
         cell: ({ row }) => (
@@ -1309,7 +1306,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "accessType",
         accessorKey: "accessType",
-        header: "Access Type",
+        header: t("accessType"),
         size: 180,
         minSize: 150,
         cell: ({ row }) => <AccessTypeCell row={row} type="user" />,
@@ -1317,7 +1314,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       {
         id: "clearanceLevel",
         accessorKey: "clearanceLevel",
-        header: "Security Level",
+        header: t("securityLevel"),
         size: 180,
         minSize: 150,
         cell: ({ row }) => <SecurityLevelCell row={row} type="user" />,
@@ -1328,6 +1325,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       handleAccessTypeChange,
       handleSecurityLevelChange,
       dataChanges,
+      t
     ]
   );
 
@@ -1340,7 +1338,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
       : handleRowDoubleClickRoles;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 max-w-full overflow-hidden">
+    <div className=" bg-white rounded-lg shadow-sm border border-gray-200 max-w-full overflow-hidden">
       {/* Enhanced Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border">
         <div className="flex items-center gap-3">
@@ -1362,13 +1360,13 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
           <div>
             <h2 className="text-xl font-semibold text-gray-800">
               {activeTable === "users"
-                ? "Users Management"
-                : "Roles Management"}
+                ? t("usersManagement")
+                : t("rolesManagement")}
             </h2>
             <p className="text-sm text-gray-600 mt-1">
               {activeTable === "users"
-                ? "Manage user permissions and access rights"
-                : "Configure role-based permissions and access levels"}
+                ? t("usersManagementDescription")
+                : t("rolesManagementDescription")}
             </p>
           </div>
         </div>
@@ -1452,7 +1450,7 @@ function UsersRolesPermissionsTable({ onDone, savedData }) {
         <ReUsableTable
           columns={currentColumns}
           data={currentData}
-          title={`${activeTable === "users" ? "Users" : "Roles"} List`}
+          title={`${activeTable === "users" ? t("users") : t("roles")} ${t("list")}`}
           isLoading={currentStatus === "loading"}
           onRowDoubleClick={currentDoubleClick}
           showGlobalFilter={true}

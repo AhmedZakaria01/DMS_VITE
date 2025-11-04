@@ -23,7 +23,7 @@ import AdminRoute from "./resusableComponents/ProtectedRoute";
 import CreateFolder from "./features/FolderContent/components/CreateFolder";
 import { Search, Settings } from "lucide-react";
 import Category from "./features/Category/Category";
-import ScreenPermissions from "./features/Permissions/screenPermissions";
+// import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -66,7 +66,7 @@ function App() {
   } 
 />         
  <Route path="/permissions" element={<Permissions />} />
-  <Route path="/ScreenPermissions" element={<ScreenPermissions />} />
+  {/* <Route path="/ScreenPermissions" element={<ScreenPermissions />} /> */}
 
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />

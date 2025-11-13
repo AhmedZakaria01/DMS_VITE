@@ -23,13 +23,14 @@ function RepoContents() {
       console.log("dispatched in Repo Content with:", { repoId });
     }
   }, [dispatch, repoId]);
-  
- // ✅ Store repoId in localStorage when it becomes available
+
+  // ✅ Store repoId in localStorage when it becomes available
   useEffect(() => {
     if (repoId) {
       localStorage.setItem("repoId", repoId);
     }
   }, [repoId]);
+
   // Combine folders and documents into one array
   const folders_documents = useMemo(() => {
     if (!repoContents) return [];
@@ -131,7 +132,7 @@ function RepoContents() {
         </div>
         <div>
           <button
-            onClick={() => navigate("/createFolder")}
+            onClick={() => navigate(`/repoContents/${repoId}/createFolder`)}
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
             aria-label={t("createFolder")}
             title={t("createFolder")}

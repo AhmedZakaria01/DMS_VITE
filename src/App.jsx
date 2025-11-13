@@ -13,7 +13,7 @@ import Audit from "./features/Audit/components/Audit";
 import Users from "./features/Users/components/Users";
 import RepoForm from "./features/Repos/components/RepoForm";
 import Roles from "./features/Roles/components/Roles";
- import FolderContents from "./features/FolderContent/components/FolderContents";
+import FolderContents from "./features/FolderContent/components/FolderContents";
 import DocumentViewer from "./features/Document/component/DocumentViewer";
 import RepoContents from "./features/RepoContents/components/RepoContents";
 import Permissions from "./features/Permissions/Permissions";
@@ -49,24 +49,24 @@ function App() {
           <Route path="/advancesSearch" element={<Search />} />
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
-<Route 
-  path="/users" 
-  element={
-    <AdminRoute>
-      <Users />
-    </AdminRoute>
-  } 
-/>
-<Route 
-  path="/roles" 
-  element={
-    <AdminRoute>
-      <Roles />
-    </AdminRoute>
-  } 
-/>         
- <Route path="/permissions" element={<Permissions />} />
-  <Route path="/ScreenPermissions" element={<ScreenPermissions />} />
+          <Route
+            path="/users"
+            element={
+              <AdminRoute>
+                <Users />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <AdminRoute>
+                <Roles />
+              </AdminRoute>
+            }
+          />
+          <Route path="/permissions" element={<Permissions />} />
+          <Route path="/ScreenPermissions" element={<ScreenPermissions />} />
 
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />
@@ -80,16 +80,20 @@ function App() {
             element={<FolderContents />}
           />
           <Route path="/createRepo" element={<RepoForm />} />
-          <Route path="/repos/:repoId/update-details" element={<UpdateRepo />} />
+          <Route
+            path="/repos/:repoId/update-details"
+            element={<UpdateRepo />}
+          />
           {/* <Route path="/repos/:repoId/update-Permissions" element={<UpdatePermissions />} /> */}
-          <Route path="/createFolder" element={<CreateFolder />} />
-
-
+          {/* <Route path="/createFolder" element={<CreateFolder />} /> */}
+          <Route
+            path="/repoContents/:repoId/createFolder"
+            element={<CreateFolder />}
+          />
         </Route>
 
         {/* Routes without Layout  */}
         <Route path="/login" element={<Login />} />
-
 
         {/* Page Not Found */}
         <Route path="*" element={<PageNotFound />} />

@@ -571,7 +571,8 @@ function RepoForm() {
                     {/* Repository Name */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        {t("repositoryName")} <span className="text-red-500">*</span>
+                        {t("repositoryName")}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
                       <input
                         {...register("name")}
@@ -601,8 +602,12 @@ function RepoForm() {
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
                       >
                         <option value="">{t("selectCategory")}</option>
-                        <option value="per_repository">{t("perRepository")}</option>
-                        <option value="per_document">{t("perDocumentType")}</option>
+                        <option value="per_repository">
+                          {t("perRepository")}
+                        </option>
+                        <option value="per_document">
+                          {t("perDocumentType")}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -636,7 +641,7 @@ function RepoForm() {
                           {t("enableEncryption")}
                         </label>
                         <p className="text-xs text-gray-600 mt-1">
-                        {t("enableEncryptionHint")} 
+                          {t("enableEncryptionHint")}
                         </p>
                       </div>
                     </div>
@@ -671,7 +676,7 @@ function RepoForm() {
                     className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
                   >
                     <Shield className="w-4 h-4" />
-                   {t("configurePermissions")}
+                    {t("configurePermissions")}
                   </button>
                 </div>
               </div>
@@ -708,11 +713,15 @@ function RepoForm() {
                   {showAddField && (
                     <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{t("indexFields")}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {t("indexFields")}
+                        </h3>
                         <p className="text-sm text-gray-600 mt-1">
                           {attributes.length === 1
                             ? t("fieldConfigured")
-                            : t("fieldsConfigured", { count: attributes.length })}
+                            : t("fieldsConfigured", {
+                                count: attributes.length,
+                              })}
                         </p>
                         <button
                           onClick={cancelAddField}
@@ -879,6 +888,7 @@ function RepoForm() {
                       setIsOpen={setOpenPermissions}
                       component={
                         <UsersRolesPermissionsTable
+                          entityType="repo"
                           onDone={handlePermissionsDataChange}
                           savedData={permissionsData}
                         />
@@ -916,25 +926,25 @@ function RepoForm() {
       </div>
 
       {/* Alert Components */}
-  {showSuccessAlert && (
-  <SuccessAlert
-    show={showSuccessAlert}
-    onClose={() => setShowSuccessAlert(false)}
-    title={t("successfullySaved")}
-    message={t("repositoryCreatedSuccessfully")}
-  />
-)}
+      {showSuccessAlert && (
+        <SuccessAlert
+          show={showSuccessAlert}
+          onClose={() => setShowSuccessAlert(false)}
+          title={t("successfullySaved")}
+          message={t("repositoryCreatedSuccessfully")}
+        />
+      )}
 
-     {showErrorAlert && (
-  <ErrorAlert
-    show={showErrorAlert}
-    onClose={() => setShowErrorAlert(false)}
-    title={t("creationFailed")}
-    message={t(errorMessage)}
-    autoClose={true}
-    duration={6000}
-  />
-)}
+      {showErrorAlert && (
+        <ErrorAlert
+          show={showErrorAlert}
+          onClose={() => setShowErrorAlert(false)}
+          title={t("creationFailed")}
+          message={t(errorMessage)}
+          autoClose={true}
+          duration={6000}
+        />
+      )}
     </div>
   );
 }

@@ -264,13 +264,9 @@
   "addDropdownValue": "يرجى إضافة قيمة واحدة على الأقل للقائمة المنسدلة",
   "createRepoFailed": "فشل إنشاء المخزن",
   "showing": "عرض",
-  "createRoleDescription": "  املأ المعلومات الأساسية لإنشاء دور جديد ",
-  "updateRoleDescription": " قم بتحديث معلومات الدور أدناه ",
-  "to": "إلى",
-  "of": "من",
-  "createRole": "إنشاء دور",
-  "fields": "حقول",
-  "showAll": "عرض الكل",
-  "clearSearch":"مسح البحث",
-  "clearAllInView":"مسح كل ما في العرض"
+    "to": "إلى", 
+    "of": "من",
+    "fields": "حقول"
+
+
 }

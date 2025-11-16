@@ -190,13 +190,13 @@ export async function createNewUser(userData) {
   } catch (err) {
     console.err("Failed to Create User", err);
   }
-}  
+}
 
 // Create New Role
 export async function createNewRole(roleData) {
   try {
     const response = await api.post("Roles/CreateRolePermissions", roleData);
-    return response; 
+    return response;
   } catch (err) {
     console.error("Failed to Create Role", err);
     throw err;
@@ -304,11 +304,20 @@ export async function getRepoContents(id) {
   try {
     const response = await api.get(
       // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
-            `Repository/GetRepositoryContentById/${id}`
+      `Repository/GetRepositoryDetailsById?id=${id}`
     );
     return response;
   } catch (err) {
     console.err("Failed to Fetch Repos Contents", err);
+  }
+}
+
+export async function createFolder(data) {
+  try {
+    const response = await api.post("Folder/CreateFolder", data);
+    console.log(response);
+  } catch (error) {
+    throw new Error(error);
   }
 }
 // Fetch Folder Contents
@@ -366,8 +375,20 @@ export async function fetchParentCategories(documentTypeId) {
   }
 }
 
+// Get available Principals //? Get Users & Roles
+export async function getPrinciples() {
+  try {
+    const response = await api.get(
+      `Principles/availablePrincipals?repoId=${1}`
+    );
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch Users", err);
+  }
+}
+
 // Get All Users
-export async function getUsers() {
+export async function getAllUsers() {
   try {
     const response = await api.get("Users/GetAllUsers/GetAllUsers");
     return response;
@@ -376,8 +397,8 @@ export async function getUsers() {
   }
 }
 
-// Fetch Roles
-export async function getRoles() {
+// Fetch All Roles
+export async function getAllRoles() {
   try {
     const response = await api.get("Roles/GetAllRoles");
     return response;
@@ -395,7 +416,18 @@ export async function getPermissions() {
     console.err("Failed to Repository Permissions", err);
   }
 }
+export async function getAvailablePermission(type) {
+  try {
+    const response = await api.get(
+      `Permissions/GetAvailablePermissionsForEntityType?entityType=${type}`
+    );
+    console.log(response);
 
+    return response;
+  } catch (err) {
+    console.err("Failed to Repository Permissions", err);
+  }
+}
 
 // fetch all External Permissions
 export async function getScreensPermissions() {
@@ -406,7 +438,3 @@ export async function getScreensPermissions() {
     console.err("Failed to Fetch screen Permissions", err);
   }
 }
-
-
-
-

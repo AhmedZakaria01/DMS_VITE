@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserRepos } from "../Repos/repoThunks";
-import { createNewRepo } from "./CategoryThunks";
+import { createNewRepo, fetchUserRepos } from "../Repos/repoThunks";
 
 const categorySlice = createSlice({
   name: "repo",

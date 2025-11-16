@@ -248,11 +248,12 @@ export async function deleteDocType(docTypeId) {
   }
 }
 
+
 // Create New Role
 export async function createNewRole(roleData) {
   try {
     const response = await api.post("Roles/CreateRolePermissions", roleData);
-    return response; 
+    return response;
   } catch (err) {
     console.error("Failed to Create Role", err);
     throw err;
@@ -361,12 +362,12 @@ export async function getRepoContents(id) {
   try {
     const response = await api.get(
       // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
-      `Repository/GetRepositoryContentById/${id}`
+                `Repository/GetRepositoryContentById/${id}`
+                //  `Repository/GetRepositoryDetailsById?id=${id}`
     );
     return response;
   } catch (err) {
-    console.error("Failed to Fetch Repos Contents", err);
-    throw err;
+    console.err("Failed to Fetch Repos Contents", err);
   }
 }
 // Fetch Folder Contents
@@ -429,11 +430,12 @@ export async function fetchParentCategories(documentTypeId) {
 // Get All Users
 export async function getUsers() {
   try {
-    const response = await api.get("Users/GetAllUsers/GetAllUsers");
+    const response = await api.get(
+      `Principles/availablePrincipals?repoId=${1}`
+    );
     return response;
   } catch (err) {
-    console.error("Failed to Fetch Users", err);
-    throw err;
+    console.err("Failed to Fetch Users", err);
   }
 }
 
@@ -458,8 +460,20 @@ export async function getPermissions() {
     throw err;
   }
 }
+export async function getAvailablePermission(type) {
+  try {
+    const response = await api.get(
+      `Permissions/GetAvailablePermissionsForEntityType?entityType=${type}`
+    );
+    console.log(response);
 
-// Fetch all External Permissions
+    return response;
+  } catch (err) {
+    console.err("Failed to Repository Permissions", err);
+  }
+}
+
+// fetch all External Permissions
 export async function getScreensPermissions() {
   try {
     const response = await api.get("Permissions/GetScreensPermissions");
@@ -469,4 +483,3 @@ export async function getScreensPermissions() {
     throw err;
   }
 }
-export default api;

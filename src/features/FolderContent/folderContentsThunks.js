@@ -1,6 +1,6 @@
 // redux/thunks/repoThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getFolderContents } from "../../services/apiServices";
+import { createFolder, getFolderContents } from "../../services/apiServices";
 
 // Fetch User Repositories
 export const fetchFolderContents = createAsyncThunk(
@@ -12,11 +12,11 @@ export const fetchFolderContents = createAsyncThunk(
   }
 );
 
-// Create New Repository
-// export const createNewRepo = createAsyncThunk(
-//   "repo/createNewRepository",
-//   async (repoData) => {
-//     const response = await createNewRepository(repoData);
-//     return response.data;
-//   }
-// );
+// Create New Folder
+export const createNewFolder = createAsyncThunk(
+  "repo/createNewRepository",
+  async (folderData) => {
+    const response = await createFolder(folderData);
+    return response.data;
+  }
+);

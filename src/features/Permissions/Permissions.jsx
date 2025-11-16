@@ -1,14 +1,16 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPermissions } from "./permissionsThunks";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
+import { fetchAvailablePermission } from "./permissionsThunks";
 
 function Permissions({
   targetId,
   targetType,
   onPermissionsChange,
   initialSelectedPermissions = [],
+  entityType,
 }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -26,7 +28,7 @@ function Permissions({
 
   useEffect(() => {
     if (permissions.length === 0) {
-      dispatch(fetchPermissions());
+      dispatch(fetchAvailablePermission(entityType));
     }
   }, [dispatch, permissions.length]);
 
@@ -49,7 +51,8 @@ function Permissions({
 
     if (isDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isDropdownOpen]);
 
@@ -161,15 +164,15 @@ function Permissions({
         <>
           {/* Fixed backdrop to capture outside clicks */}
           <div className="fixed inset-0 z-[9998]" />
-          
+
           {/* Dropdown List with improved positioning */}
-          <div 
+          <div
             ref={dropdownRef}
             className="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-72 overflow-hidden flex flex-col"
             style={{
               minWidth: buttonRef.current?.offsetWidth || 200,
               left: 0,
-              top: '100%'
+              top: "100%",
             }}
           >
             {/* Search Input */}
@@ -188,7 +191,7 @@ function Permissions({
             {/* Select All */}
             {filteredPermissions.length > 0 && (
               <div className="border-b border-gray-200 bg-gray-50">
-                <label 
+                <label
                   className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer transition-colors duration-150"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -212,7 +215,10 @@ function Permissions({
             )}
 
             {/* Permissions List */}
-            <div className="flex-1 overflow-auto" style={{ maxHeight: "180px" }}>
+            <div
+              className="flex-1 overflow-auto"
+              style={{ maxHeight: "180px" }}
+            >
               {filteredPermissions.length === 0 ? (
                 <div className="px-3 py-4 text-sm text-gray-500 text-center">
                   {searchTerm
@@ -272,23 +278,5 @@ function Permissions({
     </div>
   );
 }
-
-Permissions.propTypes = {
-  targetId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
-  targetType: PropTypes.oneOf(["user", "role"]).isRequired,
-  onPermissionsChange: PropTypes.func.isRequired,
-  initialSelectedPermissions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      displayName: PropTypes.string.isRequired,
-      code: PropTypes.string,
-    })
-  ),
-};
-
-Permissions.defaultProps = {
-  initialSelectedPermissions: [],
-};
 
 export default Permissions;

@@ -294,5 +294,6 @@
   "docTypeSetupDescription":"وصف إعداد نوع المستند",
   "securityLevelHint":"مستوى الأمان",
   "attributeTypeRequired":"نوع السمة مطلوب",
-  "attributeNameRequired":"اسم السمة مطلوب"
+  "attributeNameRequired":"اسم السمة مطلوب",
+      "fields": "حقول"
 }

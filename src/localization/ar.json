@@ -155,12 +155,18 @@
   "successfullySaved": "تم الحفظ بنجاح!",
   "repositoryCreatedSuccessfully": "تم إنشاء المستودع بنجاح.",
   "creationFailed": "فشل عملية الإنشاء",
+  "editRoleDescription": "تحديث معلومات الدور والأذونات",
+  "updateRole": "تحديث الدور",
+  "updatingRole": "جارٍ تحديث الدور...",
+  "roleUpdated": "تم تحديث الدور بنجاح!",
   "updateUser": "تحديث المستخدم",
   "creatingUser": "جاري إنشاء المستخدم...",
   "networkError": "حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
   "serverError": "خطأ في الخادم. يرجى التواصل مع الدعم.",
   "validationError": "يرجى التحقق من المدخلات والمحاولة مرة أخرى.",
   "createUser": "إنشاء مستخدم جديد",
+  "leaveEmptyKeepPassword": "Leave empty to keep current password",
+  "keepCurrentPassword": "Keep current password",
   "updateUserDescription": "قم بتحديث معلومات المستخدم أدناه",
   "createUserDescription": "املأ المعلومات الأساسية لإنشاء حساب مستخدم جديد",
   "permissionsPlaceholder": "ابحث واختر الصلاحيات...",
@@ -258,7 +264,9 @@
   "addDropdownValue": "يرجى إضافة قيمة واحدة على الأقل للقائمة المنسدلة",
   "createRepoFailed": "فشل إنشاء المخزن",
   "showing": "عرض",
-  "to": "إلى",
-  "of": "من",
-  "fields": "حقول"
+    "to": "إلى", 
+    "of": "من",
+    "fields": "حقول"
+
+
 }

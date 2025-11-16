@@ -145,7 +145,6 @@
 //       confirmPassword: "",
 //     };
 //   };
-
 //   // React Hook Form with dynamic validation schema
 //   const {
 //     register,
@@ -873,11 +872,9 @@ const UserForm = ({
   // console.log('====================================');
   // console.log('marwa',screenPermissions);
   // console.log('====================================');
-
   const isEditMode = mode === "edit";
-
   // Multi-select states
-  const [selectedRoles, setSelectedRoles] = useState([]); // Changed from selectedRoleIds
+  const [selectedRoles, setSelectedRoles] = useState([]); 
   const [selectedPermissionIds, setSelectedPermissionIds] = useState([]);
   const [roleSearchTerm, setRoleSearchTerm] = useState("");
   const [permissionSearchTerm, setPermissionSearchTerm] = useState("");
@@ -1060,9 +1057,7 @@ const UserForm = ({
         roleIds: selectedRoles,
         permissionIds: selectedPermissionIds,
       };
-// console.log('====================================');
-// console.log('marwa submitData',submitData);
-// console.log('====================================');
+      // console.log('marwa submitData',submitData);
       // In edit mode, include the ID and handle password
       if (isEditMode && initialData) {
         submitData.id = initialData.id;
@@ -1268,11 +1263,11 @@ const UserForm = ({
               {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("password")}{" "}
+                  {t("password")}
                   {!isEditMode && <span className="text-red-500">*</span>}
                   {isEditMode && (
                     <span className="text-gray-500 text-xs ml-2">
-                      (Leave empty to keep current password)
+                      {t("leaveEmptyKeepPassword")}
                     </span>
                   )}
                 </label>
@@ -1429,7 +1424,7 @@ const UserForm = ({
                               <input
                                 type="checkbox"
                                 checked={selectedRoles.includes(role.roleId)}
-                                onChange={() => {}} // Handled by onClick
+                                onChange={() => {}} 
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-3"
                               />
                               <span className="text-sm font-medium text-gray-700">
@@ -1514,7 +1509,7 @@ const UserForm = ({
                               <input
                                 type="checkbox"
                                 checked={selectedPermissionIds.includes(permission.id)}
-                                onChange={() => {}} // Handled by onClick
+                                onChange={() => {}} 
                                 className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-3"
                               />
                               <span className="text-sm font-medium text-gray-700">
@@ -1587,8 +1582,6 @@ const UserForm = ({
     </div>
   );
 };
-
-// Dynamic validation schema based on mode
 // Dynamic validation schema based on mode
 const getValidationSchema = (isEditMode, t) =>
   z.object({
@@ -1628,7 +1621,7 @@ const getValidationSchema = (isEditMode, t) =>
       .email(t("emailInvalid"))
       .toLowerCase(),
     password: isEditMode
-      ? z.string().optional().or(z.literal("")) // Optional in edit mode
+      ? z.string().optional().or(z.literal("")) 
       : z
           .string()
           .min(1, t("passwordRequired"))

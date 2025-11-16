@@ -4,17 +4,17 @@
  */
 import { createSlice } from "@reduxjs/toolkit";
 import { login, register } from "./authThunks";
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"; // Correct import name for js-cookie
 import { getRolesFromToken } from "../Users/jwtUtils";
 import { decryptToken } from "../../services/apiServices";
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: { 
-      name: null, 
+    user: {
+      name: null,
       id: null,
-      roles: []
+      roles: [],
     },
     status: "idle",
     error: null,
@@ -22,17 +22,22 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = { name: null, id: null, roles: [] };
-      // Also clear roles from cookies if needed
-      Cookies.remove("userRoles");
+      // Clear from localStorage
+      localStorage.removeItem("userRoles");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
     },
-    saveUserData: (state, user) => {
-      state.user.id = Cookies.get("userId");
-      state.user.name = Cookies.get("userName");
-      
+    saveUserData: (state, action) => {
+      // Fixed: added action parameter
+      state.user.id = localStorage.getItem("userId");
+      state.user.name = localStorage.getItem("userName");
+
       // Get roles from token if available
-      const encryptedToken = Cookies.get("token");
+      const encryptedToken = localStorage.getItem("token"); // Fixed: removed extra "Item"
       if (encryptedToken) {
-        const token = decryptToken(encryptedToken); 
+        const token = decryptToken(encryptedToken);
         if (token) {
           state.user.roles = getRolesFromToken(token);
         }
@@ -40,8 +45,9 @@ const authSlice = createSlice({
     },
     setUserRoles: (state, action) => {
       state.user.roles = action.payload;
-    }
+    },
   },
+
   extraReducers: (builder) => {
     // LOGIN
     builder
@@ -49,21 +55,23 @@ const authSlice = createSlice({
         state.status = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
-        // console.log(action.payload);
-
         state.status = "succeeded";
         state.user.name = action.payload.name;
         state.user.id = action.payload.id;
-        Cookies.set("refreshToken", action.payload.refreshToken);
-        
+
+        // Store in localStorage
+        localStorage.setItem("userId", action.payload.id);
+        localStorage.setItem("userName", action.payload.name);
+        localStorage.setItem("refreshToken", action.payload.refreshToken);
+
         // Extract roles from token and store them
-        const encryptedToken = Cookies.get("token");
+        const encryptedToken = localStorage.getItem("token");
         if (encryptedToken) {
           const token = decryptToken(encryptedToken);
           if (token) {
             state.user.roles = getRolesFromToken(token);
-            // Optionally store roles in cookies for persistence
-            Cookies.set("userRoles", JSON.stringify(state.user.roles));
+            // Store roles in localStorage for persistence
+            localStorage.setItem("userRoles", JSON.stringify(state.user.roles));
           }
         }
       })

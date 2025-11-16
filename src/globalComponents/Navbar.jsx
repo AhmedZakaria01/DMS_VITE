@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import logo from "../../src/assets/logo.png";
-import profileImg from "../../src/assets/logom.png";
-import Cookies from "js-cookie";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 function Navbar() {
@@ -10,18 +8,17 @@ function Navbar() {
   const isRTL = i18n.language === "ar";
   const navigate = useNavigate();
 
-
   const logoutRequest = async () => {
     try {
-      Cookies.remove("token");
-      Cookies.remove("userId");
-      Cookies.remove("userName");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userName");
       navigate("/login");
       return true;
     } catch (error) {
       console.error("Logout error:", error);
-      // Still remove cookie even if server call fails
-      Cookies.remove("token");
+      // Still removeItem cookie even if server call fails
+      localStorage.removeItem("token");
     }
   };
 

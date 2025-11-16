@@ -4,7 +4,6 @@
  */
 
 import axios from "axios";
-import Cookies from "js-cookie";
 import CryptoJS from "crypto-js";
 import { useNavigate } from "react-router-dom";
 
@@ -43,7 +42,7 @@ const api = axios.create({
 // Interceptors
 api.interceptors.request.use(
   (config) => {
-    const encryptedToken = Cookies.get("token");
+    const encryptedToken = localStorage.getItem("token");
 
     if (encryptedToken) {
       const token = decryptToken(encryptedToken);
@@ -52,8 +51,8 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       } else {
         // Token decryption failed, remove invalid cookie
-        Cookies.remove("token");
-        Cookies.remove("refreshToken");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
         console.warn("Invalid token detected, removing cookie");
       }
     }
@@ -74,8 +73,8 @@ api.interceptors.response.use(
       const navigate = useNavigate();
 
       // Token expired or invalid, clear cookie and redirect to login
-      Cookies.remove("token");
-      Cookies.remove("refreshToken");
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
       console.warn("Token expired, redirecting to login");
       // redirect to login page
       navigate("/login");
@@ -90,8 +89,8 @@ export const loginUser = async (credentials) => {
     const response = await api.post("Authenticate/Login", credentials);
     const { token, id, email } = response.data.response;
     // console.log(response.data.response);
-    Cookies.set("userId", id);
-    Cookies.set("email", email);
+    localStorage.setItem("userId", id);
+    localStorage.setItem("email", email);
     // console.log(id);
     // console.log(email);
 
@@ -103,7 +102,7 @@ export const loginUser = async (credentials) => {
     const encryptedToken = encryptToken(token);
 
     if (encryptedToken) {
-      Cookies.set("token", encryptedToken, {
+      localStorage.setItem("token", encryptedToken, {
         expires: 1, // 1 day
         secure: true, // HTTPS only
         sameSite: "Strict", // CSRF protection
@@ -132,7 +131,7 @@ export const registerUser = async (data) => {
 
 // Check if user is authenticated
 export const isAuthenticated = () => {
-  const encryptedToken = Cookies.get("token");
+  const encryptedToken = localStorage.getItem("token");
   if (!encryptedToken) return false;
 
   const token = decryptToken(encryptedToken);
@@ -142,7 +141,7 @@ export const isAuthenticated = () => {
 
 // Get decrypted token (for debugging or other use cases)
 export const getToken = () => {
-  const encryptedToken = Cookies.get("token");
+  const encryptedToken = localStorage.getItem("token");
   return encryptedToken ? decryptToken(encryptedToken) : null;
 };
 

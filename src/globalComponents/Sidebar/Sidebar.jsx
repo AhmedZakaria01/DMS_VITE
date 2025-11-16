@@ -34,11 +34,16 @@ export default function Sidebar({
         name: t("advancedSearch"),
         link: "/advancesSearch",
         icon: "🔍",
-      },
+      }, 
   {
         name: t("fileCategory"),
         link: "/category",
         icon: "📁",
+      },
+       {
+        name: t("docTypeForm"),
+        link: "/docTypeForm",
+        icon: "📋",
       },
       // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];

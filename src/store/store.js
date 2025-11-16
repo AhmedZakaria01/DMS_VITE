@@ -8,6 +8,8 @@ import repoContentReducer from "../features/RepoContents/repoContentSlice";
 import folderContentsReducer from "../features/FolderContent/folderContentsSlice";
 import categoryReducer from '../features/Category/categorySlice'
 import permissionsReducer from '../features/Permissions/permissionsSlice'
+import docTypeReducer from '../features/DocumentType/docTypeSlice';
+
 export const store = configureStore({
   reducer: {
     authReducer,
@@ -18,6 +20,7 @@ export const store = configureStore({
     repoContentReducer,
     folderContentsReducer,
     categoryReducer,
-    permissionsReducer
+    permissionsReducer,
+    docTypeReducer
   },
 });

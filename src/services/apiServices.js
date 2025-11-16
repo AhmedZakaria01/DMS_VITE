@@ -92,10 +92,9 @@ export const loginUser = async (credentials) => {
     // console.log(response.data.response);
     Cookies.set("userId", id);
     Cookies.set("email", email);
-    // console.log(id);
+ // console.log(id);
     // console.log(email);
-
-    if (!token) {
+        if (!token) {
       throw new Error("No token received from server");
     }
 
@@ -157,18 +156,18 @@ export async function getUserRepos(userId) {
     console.log(response);
     return response;
   } catch (error) {
-    throw new error(error);
+    throw new Error(error);
   }
 }
 
 // Get All Repos
 export async function getAllRepos() {
   try {
-    const response = await api.get(`Repository/GetAllRepositories`);
+    const response = await api.get(`Repository/GetAllRepositories`);    
     // console.log(response);
     return response;
   } catch (error) {
-    throw new error(error);
+    throw new Error(error);
   }
 }
 
@@ -178,7 +177,8 @@ export async function getAuditTrail() {
     const response = await api.get("AuditLog");
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Audit Trail", err);
+    console.error("Failed to Fetch Audit Trail", err);
+    throw err;
   }
 }
 
@@ -188,9 +188,65 @@ export async function createNewUser(userData) {
     const response = await api.post("Users/AddUser/AddUser", userData);
     return response;
   } catch (err) {
-    console.err("Failed to Create User", err);
+    console.error("Failed to Create User", err);
+    throw err;
   }
 }  
+
+// Create Document Type
+export async function createDocType(DocTypeData) {
+  try {
+    const response = await api.post("DocumentType/Create", DocTypeData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Create Doc Type", err);
+    throw err;
+  }
+}
+
+// Get Document Types by Repository
+export async function getDocTypesByRepo(repoId) {
+  try {
+    const response = await api.get(`DocumentType/GetByRepository/${repoId}`);
+    return response;
+  } catch (err) {
+    console.error("Failed to Fetch Doc Types", err);
+    throw err;
+  }
+}
+
+// Get Document Type by ID
+export async function getDocTypeById(docTypeId) {
+  try {
+    const response = await api.get(`DocumentType/GetById/${docTypeId}`);
+    return response;
+  } catch (err) {
+    console.error("Failed to Fetch Doc Type", err);
+    throw err;
+  }
+}
+
+// Update Document Type
+export async function updateDocType(docTypeId, docTypeData) {
+  try {
+    const response = await api.put(`DocumentType/Update/${docTypeId}`, docTypeData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Update Doc Type", err);
+    throw err;
+  }
+}
+
+// Delete Document Type
+export async function deleteDocType(docTypeId) {
+  try {
+    const response = await api.delete(`DocumentType/Delete/${docTypeId}`);
+    return response;
+  } catch (err) {
+    console.error("Failed to Delete Doc Type", err);
+    throw err;
+  }
+}
 
 // Create New Role
 export async function createNewRole(roleData) {
@@ -243,7 +299,7 @@ export async function createNewRepository(repoData) {
   }
 }
 
-// Update New Repository
+// Update Repository
 export async function updateRepositoryDetails(repoId, backendData) {
   try {
     const response = await api.put(
@@ -268,10 +324,11 @@ export async function updateRepositoryDetails(repoId, backendData) {
       }
     }
 
-    // Fallback to generic error
-    throw new Error("Failed to create repository. Please try again.");
+    throw new Error("Failed to update repository. Please try again.");
   }
 }
+
+// Get Repository by ID
 export async function getRepositoryById(id) {
   try {
     const response = await api.get(
@@ -279,7 +336,7 @@ export async function getRepositoryById(id) {
     );
     return response;
   } catch (err) {
-    console.error("Failed To Update Repository ", err);
+    console.error("Failed To Get Repository ", err);
 
     if (err.response?.data) {
       const errorData = err.response.data;
@@ -296,7 +353,7 @@ export async function getRepositoryById(id) {
     }
 
     // Fallback to generic error
-    throw new Error("Failed to create repository. Please try again.");
+    throw new Error("Failed to get repository. Please try again.");
   }
 }
 // Fetch Repo Contents
@@ -304,11 +361,12 @@ export async function getRepoContents(id) {
   try {
     const response = await api.get(
       // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
-            `Repository/GetRepositoryContentById/${id}`
+      `Repository/GetRepositoryContentById/${id}`
     );
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Repos Contents", err);
+    console.error("Failed to Fetch Repos Contents", err);
+    throw err;
   }
 }
 // Fetch Folder Contents
@@ -318,26 +376,28 @@ export async function getFolderContents(repoId, folderId) {
       `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
     );
     console.log(repoId, folderId);
-
-    return response;
+            return response;
   } catch (err) {
-    console.err("Failed to Fetch Folder Contents", err);
+    console.error("Failed to Fetch Folder Contents", err);
+    throw err;
   }
-} // Fetch Folder Contents
+}
+
+// Fetch Document Files
 export async function getDocumentFiles(repoId, folderId) {
   try {
     const response = await api.get(
       `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
     );
     console.log(repoId, folderId);
-
-    return response;
+        return response;
   } catch (err) {
-    console.err("Failed to Fetch Folder Contents", err);
+    console.error("Failed to Fetch Folder Contents", err);
+    throw err;
   }
 }
 
-//create a New Category
+// Create a New Category
 export async function createNewCategory(categoryData) {
   try {
     const response = await api.post("Category/Create", categoryData);
@@ -372,7 +432,8 @@ export async function getUsers() {
     const response = await api.get("Users/GetAllUsers/GetAllUsers");
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Users", err);
+    console.error("Failed to Fetch Users", err);
+    throw err;
   }
 }
 
@@ -382,7 +443,8 @@ export async function getRoles() {
     const response = await api.get("Roles/GetAllRoles");
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Roles", err);
+    console.error("Failed to Fetch Roles", err);
+    throw err;
   }
 }
 
@@ -392,21 +454,19 @@ export async function getPermissions() {
     const response = await api.get("Permissions/GetRepositoryPermissions");
     return response;
   } catch (err) {
-    console.err("Failed to Repository Permissions", err);
+    console.error("Failed to Fetch Repository Permissions", err);
+    throw err;
   }
 }
 
-
-// fetch all External Permissions
+// Fetch all External Permissions
 export async function getScreensPermissions() {
   try {
     const response = await api.get("Permissions/GetScreensPermissions");
     return response;
   } catch (err) {
-    console.err("Failed to Fetch screen Permissions", err);
+    console.error("Failed to Fetch Screen Permissions", err);
+    throw err;
   }
 }
-
-
-
-
+export default api;

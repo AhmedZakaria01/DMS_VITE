@@ -23,6 +23,7 @@ import AdminRoute from "./resusableComponents/ProtectedRoute";
 import CreateFolder from "./features/FolderContent/components/CreateFolder";
 import { Search, Settings } from "lucide-react";
 import Category from "./features/Category/Category";
+import DocTypeForm from "./features/DocumentType/DocTypeForm";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -49,6 +50,9 @@ function App() {
           <Route path="/advancesSearch" element={<Search />} />
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
+                    <Route path="/docTypeForm" element={<DocTypeForm />} />
+
+          
 <Route 
   path="/users" 
   element={

@@ -141,7 +141,6 @@
 //       state: { repoName: row.original.name }, // Keep this for immediate access
 //     });
 //   };
-  
 
 //   return (
 //     <section className="p-6">
@@ -303,6 +302,7 @@ function Repos() {
     ],
     [t]
   );
+  const { isAdmin } = useSelector((state) => state.authReducer);
 
   const handleRowDoubleClick = (row) => {
     console.log("Full row data:", row.original);
@@ -311,9 +311,20 @@ function Repos() {
     sessionStorage.setItem("currentRepoName", row.original.name);
 
     // Navigate to repository contents and pass the repository name
-    navigate(`/repoContents/${row.original.id}`, {
-      state: { repoName: row.original.name }, // Keep this for immediate access
-    });
+    // navigate(`/repoContents/${row.original.id}`, {
+    //   state: { repoName: row.original.name }, // Keep this for immediate access
+    // });
+
+    {
+      isAdmin &&
+        navigate(`/docTypeForm/${row.original.id}`, {
+          state: { repoName: row.original.name }, // Keep this for immediate access
+        });
+    }
+
+    //  : navigate(`/repoContents/${row.original.id}`, {
+    //         state: { repoName: row.original.name }, // Keep this for immediate access
+    //       });
   };
 
   return (

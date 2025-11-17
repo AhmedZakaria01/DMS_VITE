@@ -647,6 +647,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
+
 import {
   Plus,
   X,
@@ -663,6 +664,7 @@ import {
 } from "lucide-react";
 import Popup from "../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../Permissions/UsersRolesPermissionsTable";
+import { useSelector } from "react-redux";
 
 // Fake data replacements
 const fakeIndexFieldsTypes = [
@@ -1286,441 +1288,450 @@ const DocTypeForm = () => {
     (field) => field.name === currentField.type
   );
 
+  const { isAdmin } = useSelector((state) => state.authReducer);
   return (
-    <div className="py-1 px-4 sm:px-6 lg:px-8 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-3">
-          <div className="inline-flex items-center gap-4 bg-white rounded-xl px-8 py-4 shadow-sm border border-gray-200">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <FileText className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="text-left">
-              <h1 className="text-xl font-bold text-gray-900">
-                {t("createDocumentType")}
-              </h1>
-              <p className="text-gray-600 text-sm mt-1">
-                {t("docTypeSetupDescription")}
-              </p>
+    <>
+      <div className="py-1 px-4 sm:px-6 lg:px-8 min-h-screen">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-3">
+            <div className="inline-flex items-center gap-4 bg-white rounded-xl px-8 py-4 shadow-sm border border-gray-200">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <FileText className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-xl font-bold text-gray-900">
+                  {t("createDocumentType")}
+                </h1>
+                <p className="text-gray-600 text-sm mt-1">
+                  {t("docTypeSetupDescription")}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Scrollable Content Area */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Document Type Information */}
-            <div className="space-y-6">
-              {/* Document Type Information Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <FileText className="w-5 h-5 text-blue-600" />
+          {/* Scrollable Content Area */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column - Document Type Information */}
+              <div className="space-y-6">
+                {/* Document Type Information Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <FileText className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {t("information")}
+                      </h2>
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t("information")}
-                    </h2>
+                  </div>
+
+                  <div className="p-3 space-y-4">
+                    {/* Document Type Name */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {t("documentTypeName")}{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        {...register("documentType", {
+                          required: t("documentTypeRequired"),
+                        })}
+                        type="text"
+                        className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          errors.documentType
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300"
+                        }`}
+                        placeholder={t("enterDocumentTypeName")}
+                      />
+                      {errors.documentType && (
+                        <p className="text-red-600 text-sm mt-2">
+                          {errors.documentType.message}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Security Level - OPTIONAL */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        {t("securityLevel")}
+                      </label>
+                      <input
+                        {...register("securityLevel", {
+                          min: {
+                            value: 1,
+                            message: t("Min security level is 1"),
+                          },
+                          max: {
+                            value: 99,
+                            message: t("Max security level is 99"),
+                          },
+                        })}
+                        type="number"
+                        min="1"
+                        max="99"
+                        className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          errors.securityLevel
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300"
+                        }`}
+                        placeholder={t("enterSecurityLevel")}
+                      />
+                      {errors.securityLevel && (
+                        <p className="text-red-600 text-sm mt-2">
+                          {errors.securityLevel.message}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500 mt-1">
+                        {t("securityLevelHint")}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-3 space-y-4">
-                  {/* Document Type Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t("documentTypeName")}{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      {...register("documentType", {
-                        required: t("documentTypeRequired"),
-                      })}
-                      type="text"
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                        errors.documentType
-                          ? "border-red-300 bg-red-50"
-                          : "border-gray-300"
-                      }`}
-                      placeholder={t("enterDocumentTypeName")}
-                    />
-                    {errors.documentType && (
-                      <p className="text-red-600 text-sm mt-2">
-                        {errors.documentType.message}
-                      </p>
-                    )}
+                {/* Permissions Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <Users className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {t("accessPermissions")}
+                      </h2>
+                    </div>
                   </div>
 
-                  {/* Security Level - OPTIONAL */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t("securityLevel")}
-                    </label>
-                    <input
-                      {...register("securityLevel", {
-                        min: {
-                          value: 1,
-                          message: t("Min security level is 1"),
-                        },
-                        max: {
-                          value: 99,
-                          message: t("Max security level is 99"),
-                        },
-                      })}
-                      type="number"
-                      min="1"
-                      max="99"
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                        errors.securityLevel
-                          ? "border-red-300 bg-red-50"
-                          : "border-gray-300"
-                      }`}
-                      placeholder={t("enterSecurityLevel")}
-                    />
-                    {errors.securityLevel && (
-                      <p className="text-red-600 text-sm mt-2">
-                        {errors.securityLevel.message}
-                      </p>
-                    )}
-                    <p className="text-sm text-gray-500 mt-1">
-                      {t("securityLevelHint")}
-                    </p>
+                  <div className="p-3 text-center">
+                    <button
+                      type="button"
+                      onClick={handlePermissions}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                      <Shield className="w-4 h-4" />
+                      {t("configurePermissions")}
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Permissions Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <Users className="w-5 h-5 text-orange-600" />
+              {/* Right Column - Index Fields Management */}
+              <div className="space-y-6">
+                {/* Index Fields Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <Settings className="w-5 h-5 text-green-600" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900">
+                          {t("indexFieldsManagement")}
+                        </h2>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={startAddingField}
+                        disabled={showAddField}
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        {t("addIndexField")}
+                      </button>
                     </div>
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      {t("accessPermissions")}
-                    </h2>
+                  </div>
+
+                  <div className="p-2 space-y-6">
+                    {/* Add/Edit Field Form */}
+                    {showAddField && (
+                      <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {editingIndex !== null
+                              ? t("editIndexField")
+                              : t("addNewIndexField")}
+                          </h3>
+                          <button
+                            onClick={cancelAddField}
+                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        {/* Error Message */}
+                        {errorMessage && (
+                          <Alert message={errorMessage} type="error" />
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          {/* Attribute Name */}
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {t("attributeName")}{" "}
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={currentField.name}
+                              onChange={(e) =>
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  name: e.target.value,
+                                }))
+                              }
+                              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                              placeholder={t("enterAttributeName")}
+                              autoFocus
+                            />
+                          </div>
+
+                          {/* Attribute Type */}
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {t("attributeType")}{" "}
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              value={currentField.type}
+                              onChange={(e) =>
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  type: e.target.value,
+                                  size: "",
+                                  values:
+                                    e.target.value === "DROPDOWNLIST" ? [] : [],
+                                }))
+                              }
+                              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
+                            >
+                              <option value="">
+                                {t("selectAttributeType")}
+                              </option>
+                              {indexFieldsTypes?.map((field, i) => (
+                                <option key={i} value={field.name}>
+                                  {field.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Size Field */}
+                        {selectedType?.hasSize && (
+                          <div className="mb-4">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {t("attributeSize")}
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="number"
+                              value={currentField.size}
+                              onChange={(e) =>
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  size: e.target.value,
+                                }))
+                              }
+                              className="w-full md:w-48 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                              placeholder={t("enterSize")}
+                              min="1"
+                            />
+                          </div>
+                        )}
+
+                        {/* Dropdown Values */}
+                        {currentField.type === "DROPDOWNLIST" && (
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <label className="block text-sm font-semibold text-gray-700">
+                                {t("dropdownValues")}
+                              </label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                  value={inputValue}
+                                  onChange={(e) =>
+                                    setInputValue(e.target.value)
+                                  }
+                                  placeholder={t("enterDropdownValue")}
+                                  onKeyDown={(e) =>
+                                    e.key === "Enter" &&
+                                    handleAddDropdownValue()
+                                  }
+                                />
+                                <button
+                                  type="button"
+                                  onClick={handleAddDropdownValue}
+                                  className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {t("addValue")}
+                                </button>
+                              </div>
+                            </div>
+                            {currentField.values.length > 0 && (
+                              <div className="space-y-2 mb-4">
+                                {currentField.values.map((value, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <input
+                                      type="text"
+                                      className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                      value={value}
+                                      onChange={(e) => {
+                                        const newValues = [
+                                          ...currentField.values,
+                                        ];
+                                        newValues[index] = e.target.value;
+                                        setCurrentField((prev) => ({
+                                          ...prev,
+                                          values: newValues,
+                                        }));
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleDeleteDropdownValue(index)
+                                      }
+                                      className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Checkboxes */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id="isRequired"
+                              checked={currentField.isRequired}
+                              onChange={(e) =>
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  isRequired: e.target.checked,
+                                }))
+                              }
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label
+                              htmlFor="isRequired"
+                              className="ml-2 block text-sm text-gray-700 font-medium"
+                            >
+                              {t("requiredField")}
+                            </label>
+                          </div>
+
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id="isNamed"
+                              checked={currentField.isNamed}
+                              onChange={(e) =>
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  isNamed: e.target.checked,
+                                }))
+                              }
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label
+                              htmlFor="isNamed"
+                              className="ml-2 block text-sm text-gray-700 font-medium"
+                            >
+                              {t("namedField")}
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-3">
+                          <button
+                            type="button"
+                            onClick={saveIndexField}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
+                          >
+                            {editingIndex !== null
+                              ? t("updateField")
+                              : t("saveField")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelAddField}
+                            className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
+                          >
+                            {t("cancel")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Index Fields Table */}
+                    <IndexFieldsTable
+                      indexFields={indexFields}
+                      onEdit={editIndexField}
+                      onDelete={deleteIndexField}
+                      isAddingField={showAddField}
+                      itemsPerPage={3}
+                    />
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="p-3 text-center">
+            {/* Permissions Popup */}
+            {openPermissions && (
+              <Popup
+                isOpen={openPermissions}
+                setIsOpen={setOpenPermissions}
+                component={
+                  <UsersRolesPermissionsTable
+                    entityType="documenttype"
+                    onDone={handlePermissionsDataChange}
+                    savedData={permissionsData}
+                  />
+                }
+              />
+            )}
+            {/* Sticky Action Bar */}
+            <div className="bg-white border-t border-gray-200 py-3 mx-4 sm:-mx-6 lg:-mx-8">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <button
                     type="button"
-                    onClick={handlePermissions}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
+                    onClick={() => navigate(-1)}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                   >
-                    <Shield className="w-4 h-4" />
-                    {t("configurePermissions")}
+                    {t("cancel")}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isValid || showAddField}
+                    className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:shadow-none"
+                  >
+                    <Save className="w-5 h-5" />
+                    {t("createDocumentType")}
                   </button>
                 </div>
               </div>
             </div>
-
-            {/* Right Column - Index Fields Management */}
-            <div className="space-y-6">
-              {/* Index Fields Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Settings className="w-5 h-5 text-green-600" />
-                      </div>
-                      <h2 className="text-xl font-semibold text-gray-900">
-                        {t("indexFieldsManagement")}
-                      </h2>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={startAddingField}
-                      disabled={showAddField}
-                      className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors font-medium"
-                    >
-                      <Plus className="w-4 h-4" />
-                      {t("addIndexField")}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-2 space-y-6">
-                  {/* Add/Edit Field Form */}
-                  {showAddField && (
-                    <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {editingIndex !== null
-                            ? t("editIndexField")
-                            : t("addNewIndexField")}
-                        </h3>
-                        <button
-                          onClick={cancelAddField}
-                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-colors"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      {/* Error Message */}
-                      {errorMessage && (
-                        <Alert message={errorMessage} type="error" />
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {/* Attribute Name */}
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            {t("attributeName")}{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={currentField.name}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                name: e.target.value,
-                              }))
-                            }
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder={t("enterAttributeName")}
-                            autoFocus
-                          />
-                        </div>
-
-                        {/* Attribute Type */}
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            {t("attributeType")}{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={currentField.type}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                type: e.target.value,
-                                size: "",
-                                values:
-                                  e.target.value === "DROPDOWNLIST" ? [] : [],
-                              }))
-                            }
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
-                          >
-                            <option value="">{t("selectAttributeType")}</option>
-                            {indexFieldsTypes?.map((field, i) => (
-                              <option key={i} value={field.name}>
-                                {field.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Size Field */}
-                      {selectedType?.hasSize && (
-                        <div className="mb-4">
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            {t("attributeSize")}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            value={currentField.size}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                size: e.target.value,
-                              }))
-                            }
-                            className="w-full md:w-48 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                            placeholder={t("enterSize")}
-                            min="1"
-                          />
-                        </div>
-                      )}
-
-                      {/* Dropdown Values */}
-                      {currentField.type === "DROPDOWNLIST" && (
-                        <div className="mb-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <label className="block text-sm font-semibold text-gray-700">
-                              {t("dropdownValues")}
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                className="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                placeholder={t("enterDropdownValue")}
-                                onKeyDown={(e) =>
-                                  e.key === "Enter" && handleAddDropdownValue()
-                                }
-                              />
-                              <button
-                                type="button"
-                                onClick={handleAddDropdownValue}
-                                className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                              >
-                                <Plus className="w-4 h-4" />
-                                {t("addValue")}
-                              </button>
-                            </div>
-                          </div>
-                          {currentField.values.length > 0 && (
-                            <div className="space-y-2 mb-4">
-                              {currentField.values.map((value, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center gap-2"
-                                >
-                                  <input
-                                    type="text"
-                                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    value={value}
-                                    onChange={(e) => {
-                                      const newValues = [
-                                        ...currentField.values,
-                                      ];
-                                      newValues[index] = e.target.value;
-                                      setCurrentField((prev) => ({
-                                        ...prev,
-                                        values: newValues,
-                                      }));
-                                    }}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeleteDropdownValue(index)
-                                    }
-                                    className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Checkboxes */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="isRequired"
-                            checked={currentField.isRequired}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                isRequired: e.target.checked,
-                              }))
-                            }
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                          />
-                          <label
-                            htmlFor="isRequired"
-                            className="ml-2 block text-sm text-gray-700 font-medium"
-                          >
-                            {t("requiredField")}
-                          </label>
-                        </div>
-
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="isNamed"
-                            checked={currentField.isNamed}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                isNamed: e.target.checked,
-                              }))
-                            }
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                          />
-                          <label
-                            htmlFor="isNamed"
-                            className="ml-2 block text-sm text-gray-700 font-medium"
-                          >
-                            {t("namedField")}
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-3">
-                        <button
-                          type="button"
-                          onClick={saveIndexField}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium"
-                        >
-                          {editingIndex !== null
-                            ? t("updateField")
-                            : t("saveField")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={cancelAddField}
-                          className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors font-medium"
-                        >
-                          {t("cancel")}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Index Fields Table */}
-                  <IndexFieldsTable
-                    indexFields={indexFields}
-                    onEdit={editIndexField}
-                    onDelete={deleteIndexField}
-                    isAddingField={showAddField}
-                    itemsPerPage={3}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Permissions Popup */}
-          {openPermissions && (
-            <Popup
-              isOpen={openPermissions}
-              setIsOpen={setOpenPermissions}
-              component={
-                <UsersRolesPermissionsTable
-                  onDone={handlePermissionsDataChange}
-                  savedData={permissionsData}
-                />
-              }
-            />
-          )}
-          {/* Sticky Action Bar */}
-          <div className="bg-white border-t border-gray-200 py-3 mx-4 sm:-mx-6 lg:-mx-8">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-4">
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                >
-                  {t("cancel")}
-                </button>
-                <button
-                  type="submit"
-                  disabled={!isValid || showAddField}
-                  className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed shadow-lg hover:shadow-xl disabled:shadow-none"
-                >
-                  <Save className="w-5 h-5" />
-                  {t("createDocumentType")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

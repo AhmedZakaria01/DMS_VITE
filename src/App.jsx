@@ -50,27 +50,26 @@ function App() {
           <Route path="/advancesSearch" element={<Search />} />
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
-                    <Route path="/docTypeForm" element={<DocTypeForm />} />
+          <Route path="/docTypeForm/:repoId" element={<DocTypeForm />} />
 
-          
-<Route 
-  path="/users" 
-  element={
-    <AdminRoute>
-      <Users />
-    </AdminRoute>
-  } 
-/>
-<Route 
-  path="/roles" 
-  element={
-    <AdminRoute>
-      <Roles />
-    </AdminRoute>
-  } 
-/>         
- <Route path="/permissions" element={<Permissions />} />
-  {/* <Route path="/ScreenPermissions" element={<ScreenPermissions />} /> */}
+          <Route
+            path="/users"
+            element={
+              <AdminRoute>
+                <Users />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <AdminRoute>
+                <Roles />
+              </AdminRoute>
+            }
+          />
+          <Route path="/permissions" element={<Permissions />} />
+          {/* <Route path="/ScreenPermissions" element={<ScreenPermissions />} /> */}
 
           <Route path="/roles" element={<Roles />} />
           <Route path="/repoContents/:repoId" element={<RepoContents />} />

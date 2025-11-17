@@ -426,15 +426,37 @@ export async function fetchParentCategories(documentTypeId) {
   }
 }
 
+
 // Get All Users
-export async function getUsers() {
+export async function getPrinciples() {
   try {
     const response = await api.get(
       `Principles/availablePrincipals?repoId=${1}`
     );
     return response;
   } catch (err) {
-    console.err("Failed to Fetch Users", err);
+    console.err("Failed to Fetch  Principles ", err);
+  }
+}
+
+export async function createFolder(data) {
+  try {
+    const response = await api.post("Folder/CreateFolder", data);
+    console.log(response);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+// Get All Users
+export async function getAllUsers() {
+  try {
+    const response = await api.get(
+      `Users/GetAllUsers/GetAllUsers`
+    );
+    return response;
+  } catch (err) {
+    console.err("Failed to Fetch All Users", err);
   }
 }
 

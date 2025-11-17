@@ -34,7 +34,7 @@
 //   console.log("Creating document type with payload:", payload);
 //   // Simulate API delay
 //   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
 //   // Simulate successful response
 //   return {
 //     type: "CREATE_DOC_TYPE_WITH_ATTRIBUTE/fulfilled",
@@ -60,7 +60,7 @@
 //     reset,
 //     formState: { errors },
 //   } = useForm();
-  
+
 //   const { repoId } = useParams();
 
 //   const [indexFields, setIndexFields] = useState([]);
@@ -95,12 +95,12 @@
 //         return Promise.resolve({ type: 'MOCK_ACTION' });
 //       });
 //     }
-    
+
 //     // Handle object actions
 //     if (action.type && action.type.includes('createDocTypeWithAttribute')) {
 //       return mockCreateDocTypeWithAttribute(action);
 //     }
-    
+
 //     return Promise.resolve({ type: 'MOCK_ACTION' });
 //   };
 
@@ -646,7 +646,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import {
   Plus,
   X,
@@ -669,9 +669,21 @@ const fakeIndexFieldsTypes = [
   { id: 1, name: "STRING", value: "string", label: "String", hasSize: true },
   { id: 2, name: "INT", value: "int", label: "Integer", hasSize: true },
   { id: 3, name: "MEMO", value: "memo", label: "Memo", hasSize: true },
-  { id: 4, name: "DROPDOWNLIST", value: "dropdown", label: "Dropdown", hasSize: false },
+  {
+    id: 4,
+    name: "DROPDOWNLIST",
+    value: "dropdown",
+    label: "Dropdown",
+    hasSize: false,
+  },
   { id: 5, name: "DATE", value: "date", label: "Date", hasSize: false },
-  { id: 6, name: "BOOLEAN", value: "boolean", label: "Boolean", hasSize: false },
+  {
+    id: 6,
+    name: "BOOLEAN",
+    value: "boolean",
+    label: "Boolean",
+    hasSize: false,
+  },
 ];
 
 const fakeRoles = [
@@ -690,17 +702,17 @@ const fakeUsers = [
 const mockCreateDocTypeWithAttribute = async ({ payload }) => {
   console.log("Creating document type with payload:", payload);
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   // Simulate successful response
   return {
     type: "CREATE_DOC_TYPE_WITH_ATTRIBUTE/fulfilled",
     payload: {
       data: {
         message: "Document type created successfully",
-        id: Math.random().toString(36).substr(2, 9)
-      }
-    }
+        id: Math.random().toString(36).substr(2, 9),
+      },
+    },
   };
 };
 
@@ -712,10 +724,10 @@ const mockGetDocTypesFromRepo = (repoId) => {
 // Simple Alert Component for showing errors
 const Alert = ({ message, type = "error" }) => {
   if (!message) return null;
-  
+
   const styles = {
     error: "bg-red-50 border-red-200 text-red-700",
-    success: "bg-green-50 border-green-200 text-green-700"
+    success: "bg-green-50 border-green-200 text-green-700",
   };
 
   return (
@@ -728,7 +740,7 @@ const Alert = ({ message, type = "error" }) => {
 // PropTypes for Alert component
 Alert.propTypes = {
   message: PropTypes.string,
-  type: PropTypes.oneOf(['error', 'success'])
+  type: PropTypes.oneOf(["error", "success"]),
 };
 
 // PropTypes for IndexFieldsTable component
@@ -764,7 +776,9 @@ const IndexFieldsTable = ({
 
   // Get display label for attribute type
   const getTypeLabel = (type) => {
-    const typeConfig = fakeIndexFieldsTypes.find(attrType => attrType.name === type);
+    const typeConfig = fakeIndexFieldsTypes.find(
+      (attrType) => attrType.name === type
+    );
     return typeConfig?.label || type;
   };
 
@@ -789,8 +803,9 @@ const IndexFieldsTable = ({
     return (
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
         <div className="text-sm text-gray-600">
-          {t("showing")} {startIndex + 1} {t("to")} {Math.min(endIndex, indexFields.length)}{" "}
-          {t("of")} {indexFields.length} {t("fields")}
+          {t("showing")} {startIndex + 1} {t("to")}{" "}
+          {Math.min(endIndex, indexFields.length)} {t("of")}{" "}
+          {indexFields.length} {t("fields")}
         </div>
 
         <div className="flex items-center gap-2">
@@ -831,7 +846,9 @@ const IndexFieldsTable = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{t("indexFields")}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">
+          {t("indexFields")}
+        </h3>
         <p className="text-sm text-gray-600 mt-1">
           {indexFields.length === 1
             ? t("fieldConfigured")
@@ -868,10 +885,7 @@ const IndexFieldsTable = ({
           <tbody className="divide-y divide-gray-200">
             {currentFields.length > 0 ? (
               currentFields.map((field, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-gray-50 transition-colors"
-                >
+                <tr key={index} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {startIndex + index + 1}
                   </td>
@@ -940,9 +954,7 @@ const IndexFieldsTable = ({
                     <p className="text-base font-medium mb-1">
                       {t("noIndexFields")}
                     </p>
-                    <p className="text-sm">
-                      {t("addIndexFieldHint")}
-                    </p>
+                    <p className="text-sm">{t("addIndexFieldHint")}</p>
                   </div>
                 </td>
               </tr>
@@ -974,7 +986,7 @@ const DocTypeForm = () => {
   } = useForm({
     mode: "onChange",
   });
-  
+
   const { repoId } = useParams();
 
   const [indexFields, setIndexFields] = useState([]);
@@ -1004,22 +1016,22 @@ const DocTypeForm = () => {
 
   // Replace useDispatch with mock functions
   const dispatch = (action) => {
-    if (typeof action === 'function') {
+    if (typeof action === "function") {
       // Handle thunk actions
       return action((actionObj) => {
-        if (actionObj.type === 'CREATE_DOC_TYPE_WITH_ATTRIBUTE/fulfilled') {
+        if (actionObj.type === "CREATE_DOC_TYPE_WITH_ATTRIBUTE/fulfilled") {
           return Promise.resolve(actionObj);
         }
-        return Promise.resolve({ type: 'MOCK_ACTION' });
+        return Promise.resolve({ type: "MOCK_ACTION" });
       });
     }
-    
+
     // Handle object actions
-    if (action.type && action.type.includes('createDocTypeWithAttribute')) {
+    if (action.type && action.type.includes("createDocTypeWithAttribute")) {
       return mockCreateDocTypeWithAttribute(action);
     }
-    
-    return Promise.resolve({ type: 'MOCK_ACTION' });
+
+    return Promise.resolve({ type: "MOCK_ACTION" });
   };
 
   useEffect(() => {
@@ -1044,9 +1056,9 @@ const DocTypeForm = () => {
 
   const handleAddDropdownValue = () => {
     if (inputValue.trim() !== "") {
-      setCurrentField(prev => ({
+      setCurrentField((prev) => ({
         ...prev,
-        values: [...prev.values, inputValue.trim()]
+        values: [...prev.values, inputValue.trim()],
       }));
       setInputValue("");
       setErrorMessage("");
@@ -1057,9 +1069,9 @@ const DocTypeForm = () => {
 
   const handleDeleteDropdownValue = (index) => {
     if (window.confirm(t("confirmDeleteDropdownValue"))) {
-      setCurrentField(prev => ({
+      setCurrentField((prev) => ({
         ...prev,
-        values: prev.values.filter((_, i) => i !== index)
+        values: prev.values.filter((_, i) => i !== index),
       }));
     }
   };
@@ -1084,34 +1096,45 @@ const DocTypeForm = () => {
 
   const saveIndexField = () => {
     console.log("Saving index field:", currentField);
-    
+
     // Reset error message
     setErrorMessage("");
 
     // Validate required fields
     if (!currentField.name.trim()) {
-      setErrorMessage(t("attributeNameRequired") || "Attribute name is required");
+      setErrorMessage(
+        t("attributeNameRequired") || "Attribute name is required"
+      );
       return;
     }
 
     if (!currentField.type) {
-      setErrorMessage(t("attributeTypeRequired") || "Attribute type is required");
+      setErrorMessage(
+        t("attributeTypeRequired") || "Attribute type is required"
+      );
       return;
     }
 
     const selectedType = indexFieldsTypes.find(
-      field => field.name === currentField.type
+      (field) => field.name === currentField.type
     );
 
     // Validate size for types that require it
     if (selectedType?.hasSize && !currentField.size) {
-      setErrorMessage(t("specifySize") || "Please specify size for this field type");
+      setErrorMessage(
+        t("specifySize") || "Please specify size for this field type"
+      );
       return;
     }
 
     // Validate dropdown values
-    if (currentField.type === "DROPDOWNLIST" && currentField.values.length === 0) {
-      setErrorMessage(t("addDropdownValue") || "Please add at least one dropdown value");
+    if (
+      currentField.type === "DROPDOWNLIST" &&
+      currentField.values.length === 0
+    ) {
+      setErrorMessage(
+        t("addDropdownValue") || "Please add at least one dropdown value"
+      );
       return;
     }
 
@@ -1161,7 +1184,11 @@ const DocTypeForm = () => {
   };
 
   const deleteIndexField = (index) => {
-    if (window.confirm(t("confirmDeleteField") || "Are you sure you want to delete this field?")) {
+    if (
+      window.confirm(
+        t("confirmDeleteField") || "Are you sure you want to delete this field?"
+      )
+    ) {
       setIndexFields((prev) => prev.filter((_, i) => i !== index));
     }
   };
@@ -1177,7 +1204,7 @@ const DocTypeForm = () => {
     console.log("Received permissions data:", data);
     setPermissionsData(data);
     // Close the popup
-    setOpenPermissions(false); 
+    setOpenPermissions(false);
   };
 
   const onSubmit = async (values) => {
@@ -1185,7 +1212,7 @@ const DocTypeForm = () => {
     // Add current field if being edited (in case user forgot to click save)
     if (showAddField && currentField.name.trim() && currentField.type) {
       const selectedType = indexFieldsTypes.find(
-        field => field.name === currentField.type
+        (field) => field.name === currentField.type
       );
 
       const newField = {
@@ -1215,7 +1242,9 @@ const DocTypeForm = () => {
       name: values.documentType,
       repositoryId: Number(repoId),
       // Only include securityLevel if it has a value, otherwise exclude it completely
-      ...(values.securityLevel && { securityLevel: Number(values.securityLevel) }),
+      ...(values.securityLevel && {
+        securityLevel: Number(values.securityLevel),
+      }),
       documentTypeAttributeAddRequests: finalIndexFields.map((f) => ({
         attributeName: f.name,
         attributeType: f.type,
@@ -1254,7 +1283,7 @@ const DocTypeForm = () => {
   };
 
   const selectedType = indexFieldsTypes.find(
-    field => field.name === currentField.type
+    (field) => field.name === currentField.type
   );
 
   return (
@@ -1299,7 +1328,8 @@ const DocTypeForm = () => {
                   {/* Document Type Name */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t("documentTypeName")} <span className="text-red-500">*</span>
+                      {t("documentTypeName")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <input
                       {...register("documentType", {
@@ -1329,16 +1359,16 @@ const DocTypeForm = () => {
                       {...register("securityLevel", {
                         min: {
                           value: 1,
-                          message: t("securityLevelMin")
+                          message: t("Min security level is 1"),
                         },
                         max: {
-                          value: 10,
-                          message: t("securityLevelMax")
-                        }
+                          value: 99,
+                          message: t("Max security level is 99"),
+                        },
                       })}
                       type="number"
                       min="1"
-                      max="10"
+                      max="99"
                       className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                         errors.securityLevel
                           ? "border-red-300 bg-red-50"
@@ -1416,7 +1446,9 @@ const DocTypeForm = () => {
                     <div className="bg-blue-50 rounded-lg p-3 border-2 border-blue-200">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          {editingIndex !== null ? t("editIndexField") : t("addNewIndexField")}
+                          {editingIndex !== null
+                            ? t("editIndexField")
+                            : t("addNewIndexField")}
                         </h3>
                         <button
                           onClick={cancelAddField}
@@ -1466,7 +1498,8 @@ const DocTypeForm = () => {
                                 ...prev,
                                 type: e.target.value,
                                 size: "",
-                                values: e.target.value === "DROPDOWNLIST" ? [] : [],
+                                values:
+                                  e.target.value === "DROPDOWNLIST" ? [] : [],
                               }))
                             }
                             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
@@ -1544,17 +1577,21 @@ const DocTypeForm = () => {
                                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                     value={value}
                                     onChange={(e) => {
-                                      const newValues = [...currentField.values];
+                                      const newValues = [
+                                        ...currentField.values,
+                                      ];
                                       newValues[index] = e.target.value;
-                                      setCurrentField(prev => ({
+                                      setCurrentField((prev) => ({
                                         ...prev,
-                                        values: newValues
+                                        values: newValues,
                                       }));
                                     }}
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => handleDeleteDropdownValue(index)}
+                                    onClick={() =>
+                                      handleDeleteDropdownValue(index)
+                                    }
                                     className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
                                   >
                                     <X className="w-4 h-4" />
@@ -1573,10 +1610,12 @@ const DocTypeForm = () => {
                             type="checkbox"
                             id="isRequired"
                             checked={currentField.isRequired}
-                            onChange={(e) => setCurrentField(prev => ({
-                              ...prev,
-                              isRequired: e.target.checked
-                            }))}
+                            onChange={(e) =>
+                              setCurrentField((prev) => ({
+                                ...prev,
+                                isRequired: e.target.checked,
+                              }))
+                            }
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
                           <label
@@ -1592,10 +1631,12 @@ const DocTypeForm = () => {
                             type="checkbox"
                             id="isNamed"
                             checked={currentField.isNamed}
-                            onChange={(e) => setCurrentField(prev => ({
-                              ...prev,
-                              isNamed: e.target.checked
-                            }))}
+                            onChange={(e) =>
+                              setCurrentField((prev) => ({
+                                ...prev,
+                                isNamed: e.target.checked,
+                              }))
+                            }
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
                           <label
@@ -1651,10 +1692,10 @@ const DocTypeForm = () => {
                 <UsersRolesPermissionsTable
                   onDone={handlePermissionsDataChange}
                   savedData={permissionsData}
-                  />
-                }
                 />
-                  )}
+              }
+            />
+          )}
           {/* Sticky Action Bar */}
           <div className="bg-white border-t border-gray-200 py-3 mx-4 sm:-mx-6 lg:-mx-8">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-end gap-4">

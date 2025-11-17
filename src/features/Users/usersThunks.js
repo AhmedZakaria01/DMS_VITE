@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllUsers } from "../../services/apiServices";
 import { createNewUser } from "../../services/apiServices";
-export const fetchAllUsers = createAsyncThunk("users/fetchUsers", async () => {
+export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const response = await getAllUsers();
   // console.log(response.data.response);
 

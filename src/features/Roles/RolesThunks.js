@@ -1,12 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createNewRole,
-  getAllRoles,
+  getRoles,
   updateRole as updateRoleAPI,
 } from "../../services/apiServices";
 // Get all Roles
 export const fetchRoles = createAsyncThunk("users/fetchRoles", async () => {
-  const response = await getAllRoles();
+  const response = await getRoles();
   console.log(response.data.response);
   return response.data.response;
 });
@@ -16,20 +16,20 @@ export const createRole = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await createNewRole(userData);
-
+      
       // Check if response exists and has data
       if (!response || !response.data) {
         throw new Error("No response received from server");
       }
-
+      
       // Return the nested response data based on your API structure
       return response.data.response || response.data;
     } catch (error) {
       console.error("Create role thunk error:", error);
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to create role"
+        error.response?.data?.message || 
+        error.message || 
+        "Failed to create role"
       );
     }
   }

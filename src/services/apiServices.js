@@ -93,7 +93,7 @@ export const loginUser = async (credentials) => {
     localStorage.setItem("email", email);
     // console.log(id);
     // console.log(email);
-        if (!token) {
+    if (!token) {
       throw new Error("No token received from server");
     }
 
@@ -162,8 +162,8 @@ export async function getUserRepos(userId) {
 // Get All Repos
 export async function getAllRepos() {
   try {
-    const response = await api.get(`Repository/GetAllRepositories`);    
-    // console.log(response);
+    const response = await api.get(`Repository/GetAllRepositories`);
+    console.log(response);
     return response;
   } catch (error) {
     throw new Error(error);
@@ -190,7 +190,7 @@ export async function createNewUser(userData) {
     console.error("Failed to Create User", err);
     throw err;
   }
-}  
+}
 
 // Create Document Type
 export async function createDocType(DocTypeData) {
@@ -228,7 +228,10 @@ export async function getDocTypeById(docTypeId) {
 // Update Document Type
 export async function updateDocType(docTypeId, docTypeData) {
   try {
-    const response = await api.put(`DocumentType/Update/${docTypeId}`, docTypeData);
+    const response = await api.put(
+      `DocumentType/Update/${docTypeId}`,
+      docTypeData
+    );
     return response;
   } catch (err) {
     console.error("Failed to Update Doc Type", err);
@@ -246,7 +249,6 @@ export async function deleteDocType(docTypeId) {
     throw err;
   }
 }
-
 
 // Create New Role
 export async function createNewRole(roleData) {
@@ -361,8 +363,8 @@ export async function getRepoContents(id) {
   try {
     const response = await api.get(
       // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
-                `Repository/GetRepositoryContentById/${id}`
-                //  `Repository/GetRepositoryDetailsById?id=${id}`
+      `Repository/GetRepositoryContentById/${id}`
+      //  `Repository/GetRepositoryDetailsById?id=${id}`
     );
     return response;
   } catch (err) {
@@ -376,7 +378,7 @@ export async function getFolderContents(repoId, folderId) {
       `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
     );
     console.log(repoId, folderId);
-            return response;
+    return response;
   } catch (err) {
     console.error("Failed to Fetch Folder Contents", err);
     throw err;
@@ -390,7 +392,7 @@ export async function getDocumentFiles(repoId, folderId) {
       `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
     );
     console.log(repoId, folderId);
-        return response;
+    return response;
   } catch (err) {
     console.error("Failed to Fetch Folder Contents", err);
     throw err;
@@ -426,7 +428,6 @@ export async function fetchParentCategories(documentTypeId) {
   }
 }
 
-
 // Get All Users
 export async function getPrinciples() {
   try {
@@ -451,9 +452,7 @@ export async function createFolder(data) {
 // Get All Users
 export async function getAllUsers() {
   try {
-    const response = await api.get(
-      `Users/GetAllUsers/GetAllUsers`
-    );
+    const response = await api.get(`Users/GetAllUsers/GetAllUsers`);
     return response;
   } catch (err) {
     console.err("Failed to Fetch All Users", err);

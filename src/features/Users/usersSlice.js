@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createUser } from "./usersThunks";
+import { createUser, fetchUsers } from "./usersThunks";
 
 const usersSlice = createSlice({
   name: "users",
   initialState: {
     users: [],
-    status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    status: "idle",
     error: null,
     lastFetched: null,
     createStatus: "idle", // Separate status for create operation
@@ -28,20 +28,20 @@ const usersSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch users
-      // .addCase(fetcAllhUsers.pending, (state) => {
-      //   state.status = "loading";
-      //   state.error = null;
-      // })
-      // .addCase(fetcAllhUsers.fulfilled, (state, action) => {
-      //   state.status = "succeeded";
-      //   state.users = action.payload;
-      //   state.error = null;
-      //   state.lastFetched = new Date().toISOString();
-      // })
-      // .addCase(fetcAllhUsers.rejected, (state, action) => {
-      //   state.status = "failed";
-      //   state.error = action.error.message;
-      // })
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.users = action.payload;
+        state.error = null;
+        state.lastFetched = new Date().toISOString();
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
       // Create user
       .addCase(createUser.pending, (state) => {
         state.createStatus = "loading";

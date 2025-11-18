@@ -6,6 +6,7 @@ import Popup from "../../../globalComponents/Popup";
 import { Plus, Edit2, Trash2 } from "lucide-react";
  import { useTranslation } from "react-i18next";
 import { getAllUsers } from "../../../services/apiServices";
+import { fetchUsers } from "../usersThunks";
 
 function Users() {
   const dispatch = useDispatch();
@@ -22,13 +23,13 @@ function Users() {
   // Fetch users only if status is idle (no data yet)
   useEffect(() => {
     if (status === "idle") {
-      dispatch(getAllUsers());
+      dispatch(fetchUsers());
     }
   }, [dispatch, status]);
 
   // Simplified refresh - just dispatch again
   const refreshUsersData = useCallback(() => {
-    dispatch(getAllUsers());
+    dispatch(fetchUsers());
   }, [dispatch]);
 
   // Handle Update User

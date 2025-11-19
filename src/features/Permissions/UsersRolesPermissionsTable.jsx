@@ -216,9 +216,6 @@ function UsersRolesPermissionsTable({ onDone, savedData, entityType }) {
   // Updated selector - make sure this matches your actual Redux state structure
   const principlesState = useSelector((state) => state.permissionsReducer);
 
-  // Debug log to see the actual state structure
-  console.log("🔍 Full permissions state:", principlesState);
-
   // Extract principles data - adjust this path based on your actual state structure
   const principles =
     principlesState?.principles ||
@@ -227,37 +224,17 @@ function UsersRolesPermissionsTable({ onDone, savedData, entityType }) {
     [];
   const principlesStatus = principlesState?.status || "idle";
 
-  console.log("🔍 Extracted principles:", principles);
-  console.log("🔍 Principles status:", principlesStatus);
-
-  // Enhanced filtering with better debugging
   const users = useMemo(() => {
-    console.log("🔍 Filtering users from principles:", principles);
-
-    if (!Array.isArray(principles)) {
-      console.log(
-        "❌ Principles is not an array:",
-        typeof principles,
-        principles
-      );
-      return [];
-    }
-
     const filteredUsers = principles.filter((principle) => {
       const isUser = principle?.type === "User";
-      console.log(
-        `🔍 Principle ${principle?.name} (${principle?.type}): isUser = ${isUser}`
-      );
+
       return isUser;
     });
 
-    console.log("✅ Filtered users result:", filteredUsers);
     return filteredUsers;
   }, [principles]);
 
   const roles = useMemo(() => {
-    console.log("🔍 Filtering roles from principles:", principles);
-
     if (!Array.isArray(principles)) {
       console.log(
         "❌ Principles is not an array:",
@@ -269,37 +246,20 @@ function UsersRolesPermissionsTable({ onDone, savedData, entityType }) {
 
     const filteredRoles = principles.filter((principle) => {
       const isRole = principle?.type === "Role";
-      console.log(
-        `🔍 Principle ${principle?.name} (${principle?.type}): isRole = ${isRole}`
-      );
+
       return isRole;
     });
 
-    console.log("✅ Filtered roles result:", filteredRoles);
     return filteredRoles;
   }, [principles]);
 
   useEffect(() => {
-    console.log(
-      "🚀 Effect triggered - status:",
-      principlesStatus,
-      "repoId:",
-      repoId
-    );
-
     if (principlesStatus === "idle" && repoId) {
-      console.log("📡 Dispatching fetchPrinciples with repoId:", repoId);
       dispatch(fetchPrinciples(repoId));
     }
   }, [dispatch, principlesStatus, repoId]);
 
   // Debug current data
-  console.log("🎯 Current table data:", {
-    activeTable,
-    usersCount: users?.length || 0,
-    rolesCount: roles?.length || 0,
-    currentDataCount: activeTable === "users" ? users?.length : roles?.length,
-  });
 
   const getRowId = (row) => row.original.id || row.original._id;
 

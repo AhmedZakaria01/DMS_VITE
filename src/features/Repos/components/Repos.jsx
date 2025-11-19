@@ -196,28 +196,30 @@ import { Plus, Edit, Shield, Trash2 } from "lucide-react";
 // import UpdateRepo from "./UpdateRepo";
 // import { id } from "zod/v4/locales";
 import { useTranslation } from "react-i18next";
+import { clearRepos } from "../repoSlice";
 
 function Repos() {
   const { t, i18n } = useTranslation();
   const [isUpdateDetails, setIsUpdateDetails] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState(null);
-  const { user } = useSelector((state) => state.authReducer);
   const { repos, status, error } = useSelector((state) => state.repoReducer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.authReducer);
 
   // Apply RTL/LTR direction dynamically
   useEffect(() => {
     document.body.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
 
+  useEffect(() => {
+    dispatch(clearRepos());
+  }, [dispatch, user?.id]); // Clear when user changes
+
   // Fetch All Repos
   useEffect(() => {
-    // Only fetch if we haven't fetched yet or failed
-    if (status === "idle") {
-      dispatch(fetchAllRepos());
-    }
-  }, [dispatch, status]);
+    dispatch(fetchAllRepos());
+  }, [dispatch]);
 
   // Action button handlers
   const handleUpdateDetails = (repo) => {
@@ -315,9 +317,11 @@ function Repos() {
     //   state: { repoName: row.original.name }, // Keep this for immediate access
     // });
 
+
+    // Navigate to Document Type
     {
       isAdmin &&
-        navigate(`/docTypeForm/${row.original.id}`, {
+        navigate(`/documentTypes/${row.original.id}`, {
           state: { repoName: row.original.name }, // Keep this for immediate access
         });
     }

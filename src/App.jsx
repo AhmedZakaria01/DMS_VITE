@@ -24,6 +24,8 @@ import CreateFolder from "./features/FolderContent/components/CreateFolder";
 import { Search, Settings } from "lucide-react";
 import Category from "./features/Category/Category";
 import DocTypeForm from "./features/DocumentType/DocTypeForm";
+import DocumentTypes from "./features/DocumentType/DocumentTypes";
+import UpdateDocType from "./features/DocumentType/UpdateDocType";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -50,7 +52,9 @@ function App() {
           <Route path="/advancesSearch" element={<Search />} />
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/docTypeForm/:repoId" element={<DocTypeForm />} />
+          <Route path="/documentTypes/:repoId" element={<DocumentTypes />} />
+          <Route path="/updateDocType/:docTypeId" element={<UpdateDocType />} />
+          <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />
 
           <Route
             path="/users"

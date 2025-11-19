@@ -206,7 +206,9 @@ export async function createDocType(DocTypeData) {
 // Get Document Types by Repository
 export async function getDocTypesByRepo(repoId) {
   try {
-    const response = await api.get(`DocumentType/GetByRepository/${repoId}`);
+    const response = await api.get(
+      `DocumentType/GetPermittedDocumentTypes/${repoId}`
+    );
     return response;
   } catch (err) {
     console.error("Failed to Fetch Doc Types", err);
@@ -217,7 +219,9 @@ export async function getDocTypesByRepo(repoId) {
 // Get Document Type by ID
 export async function getDocTypeById(docTypeId) {
   try {
-    const response = await api.get(`DocumentType/GetById/${docTypeId}`);
+    const response = await api.get(
+      `DocumentType/GetPermittedDocumentTypeDetailsById/${docTypeId}`
+    );
     return response;
   } catch (err) {
     console.error("Failed to Fetch Doc Type", err);
@@ -225,11 +229,11 @@ export async function getDocTypeById(docTypeId) {
   }
 }
 
-// Update Document Type
+// Update Document Type Details
 export async function updateDocType(docTypeId, docTypeData) {
   try {
     const response = await api.put(
-      `DocumentType/Update/${docTypeId}`,
+      `DocumentType/UpdateDocumentTypeDetails/${docTypeId}`,
       docTypeData
     );
     return response;

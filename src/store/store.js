@@ -6,9 +6,9 @@ import rolesReducer from "../features/Roles/RolesSlice";
 import auditReducer from "../features/Audit/auditSlice";
 import repoContentReducer from "../features/RepoContents/repoContentSlice";
 import folderContentsReducer from "../features/FolderContent/folderContentsSlice";
-import categoryReducer from '../features/Category/categorySlice'
-import permissionsReducer from '../features/Permissions/permissionsSlice'
-import docTypeReducer from '../features/DocumentType/docTypeSlice';
+import categoryReducer from "../features/Category/categorySlice";
+import permissionsReducer from "../features/Permissions/permissionsSlice";
+import docTypeReducer from "../features/DocumentType/docTypeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +21,6 @@ export const store = configureStore({
     folderContentsReducer,
     categoryReducer,
     permissionsReducer,
-    docTypeReducer
+    docTypeReducer,
   },
 });

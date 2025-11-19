@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createDocTypeWithAttribute, fetchDocTypeById, getDocTypesFromRepo, removeDocType, updateDocTypeDetails } from "./DocTypeThunks";
-
-
+import {
+  createDocTypeWithAttribute,
+  fetchDocTypeById,
+  fetchDocTypesByRepo,
+  removeDocType,
+  updateDocTypeDetails,
+} from "./DocTypeThunks";
 
 const initialState = {
   docTypes: [],
@@ -44,7 +48,8 @@ const docTypeSlice = createSlice({
       .addCase(createDocTypeWithAttribute.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.message = action.payload.message || "Document type created successfully";
+        state.message =
+          action.payload.message || "Document type created successfully";
         // Add the new document type to the list if it exists in the response
         if (action.payload.id) {
           state.docTypes.push(action.payload);
@@ -57,16 +62,16 @@ const docTypeSlice = createSlice({
       })
 
       // Get Document Types by Repository
-      .addCase(getDocTypesFromRepo.pending, (state) => {
+      .addCase(fetchDocTypesByRepo.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getDocTypesFromRepo.fulfilled, (state, action) => {
+      .addCase(fetchDocTypesByRepo.fulfilled, (state, action) => {
         state.loading = false;
         state.docTypes = action.payload;
         state.error = null;
       })
-      .addCase(getDocTypesFromRepo.rejected, (state, action) => {
+      .addCase(fetchDocTypesByRepo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch document types";
         state.docTypes = [];
@@ -98,7 +103,8 @@ const docTypeSlice = createSlice({
       .addCase(updateDocTypeDetails.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.message = action.payload.message || "Document type updated successfully";
+        state.message =
+          action.payload.message || "Document type updated successfully";
         // Update the document type in the list
         const index = state.docTypes.findIndex(
           (dt) => dt.id === action.payload.id
@@ -127,7 +133,8 @@ const docTypeSlice = createSlice({
       .addCase(removeDocType.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.message = action.payload.data.message || "Document type deleted successfully";
+        state.message =
+          action.payload.data.message || "Document type deleted successfully";
         // Remove the document type from the list
         state.docTypes = state.docTypes.filter(
           (dt) => dt.id !== action.payload.docTypeId
@@ -145,10 +152,7 @@ const docTypeSlice = createSlice({
   },
 });
 
-export const { 
-  resetDocTypeState, 
-  clearCurrentDocType, 
-  clearDocTypeError 
-} = docTypeSlice.actions;
+export const { resetDocTypeState, clearCurrentDocType, clearDocTypeError } =
+  docTypeSlice.actions;
 
 export default docTypeSlice.reducer;

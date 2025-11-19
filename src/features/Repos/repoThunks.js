@@ -13,9 +13,11 @@ export const fetchAllRepos = createAsyncThunk(
   "repo/fetchAllRepos",
   async () => {
     const response = await getAllRepos();
-    return response.data;
+    console.log("API response:", response); // Debug log
+    return response.data.response; // Return full response to match reducer expectation
   }
 ); // Fetch User Repositories
+
 export const fetchUserRepos = createAsyncThunk(
   "repo/fetchUserRepos",
   async (userId) => {
@@ -37,7 +39,7 @@ export const createNewRepo = createAsyncThunk(
 // Update Repository
 export const editRepositoryDetails = createAsyncThunk(
   "repo/updateRepositoryDetails",
-  async ({repoId, backendData}) => {
+  async ({ repoId, backendData }) => {
     console.log(repoId);
     console.log(backendData);
 

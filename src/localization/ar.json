@@ -291,9 +291,15 @@
   "addField":"أضف حقل",
   "required":"إلزامي",
   "named":"مسمى",
+  "repoId": "رقم المستودع",
+  "missing": "مفقود",
+  "raw": "البيانات ",
+    "backToRepositories": "العودة إلى المخازن",
   "docTypeSetupDescription":"وصف إعداد نوع المستند",
   "securityLevelHint":"مستوى الأمان",
   "attributeTypeRequired":"نوع السمة مطلوب",
   "attributeNameRequired":"اسم السمة مطلوب",
-      "fields": "حقول"
+        "documentTypes": "أنواع المستندات",
+          "documentTypesManagement": "إدارة أنواع المستندات"
+
 }

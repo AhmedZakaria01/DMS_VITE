@@ -704,13 +704,13 @@ function UsersRolesPermissionsTable({ onDone, savedData, entityType }) {
       <div className="p-3 bg-blue-50 border-b border-blue-200 text-sm">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <strong>Status:</strong> {principlesStatus} |{" "}
-            <strong>RepoId:</strong> {repoId || "Missing"}
+            <strong>{t("status")}:</strong> {principlesStatus} |{" "}
+            <strong>{t("repoId")}:</strong> {repoId || t("missing")}
           </div>
           <div>
-            <strong>Raw:</strong> {principles?.length || 0} |{" "}
-            <strong>Users:</strong> {users?.length || 0} |{" "}
-            <strong>Roles:</strong> {roles?.length || 0}
+            <strong>{t("raw")}:</strong> {principles?.length || 0} |{" "}
+            <strong>{t("users")}:</strong> {users?.length || 0} |{" "}
+            <strong>{t("roles")}:</strong> {roles?.length || 0}
           </div>
         </div>
       </div>

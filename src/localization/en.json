@@ -274,6 +274,11 @@
   "addDropdownValue": "Please add at least one dropdown value",
   "createRepoFailed": "Failed to create repository",
   "createDocumentType": "Create Document Type",
+    "backToRepositories": "Back To Repositories",
+  "repoId": "Repo ID",
+  "missing": "Missing",
+  "raw": "Raw",
+  
   "documentTypeName": "Document Type Name",
   "documentTypeRequired": "Document type name is required",
   "enterDocumentTypeName": "Enter document type name",
@@ -292,6 +297,9 @@
   "docTypeSetupDescription":"Document Type Setup Description",
     "securityLevelHint":"Security Level ",
     "attributeTypeRequired":"Attribute Type Required",
-    "attributeNameRequired":"Attribute Name Required"
+    "attributeNameRequired":"Attribute Name Required",
+      "documentTypes": "Document Types",
+      "documentTypesManagement": "Document Types Management"
+
 
 }

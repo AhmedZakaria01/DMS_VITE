@@ -160,21 +160,21 @@ function DocumentTypes() {
           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
-          {t("Back To Repositories")}
+          {t("backToRepositories")}
         </button>
         <nav className="text-sm text-gray-600 mt-2">
           <span>{t("repositories")}</span>
           <span className="mx-2">/</span>
           <span className="font-medium">{repoName}</span>
           <span className="mx-2">/</span>
-          <span>{t("Document Types")}</span>
+          <span>{t("documentTypes")}</span>
         </nav>
       </div>
 
       <div className="flex justify-between">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t("Document Types")}
+            {t("documentTypes")}
           </h1>
 
         </div>
@@ -184,7 +184,7 @@ function DocumentTypes() {
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
           >
             <Plus className="w-5 h-5" />
-            {t("Create Document Type")}
+            {t("createDocumentType")}
           </button>
         </div>
       </div>
@@ -193,7 +193,7 @@ function DocumentTypes() {
         <ReUsableTable
           columns={columns}
           data={docTypes || []}
-          title={t("Document Types Management")}
+          title={t("documentTypesManagement")}
           isLoading={status === "loading"}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}

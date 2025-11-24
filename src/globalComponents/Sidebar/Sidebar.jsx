@@ -24,7 +24,7 @@ export default function Sidebar({
 
   const navigation = [
     { name: t("home"), link: "/", icon: "🏠" },
-       // Admin only items
+      // Admin only items
     ...(hasAdminRole(userRoles) ? [
        { name: t("users"), link: "/users", icon: "🙍‍♂️" },
         { name: t("roles"), link: "/roles", icon: "👥" },

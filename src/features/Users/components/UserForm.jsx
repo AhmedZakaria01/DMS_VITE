@@ -825,7 +825,6 @@
 // };
 
 // export default React.memo(UserForm);
-
 /* eslint-disable react/prop-types */
 import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -848,6 +847,8 @@ import { createUser } from "../usersThunks";
 import { fetchRoles } from "../../Roles/RolesThunks";
 import { fetchScreensPermissions } from "../../Permissions/permissionsThunks";
 import { useTranslation } from "react-i18next";
+import SuccessAlert from "../../../globalComponents/Alerts/SuccessAlert";
+import ErrorAlert from "../../../globalComponents/Alerts/ErrorAlert";
 
 const UserForm = ({
   mode = "create",
@@ -859,8 +860,14 @@ const UserForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   
+  // Alert states - consistent with RepoForm
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const autoCloseTimeoutRef = useRef(null);
 
   const { screenPermissions = [] } = useSelector(
     (state) => state.permissionsReducer
@@ -869,10 +876,11 @@ const UserForm = ({
   useEffect(() => {
     dispatch(fetchScreensPermissions());
   }, [dispatch]);
-  // console.log('====================================');
+ // console.log('====================================');
   // console.log('marwa',screenPermissions);
   // console.log('====================================');
   const isEditMode = mode === "edit";
+  
   // Multi-select states
   const [selectedRoles, setSelectedRoles] = useState([]); 
   const [selectedPermissionIds, setSelectedPermissionIds] = useState([]);
@@ -927,7 +935,6 @@ const UserForm = ({
   useEffect(() => {
     dispatch(fetchRoles());
   }, [dispatch]);
-
   // console.log('Roles from Redux:', roles);
 
   // Filter roles based on search terms
@@ -969,6 +976,15 @@ const UserForm = ({
     }
   }, [isEditMode, initialData, setValue, trigger]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimeoutRef.current) {
+        clearTimeout(autoCloseTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Handle click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -985,6 +1001,58 @@ const UserForm = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Handle success alert close - FIXED: consistent with RepoForm approach
+  const handleSuccessAlertClose = () => {
+    if (autoCloseTimeoutRef.current) {
+      clearTimeout(autoCloseTimeoutRef.current);
+    }
+    setShowSuccessAlert(false);
+    handleAutoClose();
+  };
+
+  // Handle error alert close - FIXED: consistent with RepoForm approach
+  const handleErrorAlertClose = () => {
+    setShowErrorAlert(false);
+  };
+
+  // Handle auto close after success
+  const handleAutoClose = () => {
+    console.log("Auto closing popup and alert...");
+    setShowSuccessAlert(false);
+    if (!isEditMode) {
+      reset();
+      setSelectedRoles([]);
+      setSelectedPermissionIds([]);
+    }
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
+  // Show success alert - FIXED: consistent naming and approach
+  const triggerSuccess = (message) => {
+    setSuccessMessage(message);
+    setShowSuccessAlert(true);
+    
+    // Auto close after 3 seconds
+    if (autoCloseTimeoutRef.current) {
+      clearTimeout(autoCloseTimeoutRef.current);
+    }
+    autoCloseTimeoutRef.current = setTimeout(() => {
+      handleSuccessAlertClose();
+    }, 3000);
+  };
+
+  // Show error alert - FIXED: consistent with RepoForm approach
+  const triggerError = (message) => {
+    setErrorMessage(message);
+    setShowErrorAlert(true);
+    // Auto close after 6 seconds like RepoForm
+    setTimeout(() => {
+      setShowErrorAlert(false);
+    }, 6000);
+  };
 
   // Handle role selection - using roleId instead of roleName
   const handleRoleToggle = (roleId) => {
@@ -1045,6 +1113,12 @@ const UserForm = ({
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
+      setShowSuccessAlert(false);
+      setShowErrorAlert(false);
+
+      if (autoCloseTimeoutRef.current) {
+        clearTimeout(autoCloseTimeoutRef.current);
+      }
 
       // Prepare data for submission in the desired format
       const submitData = {
@@ -1075,25 +1149,31 @@ const UserForm = ({
 
       console.log(`User ${isEditMode ? "updated" : "created"} successfully!`, result);
 
-      // Call success callback to close modal and refresh data
-      if (onSuccess) {
-        onSuccess(result);
-      }
+      // Show success alert immediately after successful API call
+      triggerSuccess(`User ${isEditMode ? 'updated' : 'created'} successfully`);
+      
+      // Reset submitting state
       setIsSubmitting(false);
+
     } catch (error) {
       console.error(
         `Failed to ${isEditMode ? "update" : "create"} user:`,
         error
       );
-      alert(
-        `Failed to ${isEditMode ? "update" : "create"} user: ${error.message || 'Please try again.'}`
-      );
+      
+      // FIXED: Use ErrorAlert component instead of native alert
+      const errorMsg = error?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
+      triggerError(errorMsg);
       setIsSubmitting(false);
     }
   };
 
   // Reset form handler
   const handleReset = () => {
+    if (autoCloseTimeoutRef.current) {
+      clearTimeout(autoCloseTimeoutRef.current);
+    }
+
     if (isEditMode && initialData) {
       // Reset to initial data in edit mode
       setValue("firstName", initialData.firstName || "");
@@ -1123,10 +1203,18 @@ const UserForm = ({
     setPermissionSearchTerm("");
     setIsRoleDropdownOpen(false);
     setIsPermissionDropdownOpen(false);
+    setShowSuccessAlert(false);
+    setShowErrorAlert(false);
   };
 
   // Cancel handler
   const handleCancel = () => {
+    if (autoCloseTimeoutRef.current) {
+      clearTimeout(autoCloseTimeoutRef.current);
+    }
+    
+    setShowSuccessAlert(false);
+    setShowErrorAlert(false);
     if (onCancel) {
       onCancel();
     }
@@ -1134,6 +1222,30 @@ const UserForm = ({
 
   return (
     <div className="max-w-2xl mx-auto">
+      {/* Success Alert - FIXED: consistent with RepoForm */}
+      {showSuccessAlert && (
+        <SuccessAlert
+          show={showSuccessAlert}
+          onClose={handleSuccessAlertClose}
+          title={t('success')}
+          message={successMessage}
+          autoHide={true}
+          duration={3000}
+        />
+      )}
+
+      {/* Error Alert - FIXED: consistent with RepoForm */}
+      {showErrorAlert && (
+        <ErrorAlert
+          show={showErrorAlert}
+          onClose={handleErrorAlertClose}
+          title={isEditMode ? t("updateFailed") : t("creationFailed")}
+          message={errorMessage}
+          autoClose={true}
+          duration={6000}
+        />
+      )}
+
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -1176,7 +1288,7 @@ const UserForm = ({
                   placeholder={t("firstNamePlaceholder")}
                 />
                 {errors.firstName && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.firstName.message}
                   </p>
@@ -1200,7 +1312,7 @@ const UserForm = ({
                   placeholder={t("lastNamePlaceholder")}
                 />
                 {errors.lastName && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.lastName.message}
                   </p>
@@ -1224,7 +1336,7 @@ const UserForm = ({
                   placeholder={t("usernamePlaceholder")}
                 />
                 {errors.userName && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.userName.message}
                   </p>
@@ -1253,7 +1365,7 @@ const UserForm = ({
                   />
                 </div>
                 {errors.email && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.email.message}
                   </p>
@@ -1303,7 +1415,7 @@ const UserForm = ({
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.password.message}
                   </p>
@@ -1358,7 +1470,7 @@ const UserForm = ({
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-text-red-600 flex items-center">
+                  <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
                     {errors.confirmPassword.message}
                   </p>
@@ -1582,6 +1694,7 @@ const UserForm = ({
     </div>
   );
 };
+
 // Dynamic validation schema based on mode
 const getValidationSchema = (isEditMode, t) =>
   z.object({

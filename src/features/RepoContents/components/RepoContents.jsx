@@ -6,6 +6,8 @@ import { Plus, Folder, FileText } from "lucide-react";
 import { fetchRepoContents } from "../repoContentThunks";
 import { useTranslation } from "react-i18next";
 
+import usePermission from "../../auth/usePermission";
+
 function RepoContents() {
   const { t } = useTranslation();
   const { repoContents, status, error } = useSelector(
@@ -16,6 +18,9 @@ function RepoContents() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { repoId } = useParams();
+
+  // Check for CreateFolder permission
+  const canCreateFolder = usePermission("screens.folder.create");
 
   useEffect(() => {
     if (repoId) {
@@ -80,11 +85,10 @@ function RepoContents() {
         header: t("type"),
         cell: ({ row }) => (
           <span
-            className={`px-2 py-1 text-xs font-medium rounded-full ${
-              row.original.type === "folder"
+            className={`px-2 py-1 text-xs font-medium rounded-full ${row.original.type === "folder"
                 ? "bg-blue-100 text-blue-800"
                 : "bg-gray-100 text-gray-800"
-            }`}
+              }`}
           >
             {row.original.type === "folder" ? t("folder") : t("document")}
           </span>
@@ -131,15 +135,17 @@ function RepoContents() {
           <p className="text-gray-600">{t("repoContentsDescription")}</p>
         </div>
         <div>
-          <button
-            onClick={() => navigate(`/repoContents/${repoId}/createFolder`)}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
-            aria-label={t("createFolder")}
-            title={t("createFolder")}
-          >
-            <Plus className="w-5 h-5" />
-            {t("createFolder")}
-          </button>
+          {canCreateFolder && (
+            <button
+              onClick={() => navigate(`/repoContents/${repoId}/createFolder`)}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+              aria-label={t("createFolder")}
+              title={t("createFolder")}
+            >
+              <Plus className="w-5 h-5" />
+              {t("createFolder")}
+            </button>
+          )}
         </div>
       </div>
 

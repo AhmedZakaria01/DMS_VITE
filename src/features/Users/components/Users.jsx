@@ -4,13 +4,18 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import UserForm from "./UserForm";
 import Popup from "../../../globalComponents/Popup";
 import { Plus, Edit2, Trash2 } from "lucide-react";
- import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { getAllUsers } from "../../../services/apiServices";
 import { fetchUsers } from "../usersThunks";
+
+import usePermission from "../../auth/usePermission";
 
 function Users() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  // Check for Create User permission
+  const canCreateUser = usePermission("screens.users.create");
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -132,13 +137,15 @@ function Users() {
           <p className="text-gray-600">{t("usersDescription")}</p>
         </div>
         <div>
-          <button
-            onClick={handleCreateClick}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
-          >
-            <Plus className="w-5 h-5" />
-            {t("createNewUser")}
-          </button>
+          {canCreateUser && (
+            <button
+              onClick={handleCreateClick}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+              {t("createNewUser")}
+            </button>
+          )}
         </div>
       </div>
 

@@ -21,3 +21,8 @@ export const getRolesFromToken = (token) => {
   const decoded = decodeJWT(token);
   return decoded?.roles || [];
 };
+
+export const getPermissionsFromToken = (token) => {
+  const decoded = decodeJWT(token);
+  return decoded?.permissions || [];
+};

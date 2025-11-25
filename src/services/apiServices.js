@@ -365,11 +365,11 @@ export async function getRepositoryById(id) {
 // Fetch Repo Contents
 export async function getRepoContents(id) {
   try {
-    const response = await api.get(
-      // `Repository/GetRepositoryWithFoldersAndDocumentInfos/${id}`
-      `Repository/GetRepositoryContentById/${id}`
-      //  `Repository/GetRepositoryDetailsById?id=${id}`
-    );
+    const response = await api
+      .get
+      //! Replace With Repo Contents API
+      // `Repository/GetRepositoryDetailsById?id=${id}`
+      ();
     return response;
   } catch (err) {
     console.err("Failed to Fetch Repos Contents", err);
@@ -448,6 +448,7 @@ export async function createFolder(data) {
   try {
     const response = await api.post("Folder/CreateFolder", data);
     console.log(response);
+    return response
   } catch (error) {
     throw new Error(error);
   }

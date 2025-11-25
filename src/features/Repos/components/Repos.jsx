@@ -318,12 +318,17 @@ function Repos() {
     //   state: { repoName: row.original.name }, // Keep this for immediate access
     // });
 
-    // Navigate to Document Type
+
+
+    // ! Navigate to Document Type Or Folder Based on ROLE
     {
-      isAdmin &&
-        navigate(`/documentTypes/${row.original.id}`, {
-          state: { repoName: row.original.name }, // Keep this for immediate access
-        });
+      isAdmin
+        ? navigate(`/documentTypes/${row.original.id}`, {
+            state: { repoName: row.original.name }, // Keep this for immediate access
+          })
+        : navigate(`/repoContents/${row.original.id}`, {
+            state: { repoName: row.original.name }, // Keep this for immediate access
+          });
     }
 
     //  : navigate(`/repoContents/${row.original.id}`, {

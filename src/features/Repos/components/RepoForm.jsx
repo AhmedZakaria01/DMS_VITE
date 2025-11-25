@@ -69,7 +69,9 @@ const IndexFieldsTable = ({
       { value: "memo", label: t("memo"), hasSize: true },
       { value: "dropdown", label: t("dropdown"), hasSize: false },
     ];
-    return ATTRIBUTE_TYPES.find((attrType) => attrType.value === type)?.label || type;
+    return (
+      ATTRIBUTE_TYPES.find((attrType) => attrType.value === type)?.label || type
+    );
   };
 
   // Render pagination controls
@@ -93,8 +95,9 @@ const IndexFieldsTable = ({
     return (
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
         <div className="text-sm text-gray-600">
-          {t("showing")} {startIndex + 1} {t("to")} {Math.min(endIndex, indexFields.length)}{" "}
-          {t("of")} {indexFields.length} {t("fields")}
+          {t("showing")} {startIndex + 1} {t("to")}{" "}
+          {Math.min(endIndex, indexFields.length)} {t("of")}{" "}
+          {indexFields.length} {t("fields")}
         </div>
 
         <div className="flex items-center gap-2">
@@ -135,7 +138,9 @@ const IndexFieldsTable = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="px-6 py-2 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">{t("indexFields")}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">
+          {t("indexFields")}
+        </h3>
         <p className="text-sm text-gray-600 mt-1">
           {indexFields.length === 1
             ? t("fieldConfigured")
@@ -241,9 +246,7 @@ const IndexFieldsTable = ({
                     <p className="text-base font-medium mb-1">
                       {t("noIndexFields")}
                     </p>
-                    <p className="text-sm">
-                      {t("addIndexFieldHint")}
-                    </p>
+                    <p className="text-sm">{t("addIndexFieldHint")}</p>
                   </div>
                 </td>
               </tr>
@@ -258,13 +261,10 @@ const IndexFieldsTable = ({
 
 function RepoForm() {
   const { t } = useTranslation();
-  
+
   // Form validation schema - FIXED validation keys
   const validationSchema = z.object({
-    name: z
-      .string()
-      .min(1, t("nameRequired"))
-      .min(3, t("minThreeChars")),
+    name: z.string().min(1, t("nameRequired")).min(3, t("minThreeChars")),
     description: z
       .string()
       .min(1, t("descriptionRequired"))
@@ -272,7 +272,7 @@ function RepoForm() {
     isEncrypted: z.boolean(),
     categoryOption: z.string().optional(),
   });
-  
+
   // Available attribute types with size requirements - FIXED
   const ATTRIBUTE_TYPES = [
     { value: "string", label: t("string"), hasSize: true },
@@ -517,8 +517,7 @@ function RepoForm() {
       });
     } catch (error) {
       console.error("Failed to create repository:", error);
-      const errorMsg =
-        error?.message || t("createRepoFailed");
+      const errorMsg = error?.message || t("createRepoFailed");
       triggerError(errorMsg);
     }
   };
@@ -888,6 +887,7 @@ function RepoForm() {
                       setIsOpen={setOpenPermissions}
                       component={
                         <UsersRolesPermissionsTable
+                          // fetchUsers_Roles={}
                           entityType="repo"
                           onDone={handlePermissionsDataChange}
                           savedData={permissionsData}

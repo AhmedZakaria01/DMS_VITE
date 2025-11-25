@@ -170,6 +170,9 @@ const ReUsableTable = ({
   defaultPageSize = 10,
   className = "",
   isLoading = false,
+  fetchUsers,
+  fetchRoles,
+  isRepository,
 }) => {
   const { t } = useTranslation();
   const [globalFilter, setGlobalFilter] = useState("");

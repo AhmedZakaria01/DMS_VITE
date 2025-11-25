@@ -433,10 +433,10 @@ export async function fetchParentCategories(documentTypeId) {
 }
 
 // Get All Users
-export async function getPrinciples() {
+export async function getPrinciples(id) {
   try {
     const response = await api.get(
-      `Principles/availablePrincipals?repoId=${1}`
+      `Principles/availablePrincipals?repoId=${id}`
     );
     return response;
   } catch (err) {

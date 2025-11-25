@@ -27,6 +27,9 @@ import Popup from "../../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
 
 import { useTranslation } from "react-i18next";
+import { getAllUsers, getRoles } from "../../../services/apiServices";
+import { fetchUsers } from "../../Users/usersThunks";
+import { fetchRoles } from "../../Roles/RolesThunks";
 
 // Paginated table component for index fields
 const IndexFieldsTable = ({
@@ -891,6 +894,9 @@ function RepoForm() {
                           entityType="repo"
                           onDone={handlePermissionsDataChange}
                           savedData={permissionsData}
+                          fetchUsers={fetchUsers}
+                          fetchRoles={fetchRoles}
+                          isRepository={true}
                         />
                       }
                     />

@@ -197,6 +197,7 @@ import { Plus, Edit, Shield, Trash2 } from "lucide-react";
 // import { id } from "zod/v4/locales";
 import { useTranslation } from "react-i18next";
 import { clearRepos } from "../repoSlice";
+import { getAllUsers, getRoles } from "../../../services/apiServices";
 
 function Repos() {
   const { t, i18n } = useTranslation();
@@ -317,7 +318,6 @@ function Repos() {
     //   state: { repoName: row.original.name }, // Keep this for immediate access
     // });
 
-
     // Navigate to Document Type
     {
       isAdmin &&
@@ -355,8 +355,9 @@ function Repos() {
         <ReUsableTable
           columns={columns}
           data={repos || []}
-          title={t("Repositories")}
-          isLoading={status === "loading"}
+          fetchUsers={getAllUsers}
+          fetchRoles={getRoles}
+          isRepository={true}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}
           pageSizeOptions={[5, 10, 20, 50]}

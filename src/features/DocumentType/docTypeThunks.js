@@ -1,5 +1,5 @@
 // import { createAsyncThunk } from "@reduxjs/toolkit";
-// import { 
+// import {
 //   createDocType as createDocTypeAPI,
 //   getDocTypesByRepo,
 //   getDocTypeById,
@@ -13,19 +13,19 @@
 //   async ({ payload }, { rejectWithValue }) => {
 //     try {
 //       const response = await createDocTypeAPI(payload);
-      
+
 //       // Check if response exists and has data
 //       if (!response || !response.data) {
 //         throw new Error("No response received from server");
 //       }
-      
+
 //       // Return the nested response data based on your API structure
 //       return response.data.response || response.data;
 //     } catch (error) {
 //       console.error("Create Doc Type thunk error:", error);
 //       return rejectWithValue(
-//         error.response?.data?.message || 
-//         error.message || 
+//         error.response?.data?.message ||
+//         error.message ||
 //         "Failed to create Doc Type"
 //       );
 //     }
@@ -38,17 +38,17 @@
 //   async (repoId, { rejectWithValue }) => {
 //     try {
 //       const response = await getDocTypesByRepo(repoId);
-      
+
 //       if (!response || !response.data) {
 //         throw new Error("No response received from server");
 //       }
-      
+
 //       return response.data.response || response.data;
 //     } catch (error) {
 //       console.error("Get Doc Types thunk error:", error);
 //       return rejectWithValue(
-//         error.response?.data?.message || 
-//         error.message || 
+//         error.response?.data?.message ||
+//         error.message ||
 //         "Failed to fetch Doc Types"
 //       );
 //     }
@@ -61,17 +61,17 @@
 //   async (docTypeId, { rejectWithValue }) => {
 //     try {
 //       const response = await getDocTypeById(docTypeId);
-      
+
 //       if (!response || !response.data) {
 //         throw new Error("No response received from server");
 //       }
-      
+
 //       return response.data.response || response.data;
 //     } catch (error) {
 //       console.error("Get Doc Type thunk error:", error);
 //       return rejectWithValue(
-//         error.response?.data?.message || 
-//         error.message || 
+//         error.response?.data?.message ||
+//         error.message ||
 //         "Failed to fetch Doc Type"
 //       );
 //     }
@@ -84,17 +84,17 @@
 //   async ({ docTypeId, payload }, { rejectWithValue }) => {
 //     try {
 //       const response = await updateDocType(docTypeId, payload);
-      
+
 //       if (!response || !response.data) {
 //         throw new Error("No response received from server");
 //       }
-      
+
 //       return response.data.response || response.data;
 //     } catch (error) {
 //       console.error("Update Doc Type thunk error:", error);
 //       return rejectWithValue(
-//         error.response?.data?.message || 
-//         error.message || 
+//         error.response?.data?.message ||
+//         error.message ||
 //         "Failed to update Doc Type"
 //       );
 //     }
@@ -107,17 +107,17 @@
 //   async (docTypeId, { rejectWithValue }) => {
 //     try {
 //       const response = await deleteDocType(docTypeId);
-      
+
 //       if (!response || !response.data) {
 //         throw new Error("No response received from server");
 //       }
-      
+
 //       return { docTypeId, data: response.data.response || response.data };
 //     } catch (error) {
 //       console.error("Delete Doc Type thunk error:", error);
 //       return rejectWithValue(
-//         error.response?.data?.message || 
-//         error.message || 
+//         error.response?.data?.message ||
+//         error.message ||
 //         "Failed to delete Doc Type"
 //       );
 //     }
@@ -167,8 +167,9 @@ export const fetchDocTypesByRepo = createAsyncThunk(
       if (!response || !response.data) {
         throw new Error("No response received from server");
       }
+      console.log(response.data?.response);
 
-      return response.data.response || response.data;
+      return response.data?.response;
     } catch (error) {
       console.error("Get Doc Types thunk error:", error);
       return rejectWithValue(

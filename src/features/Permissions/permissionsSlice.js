@@ -1,55 +1,3 @@
-// import { createSlice } from "@reduxjs/toolkit";
-// import {  fetchAvailablePermission, fetchScreensPermissions } from "./permissionsThunks";
-
-// const permissionSlice = createSlice({
-//   name: "permissions",
-//   initialState: {
-//     permissions: [],
-//     status: "idle",
-//     error: null,
-//     screenPermissions: [],
-//     screenStatus: "idle",
-//     screenError: null,
-//   },
-//   reducers: {
-//     clearPermissions: (state) => {
-//       state.permissions = [];
-//       state.screenPermissions = [];
-//     },
-//   },
-//   extraReducers: (builder) => {
-//     builder
-//       // Fetch User Permissions
-//       .addCase(fetchAvailablePermission.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(fetchAvailablePermission.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.permissions = action.payload?.response || [];
-//       })
-//       .addCase(fetchAvailablePermission.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message;
-//       })
-
-//       // Fetch Screen Permissions
-//       .addCase(fetchScreensPermissions.pending, (state) => {
-//         state.screenStatus = "loading";
-//       })
-//       .addCase(fetchScreensPermissions.fulfilled, (state, action) => {
-//         state.screenStatus = "succeeded";
-//         state.screenPermissions = action.payload?.response || [];
-//       })
-//       .addCase(fetchScreensPermissions.rejected, (state, action) => {
-//         state.screenStatus = "failed";
-//         state.screenError = action.error.message;
-//       });
-//   },
-// });
-
-// export const { clearPermissions } = permissionSlice.actions;
-// export default permissionSlice.reducer;
-
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchAvailablePermission,
@@ -61,8 +9,10 @@ const permissionSlice = createSlice({
   name: "permissions",
   initialState: {
     permissions: [],
+    currentEntityType: null, // ✅ ADDED: Track current entity type
     status: "idle",
     error: null,
+    loading: false, // ✅ ADDED: Explicit loading flag
     screenPermissions: [],
     screenStatus: "idle",
     screenError: null,
@@ -74,8 +24,11 @@ const permissionSlice = createSlice({
   reducers: {
     clearPermissions: (state) => {
       state.permissions = [];
+      state.currentEntityType = null; // ✅ ADDED: Clear entity type
       state.screenPermissions = [];
-      state.principles = []; // Clear principles too
+      state.principles = [];
+      state.status = "idle";
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
@@ -83,14 +36,24 @@ const permissionSlice = createSlice({
       // Fetch User Permissions
       .addCase(fetchAvailablePermission.pending, (state) => {
         state.status = "loading";
+        state.loading = true; // ✅ ADDED: Set loading flag
+        state.error = null;
       })
       .addCase(fetchAvailablePermission.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.loading = false; // ✅ ADDED: Clear loading flag
         state.permissions = action.payload?.response || [];
+        state.currentEntityType = action.meta.arg; // ✅ ADDED: Store the entityType from the request
+        console.log(
+          "✅ Permissions loaded for entity type:",
+          state.currentEntityType
+        );
       })
       .addCase(fetchAvailablePermission.rejected, (state, action) => {
         state.status = "failed";
+        state.loading = false; // ✅ ADDED: Clear loading flag
         state.error = action.error.message;
+        state.currentEntityType = null; // ✅ ADDED: Clear entity type on error
       })
 
       // Fetch Screen Permissions

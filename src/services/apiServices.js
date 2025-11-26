@@ -207,8 +207,11 @@ export async function createDocType(DocTypeData) {
 export async function getDocTypesByRepo(repoId) {
   try {
     const response = await api.get(
-      `DocumentType/GetPermittedDocumentTypes/${repoId}`
+      // `DocumentType/GetPermittedDocumentTypes/${repoId}`
+      `DocumentType/GetPermittedDocumentTypes/2`
     );
+    console.log(response);
+
     return response;
   } catch (err) {
     console.error("Failed to Fetch Doc Types", err);
@@ -448,7 +451,7 @@ export async function createFolder(data) {
   try {
     const response = await api.post("Folder/CreateFolder", data);
     console.log(response);
-    return response
+    return response;
   } catch (error) {
     throw new Error(error);
   }

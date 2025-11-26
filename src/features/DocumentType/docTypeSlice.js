@@ -1,11 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  createDocTypeWithAttribute,
-  fetchDocTypeById,
-  fetchDocTypesByRepo,
-  removeDocType,
-  updateDocTypeDetails,
-} from "./DocTypeThunks";
+import { createDocTypeWithAttribute, fetchDocTypeById, fetchDocTypesByRepo, removeDocType, updateDocTypeDetails } from "./docTypeThunks";
+ 
 
 const initialState = {
   docTypes: [],

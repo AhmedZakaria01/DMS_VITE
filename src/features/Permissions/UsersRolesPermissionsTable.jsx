@@ -2564,24 +2564,28 @@ function UsersRolesPermissionsTable({
           />
         ),
       },
-      {
-        id: "clearanceLevel",
-        accessorKey: "clearanceLevel",
-        header: t("securityLevel"),
-        size: 180,
-        minSize: 150,
-        cell: ({ row }) => (
-          <SecurityLevelCell
-            row={row}
-            type="role"
-            dataChanges={dataChanges}
-            handleSecurityLevelChange={handleSecurityLevelChange}
-            getRowId={getRowId}
-            getOriginalClearanceLevel={getOriginalClearanceLevel}
-            t={t}
-          />
-        ),
-      },
+      ...(isRepository
+        ? [
+            {
+              id: "clearanceLevel",
+              accessorKey: "clearanceLevel",
+              header: t("securityLevel"),
+              size: 180,
+              minSize: 150,
+              cell: ({ row }) => (
+                <SecurityLevelCell
+                  row={row}
+                  type="role"
+                  dataChanges={dataChanges}
+                  handleSecurityLevelChange={handleSecurityLevelChange}
+                  getRowId={getRowId}
+                  getOriginalClearanceLevel={getOriginalClearanceLevel}
+                  t={t}
+                />
+              ),
+            },
+          ]
+        : []),
     ],
     [
       handleRolePermissionsChange,
@@ -2590,6 +2594,7 @@ function UsersRolesPermissionsTable({
       dataChanges,
       entityType,
       t,
+      isRepository,
     ]
   );
 
@@ -2654,24 +2659,28 @@ function UsersRolesPermissionsTable({
           />
         ),
       },
-      {
-        id: "clearanceLevel",
-        accessorKey: "clearanceLevel",
-        header: t("securityLevel"),
-        size: 180,
-        minSize: 150,
-        cell: ({ row }) => (
-          <SecurityLevelCell
-            row={row}
-            type="user"
-            dataChanges={dataChanges}
-            handleSecurityLevelChange={handleSecurityLevelChange}
-            getRowId={getRowId}
-            getOriginalClearanceLevel={getOriginalClearanceLevel}
-            t={t}
-          />
-        ),
-      },
+      ...(isRepository
+        ? [
+            {
+              id: "clearanceLevel",
+              accessorKey: "clearanceLevel",
+              header: t("securityLevel"),
+              size: 180,
+              minSize: 150,
+              cell: ({ row }) => (
+                <SecurityLevelCell
+                  row={row}
+                  type="user"
+                  dataChanges={dataChanges}
+                  handleSecurityLevelChange={handleSecurityLevelChange}
+                  getRowId={getRowId}
+                  getOriginalClearanceLevel={getOriginalClearanceLevel}
+                  t={t}
+                />
+              ),
+            },
+          ]
+        : []),
     ],
     [
       handleUserPermissionsChange,
@@ -2680,9 +2689,9 @@ function UsersRolesPermissionsTable({
       dataChanges,
       entityType,
       t,
+      isRepository,
     ]
   );
-
   const currentData = activeTable === "users" ? users || [] : roles || [];
   const currentColumns = activeTable === "users" ? usersColumns : rolesColumns;
   const currentStatus = principlesStatus;

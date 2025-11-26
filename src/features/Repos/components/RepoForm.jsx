@@ -573,7 +573,7 @@ function RepoForm() {
                     {/* Repository Name */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        {t("repositoryName")}{" "}
+                        {t("repositoryName")}
                         <span className="text-red-500">*</span>
                       </label>
                       <input

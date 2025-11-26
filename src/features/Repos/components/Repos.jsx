@@ -5,53 +5,45 @@
 // import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
 // import { useNavigate } from "react-router-dom";
 // import { Plus, Edit, Shield, Trash2 } from "lucide-react";
-// import Popup from "../../../globalComponents/Popup";
-// import UserForm from "../../Users/components/UserForm";
-// import RepoForm from "./RepoForm";
-// import UpdateRepo from "./UpdateRepo";
-// import { id } from "zod/v4/locales";
+// // import Popup from "../../../globalComponents/Popup";
+// // import UserForm from "../../Users/components/UserForm";
+// // import RepoForm from "./RepoForm";
+// // import UpdateRepo from "./UpdateRepo";
+// // import { id } from "zod/v4/locales";
 // import { useTranslation } from "react-i18next";
+// import { clearRepos } from "../repoSlice";
+// import usePermission from "../../auth/usePermission";
 
 // function Repos() {
 //   const { t, i18n } = useTranslation();
+
 //   const [isUpdateDetails, setIsUpdateDetails] = useState(false);
 //   const [selectedRepo, setSelectedRepo] = useState(null);
-//   const { user } = useSelector((state) => state.authReducer);
 //   const { repos, status, error } = useSelector((state) => state.repoReducer);
 //   const dispatch = useDispatch();
 //   const navigate = useNavigate();
+//   const { user } = useSelector((state) => state.authReducer);
 
-//  // Apply RTL/LTR direction dynamically
+//   // Apply RTL/LTR direction dynamically
 //   useEffect(() => {
 //     document.body.dir = i18n.language === "ar" ? "rtl" : "ltr";
 //   }, [i18n.language]);
 
+//   useEffect(() => {
+//     dispatch(clearRepos());
+//   }, [dispatch, user?.id]); // Clear when user changes
+
 //   // Fetch All Repos
 //   useEffect(() => {
-// // Only fetch if we haven't fetched yet or failed
-// if (status === "idle") {
-//   dispatch(fetchAllRepos());
-// }
-// }, [dispatch, status]);
+//     dispatch(fetchAllRepos());
+//   }, [dispatch]);
 
-// //////////////////////marwa////////////////////////////
-// // useEffect(() => {
-// // //marwa////////////////////////////////
-// // console.log(dispatch(fetchUserRepos()));
-// // ////////////////////////////////
-// // }, [dispatch])
-// // console.log('====================================');
-// // console.log("Repos dataaaa:", repos);
-// // console.log('====================================');
-
-// ///////////////////////////////////////////////////////
 //   // Action button handlers
 //   const handleUpdateDetails = (repo) => {
 //     console.log("Update details for:", repo.name);
 //     setSelectedRepo(repo.id);
 //     // Navigate to update details page or open modal
 //     navigate(`/repos/${repo.id}/update-details`);
-
 //     setIsUpdateDetails(true);
 //   };
 
@@ -64,7 +56,7 @@
 //   const handleDelete = (repo) => {
 //     console.log("Delete repo:", repo.name);
 //     // Show confirmation dialog and handle delete
-//     if (window.confirm(`Are you sure you want to delete "${repo.name}"?`)) {
+//     if (window.confirm(t("system.confirmDelete", { name: repo.name }))) {
 //       // Dispatch delete action here
 //       // dispatch(deleteRepo(repo.id));
 //     }
@@ -79,9 +71,9 @@
 //           handleUpdateDetails(repo);
 //         }}
 //         className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-//         title="Update Details"
+//         title={t("update")}
 //       >
-//         <p> Update Details </p>
+//         <p>{t("update")}</p>
 //         <Edit className="w-4 h-4" />
 //       </button>
 //       <button
@@ -90,9 +82,9 @@
 //           handleUpdatePermissions(repo);
 //         }}
 //         className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
-//         title="Update Permissions"
+//         title={t("managePermissions")}
 //       >
-//         <p> Update Permissions </p>
+//         <p>{t("managePermissions")}</p>
 //         <Shield className="w-4 h-4" />
 //       </button>
 //       <button
@@ -101,9 +93,9 @@
 //           handleDelete(repo);
 //         }}
 //         className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
-//         title="Delete Repository"
+//         title={t("delete")}
 //       >
-//         <p> Delete </p>
+//         <p>{t("delete")}</p>
 //         <Trash2 className="w-4 h-4" />
 //       </button>
 //     </div>
@@ -115,20 +107,21 @@
 //       {
 //         id: "name",
 //         accessorKey: "name",
-//         header: "Repository Name",
+//         header: t("repositoryName"),
 //       },
 //       {
 //         id: "actions",
 //         accessorKey: "actions",
-//         header: "Actions",
+//         header: t("actions"),
 //         size: 140,
 //         enableSorting: false,
 //         enableColumnFilter: false,
 //         cell: ({ row }) => <ActionButtons repo={row.original} />,
 //       },
 //     ],
-//     []
+//     [t]
 //   );
+//   const { isAdmin } = useSelector((state) => state.authReducer);
 
 //   const handleRowDoubleClick = (row) => {
 //     console.log("Full row data:", row.original);
@@ -136,10 +129,17 @@
 //     // Store repository name in sessionStorage
 //     sessionStorage.setItem("currentRepoName", row.original.name);
 
-//     // Navigate to repository contents and pass the repository name
-//     navigate(`/repoContents/${row.original.id}`, {
-//       state: { repoName: row.original.name }, // Keep this for immediate access
-//     });
+//     if (isAdmin) {
+//       // Navigate to Document Type for Admins
+//       navigate(`/documentTypes/${row.original.id}`, {
+//         state: { repoName: row.original.name }, // Keep this for immediate access
+//       });
+//     } else {
+//       // Navigate to Create Folder for non-Admins
+//       navigate(`/repoContents/${row.original.id}/createFolder`, {
+//         state: { repoName: row.original.name }, // Keep this for immediate access
+//       });
+//     }
 //   };
 
 //   return (
@@ -147,18 +147,19 @@
 //       <div className="flex justify-between ">
 //         <div className="mb-6">
 //           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-//             {t("repos.title")}
+//             {t("repositories")}
 //           </h1>
-//           <p className="text-gray-600">{t("repos.description")}</p>
+//           <p className="text-gray-600">{t("reposDescription")}</p>
 //         </div>
 //         <div>
-//           <button
+  
+//          <button
 //             onClick={() => navigate("/createRepo")}
 //             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
 //           >
 //             <Plus className="w-5 h-5" />
 //             {t("createRepository")}
-//           </button>
+//           </button> 
 //         </div>
 //       </div>
 
@@ -166,7 +167,7 @@
 //         <ReUsableTable
 //           columns={columns}
 //           data={repos || []}
-//           title="Repository Management"
+//           title={t("Repositories")}
 //           isLoading={status === "loading"}
 //           onRowDoubleClick={handleRowDoubleClick}
 //           showGlobalFilter={true}
@@ -175,7 +176,7 @@
 //           className="repos-table"
 //           enableSelection={false}
 //         />
-//         {console.log("Repos data:", repos)}
+//         {/* {console.log("Repos data:", repos)} */}
 //       </div>
 //     </section>
 //   );
@@ -186,7 +187,7 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Shield, Trash2 } from "lucide-react";
@@ -194,13 +195,19 @@ import { Plus, Edit, Shield, Trash2 } from "lucide-react";
 // import UserForm from "../../Users/components/UserForm";
 // import RepoForm from "./RepoForm";
 // import UpdateRepo from "./UpdateRepo";
-// import { id } from "zod/v4/locales";
-import { useTranslation } from "react-i18next";
+// import { id } from "zod/v4/locales";import { useTranslation } from "react-i18next";
 import { clearRepos } from "../repoSlice";
-import { getAllUsers, getRoles } from "../../../services/apiServices";
+import usePermission from "../../auth/usePermission";
+import { useTranslation } from "react-i18next";
 
 function Repos() {
   const { t, i18n } = useTranslation();
+  // Check for permissions
+  const canCreateRepo = usePermission("screens.repositories.create");
+  const canEditRepo = usePermission("screens.repositories.edit");
+  const canDeleteRepo = usePermission("screens.repositories.delete");
+  const canManagePermissions = usePermission("screens.repositories.permissions"); 
+
   const [isUpdateDetails, setIsUpdateDetails] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState(null);
   const { repos, status, error } = useSelector((state) => state.repoReducer);
@@ -215,7 +222,7 @@ function Repos() {
 
   useEffect(() => {
     dispatch(clearRepos());
-  }, [dispatch, user?.id]); // Clear when user changes
+  }, [dispatch, user?.id]);
 
   // Fetch All Repos
   useEffect(() => {
@@ -223,77 +230,95 @@ function Repos() {
   }, [dispatch]);
 
   // Action button handlers
-  const handleUpdateDetails = (repo) => {
+  const handleUpdateDetails = useCallback((repo) => {
     console.log("Update details for:", repo.name);
     setSelectedRepo(repo.id);
-    // Navigate to update details page or open modal
     navigate(`/repos/${repo.id}/update-details`);
     setIsUpdateDetails(true);
-  };
+  }, [navigate]);
 
-  const handleUpdatePermissions = (repo) => {
+  const handleUpdatePermissions = useCallback((repo) => {
     console.log("Update permissions for:", repo.name);
-    // Navigate to permissions page or open modal
     navigate(`/repos/${repo.id}/permissions`);
-  };
+  }, [navigate]);
 
-  const handleDelete = (repo) => {
+  const handleDelete = useCallback((repo) => {
     console.log("Delete repo:", repo.name);
-    // Show confirmation dialog and handle delete
     if (window.confirm(t("system.confirmDelete", { name: repo.name }))) {
       // Dispatch delete action here
       // dispatch(deleteRepo(repo.id));
     }
-  };
+  }, [t]);
 
-  // Action Buttons Component
-  const ActionButtons = ({ repo }) => (
-    <div className="flex gap-2">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleUpdateDetails(repo);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-        title={t("update")}
-      >
-        <p>{t("update")}</p>
-        <Edit className="w-4 h-4" />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleUpdatePermissions(repo);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
-        title={t("managePermissions")}
-      >
-        <p>{t("managePermissions")}</p>
-        <Shield className="w-4 h-4" />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDelete(repo);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
-        title={t("delete")}
-      >
-        <p>{t("delete")}</p>
-        <Trash2 className="w-4 h-4" />
-      </button>
-    </div>
-  );
+  // Action Buttons Component with permission checks
+  const ActionButtons = useCallback(({ repo }) => {
+    // Check if user has any action permissions
+    const hasAnyActionPermission = canEditRepo || canManagePermissions || canDeleteRepo;
+    
+    if (!hasAnyActionPermission) {
+      return null;
+    }
 
-  // Define table columns using TanStack Table format
-  const columns = useMemo(
-    () => [
+    return (
+      <div className="flex gap-2">
+        {canEditRepo && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUpdateDetails(repo);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            title={t("update")}
+          >
+            <p>{t("update")}</p>
+            <Edit className="w-4 h-4" />
+          </button>
+        )}
+        
+        {canManagePermissions && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUpdatePermissions(repo);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
+            title={t("managePermissions")}
+          >
+            <p>{t("managePermissions")}</p>
+            <Shield className="w-4 h-4" />
+          </button>
+        )}
+        
+        {canDeleteRepo && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(repo);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+            title={t("delete")}
+          >
+            <p>{t("delete")}</p>
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  }, [canEditRepo, canManagePermissions, canDeleteRepo, handleUpdateDetails, handleUpdatePermissions, handleDelete, t]);
+
+  // Conditionally show actions column only if user has any actions permissions
+  const columns = useMemo(() => {
+    const baseColumns = [
       {
         id: "name",
         accessorKey: "name",
         header: t("repositoryName"),
       },
-      {
+    ];
+
+    // Only add actions column if user has any action permissions
+    if (canEditRepo || canManagePermissions || canDeleteRepo) {
+      baseColumns.push({
         id: "actions",
         accessorKey: "actions",
         header: t("actions"),
@@ -301,40 +326,32 @@ function Repos() {
         enableSorting: false,
         enableColumnFilter: false,
         cell: ({ row }) => <ActionButtons repo={row.original} />,
-      },
-    ],
-    [t]
-  );
+      });
+    }
+
+    return baseColumns;
+  }, [t, canEditRepo, canManagePermissions, canDeleteRepo, ActionButtons]);
+
   const { isAdmin } = useSelector((state) => state.authReducer);
 
-  const handleRowDoubleClick = (row) => {
+  const handleRowDoubleClick = useCallback((row) => {
     console.log("Full row data:", row.original);
 
     // Store repository name in sessionStorage
     sessionStorage.setItem("currentRepoName", row.original.name);
 
-    // Navigate to repository contents and pass the repository name
-    // navigate(`/repoContents/${row.original.id}`, {
-    //   state: { repoName: row.original.name }, // Keep this for immediate access
-    // });
-
-
-
-    // ! Navigate to Document Type Or Folder Based on ROLE
-    {
-      isAdmin
-        ? navigate(`/documentTypes/${row.original.id}`, {
-            state: { repoName: row.original.name }, // Keep this for immediate access
-          })
-        : navigate(`/repoContents/${row.original.id}`, {
-            state: { repoName: row.original.name }, // Keep this for immediate access
-          });
+    if (isAdmin) {
+      // Navigate to Document Type for Admins
+      navigate(`/documentTypes/${row.original.id}`, {
+        state: { repoName: row.original.name },
+      });
+    } else {
+      // Navigate to Create Folder for non-Admins
+      navigate(`/repoContents/${row.original.id}/createFolder`, {
+        state: { repoName: row.original.name },
+      });
     }
-
-    //  : navigate(`/repoContents/${row.original.id}`, {
-    //         state: { repoName: row.original.name }, // Keep this for immediate access
-    //       });
-  };
+  }, [navigate, isAdmin]);
 
   return (
     <section className="p-6">
@@ -346,13 +363,15 @@ function Repos() {
           <p className="text-gray-600">{t("reposDescription")}</p>
         </div>
         <div>
-          <button
-            onClick={() => navigate("/createRepo")}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
-          >
-            <Plus className="w-5 h-5" />
-            {t("createRepository")}
-          </button>
+          {canCreateRepo && (
+            <button
+              onClick={() => navigate("/createRepo")}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+            >
+              <Plus className="w-5 h-5" />
+              {t("createRepository")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -360,9 +379,8 @@ function Repos() {
         <ReUsableTable
           columns={columns}
           data={repos || []}
-          fetchUsers={getAllUsers}
-          fetchRoles={getRoles}
-          isRepository={true}
+          title={t("Repositories")}
+          isLoading={status === "loading"}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}
           pageSizeOptions={[5, 10, 20, 50]}
@@ -370,7 +388,6 @@ function Repos() {
           className="repos-table"
           enableSelection={false}
         />
-        {/* {console.log("Repos data:", repos)} */}
       </div>
     </section>
   );

@@ -6,46 +6,59 @@ import { useTranslation } from "react-i18next";
 import { Fragment } from "react";
 import { hasAdminRole } from "../../features/auth/roleUtils";
 import { useSelector } from "react-redux";
+import usePermission from "../../features/auth/usePermission";
 
 export default function Sidebar({
   desktopSidebarExpanded,
   setDesktopSidebarExpanded,
 }) {
-
-  // check admin or user 
-    const { user } = useSelector((state) => state.authReducer);
+  // check admin or user
+  const { user } = useSelector((state) => state.authReducer);
   const userRoles = user?.roles || [];
 
   const { i18n, t } = useTranslation();
   const isRTL = i18n.language === "ar";
+  const canViewAudit = usePermission("screens.auditlog.view");
+  const canViewFileCategory = usePermission("screens.categories.view");
+  const canViewRole = usePermission("screens.roles.view");
+  const canViewUser = usePermission("screens.users.view");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("Dashboard");
 
+  // Fixed navigation array with proper conditional rendering
   const navigation = [
     { name: t("home"), link: "/", icon: "🏠" },
-      // Admin only items
-    ...(hasAdminRole(userRoles) ? [
-       { name: t("users"), link: "/users", icon: "🙍‍♂️" },
-        { name: t("roles"), link: "/roles", icon: "👥" },
-    ] : []),
-      { name: t("auditTrail"), link: "/audit", icon: "📈" },
-        {
-        name: t("advancedSearch"),
-        link: "/advancesSearch",
-        icon: "🔍",
-      }, 
-  {
-        name: t("fileCategory"),
-        link: "/category",
-        icon: "📁",
-      },
-       {
-        name: t("docTypeForm"),
-        link: "/docTypeForm",
-        icon: "📋",
-      },
-      // { name: t("settings"), link: "/settings", icon: "⚙️" },
+    // Admin only items
+    // ...(hasAdminRole(userRoles) ? [
+    ...(canViewUser ? [{ name: t("users"), link: "/users", icon: "🙍‍♂️" }] : []),
+    ...(canViewRole ? [{ name: t("roles"), link: "/roles", icon: "👥" }] : []),
+    // ] : []),
+    // Conditionally include audit trail based on permission
+    ...(canViewAudit
+      ? [{ name: t("auditTrail"), link: "/audit", icon: "📈" }]
+      : []),
+    {
+      name: t("advancedSearch"),
+      link: "/advancesSearch",
+      icon: "🔍",
+    },
+
+    ...(canViewFileCategory
+      ? [
+          {
+            name: t("fileCategory"),
+            link: "/category",
+            icon: "📁",
+          },
+        ]
+      : []),
+    {
+      name: t("docTypeForm"),
+      link: "/docTypeForm",
+      icon: "📋",
+    },
+    // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 
   const handleNavClick = () => {
@@ -103,9 +116,7 @@ export default function Sidebar({
                       className="-m-2.5 p-2.5"
                       onClick={() => setSidebarOpen(false)}
                     >
-                      <span className="sr-only">
-                        {t("close_sidebar")}
-                      </span>
+                      <span className="sr-only">{t("close_sidebar")}</span>
                       <div className="h-6 w-6 text-white">✕</div>
                     </button>
                   </div>
@@ -164,7 +175,9 @@ export default function Sidebar({
         } ${desktopSidebarExpanded ? "lg:w-72" : "lg:w-16"}`}
       >
         <div
-          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-slate-100 via-blue-50 to-slate-200 px-3 pb-4 ${isRTL ? "border-l" : "border-r"}`}
+          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-slate-100 via-blue-50 to-slate-200 px-3 pb-4 ${
+            isRTL ? "border-l" : "border-r"
+          }`}
         >
           {/* <div
           className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-indigo-50 via-slate-200 to-indigo-400 px-3 pb-4 ${
@@ -177,7 +190,6 @@ export default function Sidebar({
               <span className="text-white font-bold">DMS</span>
             </div>
           </div> */}
-
           {/* Toggle button */}
           <div className="flex justify-center">
             <button

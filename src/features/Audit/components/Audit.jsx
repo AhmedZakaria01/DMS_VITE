@@ -3,13 +3,16 @@
 // import React, { useMemo, useState, useEffect } from "react";
 // import { fetchAuditTrail } from "../auditThunks";
 // import { useTranslation } from "react-i18next";
+// import usePermission from "../../auth/usePermission";
 
 // function AuditTrail() {
 //   const { t } = useTranslation();
 //   const dispatch = useDispatch();
 //   const [loading, setLoading] = useState(true);
 //   const { audits, status, error } = useSelector((state) => state.auditReducer);
-
+    
+// // Check for View Audit permission
+//   const canViewAudit = usePermission("screens.auditlog.view");
 //   // Fetching Audit Trail Data
 //   useEffect(() => {
 //     if (status === "idle") {
@@ -60,7 +63,9 @@
 //   };
 
 //   return (
-//     <div className="p-6">
+// <div>
+//      {canViewAudit && (
+//  <div className="p-6">
 //       <div className="mb-6">
 //         <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("auditTitle")}</h1>
 //         <p className="text-gray-600">
@@ -81,6 +86,8 @@
 //         enableSelection={false}
 //       />
 //     </div>
+//      )}
+//    </div>
 //   );
 // }
 

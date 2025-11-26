@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
+import { fetchAllRepos } from "../../Repos/repoThunks";
+import { useDispatch, useSelector } from "react-redux";
 
 // Zod schema
 const schema = z.object({
@@ -12,15 +14,6 @@ const schema = z.object({
   DocType: z.string().min(1, "DocType is required"),
   Repo: z.string().min(1, "Repository is required"),
 });
-
-// Static data
-const staticRepos = [
-  { id: 1, name: "Finance Repository" },
-  { id: 2, name: "HR Repository" },
-  { id: 3, name: "Legal Repository" },
-  { id: 4, name: "IT Repository" },
-  { id: 5, name: "Operations Repository" },
-];
 
 const staticDocTypes = [
   { id: 1, name: "Invoices", repoId: 1 },
@@ -37,7 +30,13 @@ const staticDocTypes = [
 
 const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocTypeId, currentParentCategoryId }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { repos } = useSelector((state) => state.repoReducer);
 
+  useEffect(() => {
+         dispatch(fetchAllRepos());
+  
+  }, [dispatch])
   const {
     register,
     handleSubmit,
@@ -80,7 +79,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
   }, []);
 
   // Filter repos for dropdown
-  const filteredRepos = staticRepos.filter((repo) =>
+  const filteredRepos = repos.filter((repo) =>
     repo.name.toLowerCase().includes(repoSearchTerm.toLowerCase())
   );
 

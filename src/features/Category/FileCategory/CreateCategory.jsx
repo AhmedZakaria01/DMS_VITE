@@ -152,7 +152,7 @@ function CreateCategory() {
     }
     
     // Show success message
-    alert(`Category "${newCategory.name}" created successfully!`);
+    alert(t("categoryCreatedSuccessAlert", { categoryName: newCategory.name }) || `Category "${newCategory.name}" created successfully!`);
   };
 
   const getPageTitle = () => {
@@ -195,17 +195,17 @@ function CreateCategory() {
         <div className="mt-3 flex flex-wrap gap-4">
           {currentDocTypeId && (
             <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-              <span className="text-sm">Document Type ID: {currentDocTypeId}</span>
+              <span className="text-sm">{t("documentTypeId") || "Document Type ID"}: {currentDocTypeId}</span>
             </div>
           )}
           {currentParentCategoryId && (
             <div className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-              <span className="text-sm">Parent Category ID: {currentParentCategoryId}</span>
+              <span className="text-sm">{t("parentCategoryId") || "Parent Category ID"}: {currentParentCategoryId}</span>
             </div>
           )}
           {categoryType && (
             <div className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium capitalize">
-              <span className="text-sm">Type: {categoryType}</span>
+              <span className="text-sm">{t("type") || "Type"}: {categoryType}</span>
             </div>
           )}
         </div>
@@ -214,7 +214,7 @@ function CreateCategory() {
       {/* Error Display */}
       {error && (
         <div className="mb-6 p-4 bg-red-100 border border-red-300 text-red-700 rounded-md">
-          <h4 className="font-semibold mb-1 text-sm">Error:</h4>
+          <h4 className="font-semibold mb-1 text-sm">{t("error") || "Error"}:</h4>
           <p className="text-sm">{error}</p>
         </div>
       )}
@@ -252,7 +252,7 @@ function CreateCategory() {
               {categoryData.length}
             </div>
             <div className="text-sm text-blue-800">
-              Total Categories
+              {t("totalCategories") || "Total Categories"}
             </div>
           </div> */}
           
@@ -261,7 +261,7 @@ function CreateCategory() {
               {categoryType || "N/A"}
             </div>
             <div className="text-sm text-green-800">
-              Category Type
+              {t("categoryType") || "Category Type"}
             </div>
           </div> */}
           
@@ -270,16 +270,16 @@ function CreateCategory() {
               {currentDocTypeId || "N/A"}
             </div>
             <div className="text-sm text-purple-800">
-              Document Type ID
+              {t("documentTypeId") || "Document Type ID"}
             </div>
           </div> */}
           
           {/* <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
             <div className="text-2xl font-bold text-orange-600">
-              {status === "loading" ? "..." : "Ready"}
+              {status === "loading" ? "..." : t("ready") || "Ready"}
             </div>
             <div className="text-sm text-orange-800">
-              Status
+              {t("status") || "Status"}
             </div>
           </div> */}
         </div>
@@ -291,7 +291,10 @@ function CreateCategory() {
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
             <p className="mt-4 text-gray-600 text-sm">
-              {categoryType === "child" ? "Loading child categories..." : "Loading categories..."}
+              {categoryType === "child" ? 
+                (t("loadingChildCategories") || "Loading child categories...") : 
+                (t("loadingCategories") || "Loading categories...")
+              }
             </p>
           </div>
         </div>
@@ -300,7 +303,7 @@ function CreateCategory() {
       {/* Debug Information (remove in production) */}
       {/* {import.meta.env.DEV && (
         <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h3 className="font-semibold mb-2 text-sm">Debug Info:</h3>
+          <h3 className="font-semibold mb-2 text-sm">{t("debugInfo") || "Debug Info"}:</h3>
           <pre className="text-xs">
             {JSON.stringify({
               params,

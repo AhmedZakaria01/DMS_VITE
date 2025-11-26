@@ -304,7 +304,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
       setNewCategoryName({});
       
       console.log("Category created:", newCategory);
-      alert(`Category "${categoryName}" created successfully!`);
+      alert(t("categoryCreatedSuccessAlert", { categoryName }) || `Category "${categoryName}" created successfully!`);
     }, 1000);
   };
 
@@ -410,7 +410,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
               {isLoadingChildren && (
                 <div className="flex items-center gap-1 text-gray-500">
                   <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-400"></div>
-                  <span className="text-xs">Loading...</span>
+                  <span className="text-xs">{t("loading") || "Loading..."}</span>
                 </div>
               )}
             </div>
@@ -455,7 +455,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                   style={{ paddingLeft: `${(level + 1) * 24}px` }}
                 >
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm">Loading children...</span>
+                  <span className="text-sm">{t("loadingChildren") || "Loading children..."}</span>
                 </div>
               </td>
             </tr>
@@ -470,7 +470,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 className="px-6 py-4 text-center text-gray-500 italic"
               >
                 <div style={{ paddingLeft: `${(level + 1) * 24}px` }}>
-                  <span className="text-sm">No child categories found</span>
+                  <span className="text-sm">{t("noChildCategories") || "No child categories found"}</span>
                 </div>
               </td>
             </tr>

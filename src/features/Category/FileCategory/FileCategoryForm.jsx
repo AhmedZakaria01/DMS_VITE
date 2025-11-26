@@ -163,7 +163,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
     }
     
     // Here you would typically send the data to your API
-    alert(`Category "${data.name}" created successfully for ${data.DocType} in ${data.Repo}`);
+    alert(t("categoryCreatedSuccess", { categoryName: data.name, docType: data.DocType, repo: data.Repo }) || `Category "${data.name}" created successfully for ${data.DocType} in ${data.Repo}`);
     
     // Reset form
     setValue("name", "");
@@ -194,14 +194,14 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
           {/* Category Name Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category Name <span className="text-red-500">*</span>
+              {t("categoryName")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
                 errors.name ? "border-red-500" : "border-gray-300"
               }`}
-              placeholder="Enter category name"
+              placeholder={t("enterCategoryName") || "Enter category name"}
               {...register("name")}
             />
             {errors.name && (
@@ -212,7 +212,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
           {/* Searchable Dropdown for repos */}
           <div className="relative" ref={repoDropdownRef}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Repository <span className="text-red-500">*</span>
+              {t("repository")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -262,7 +262,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-sm font-medium text-green-800">
-                  Selected Repository
+                  {t("selectedRepository") || "Selected Repository"}
                 </span>
               </div>
               <p className="text-green-700 font-semibold mt-1 text-sm">
@@ -291,7 +291,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
                 if (selectedRepo) {
                   setShowOptions(true);
                 } else {
-                  alert("Please select a repository first");
+                  alert(t("selectRepositoryFirst") || "Please select a repository first");
                 }
               }}
               disabled={!selectedRepo}
@@ -349,7 +349,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
             disabled={!selectedRepo || !selectedDocType}
           >
             <Plus className="w-5 h-5 mr-2" />
-            <span className="text-base">Create Category</span>
+            <span className="text-base">{t("createCategory") || "Create Category"}</span>
           </button>
 
           {/* Instructions */}
@@ -358,10 +358,10 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
               {t("instructions") || "Instructions"}
             </h3>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Select a repository first to see available document types</li>
-              <li>• Choose a document type to create categories for</li>
-              <li>• Enter a name for your new category</li>
-              <li>• Submit the form to create the category</li>
+              <li>• {t("instructionSelectRepo") || "Select a repository first to see available document types"}</li>
+              <li>• {t("instructionChooseDocType") || "Choose a document type to create categories for"}</li>
+              <li>• {t("instructionEnterName") || "Enter a name for your new category"}</li>
+              <li>• {t("instructionSubmit") || "Submit the form to create the category"}</li>
             </ul>
           </div>
         </form>

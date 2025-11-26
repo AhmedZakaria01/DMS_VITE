@@ -6,23 +6,36 @@ const usePermission = (permissionName) => {
     const [hasPermission, setHasPermission] = useState(false);
 
     useEffect(() => {
+        // Early return if no permission name provided
+        if (!permissionName) {
+            setHasPermission(false);
+            return;
+        }
+
         const checkPermission = () => {
-            const encryptedToken = localStorage.getItem('token');
-            if (encryptedToken) {
-                const token = decryptToken(encryptedToken);
-                if (token) {
-                    const permissions = getPermissionsFromToken(token);
-                    setHasPermission(permissions.includes(permissionName));
-                } else {
+            try {
+                const encryptedToken = localStorage.getItem('token');
+                if (!encryptedToken) {
                     setHasPermission(false);
+                    return;
                 }
-            } else {
+
+                const token = decryptToken(encryptedToken);
+                if (!token) {
+                    setHasPermission(false);
+                    return;
+                }
+
+                const permissions = getPermissionsFromToken(token);
+                setHasPermission(permissions.includes(permissionName));
+            } catch (error) {
+                console.error('Error checking permission:', error);
                 setHasPermission(false);
             }
         };
 
         checkPermission();
-        // Listen for storage changes in case token updates (optional but good for consistency)
+        // Optional: Listen for storage changes
         window.addEventListener('storage', checkPermission);
 
         return () => {

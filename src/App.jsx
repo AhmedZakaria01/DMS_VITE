@@ -22,10 +22,13 @@ import UpdateRepo from "./features/Repos/components/UpdateRepo";
 import AdminRoute from "./resusableComponents/ProtectedRoute";
 import CreateFolder from "./features/FolderContent/components/CreateFolder";
 import { Search, Settings } from "lucide-react";
-import Category from "./features/Category/Category";
+import Category from "./features/Category/FileCategory/Category";
 import DocTypeForm from "./features/DocumentType/DocTypeForm";
 import DocumentTypes from "./features/DocumentType/DocumentTypes";
 import UpdateDocType from "./features/DocumentType/UpdateDocType";
+import FileCategoryForm from "./features/Category/FileCategory/FileCategoryForm";
+import CategoryTable from "./features/Category/FileCategory/CategoryTable";
+import CreateCategory from "./features/Category/FileCategory/CreateCategory";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -50,11 +53,15 @@ function App() {
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
           <Route path="/advancesSearch" element={<Search />} />
+          {/* <Route path="/category" element={<CreateCategory />} /> */}
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/documentTypes/:repoId" element={<DocumentTypes />} />
           <Route path="/updateDocType/:docTypeId" element={<UpdateDocType />} />
           <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />
+          <Route path="/FileCategoryForm" element={<FileCategoryForm />} />
+          <Route path="/CategoryTable" element={<CategoryTable />} />
+          <Route path="/CreateCategory" element={<CreateCategory />} />
 
           <Route
             path="/users"

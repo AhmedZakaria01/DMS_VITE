@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createDocTypeWithAttribute, fetchDocTypeById, fetchDocTypesByRepo, removeDocType, updateDocTypeDetails } from "./docTypeThunks";
- 
+import {
+  createDocTypeWithAttribute,
+  fetchtDocTypeByAttributes,
+  fetchDocTypesByRepo,
+  removeDocType,
+  updateDocTypeDetails,
+} from "./docTypeThunks";
 
 const initialState = {
   docTypes: [],
@@ -73,16 +78,16 @@ const docTypeSlice = createSlice({
       })
 
       // Get Document Type by ID
-      .addCase(fetchDocTypeById.pending, (state) => {
+      .addCase(fetchtDocTypeByAttributes.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDocTypeById.fulfilled, (state, action) => {
+      .addCase(fetchtDocTypeByAttributes.fulfilled, (state, action) => {
         state.loading = false;
         state.currentDocType = action.payload;
         state.error = null;
       })
-      .addCase(fetchDocTypeById.rejected, (state, action) => {
+      .addCase(fetchtDocTypeByAttributes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch document type";
         state.currentDocType = null;

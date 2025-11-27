@@ -56,8 +56,8 @@
 // );
 
 // // Get Document Type by ID
-// export const fetchDocTypeById = createAsyncThunk(
-//   "docType/fetchDocTypeById",
+// export const fetchtDocTypeByAttributes = createAsyncThunk(
+//   "docType/fetchtDocTypeByAttributes",
 //   async (docTypeId, { rejectWithValue }) => {
 //     try {
 //       const response = await getDocTypeById(docTypeId);
@@ -127,7 +127,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createDocType as createDocTypeAPI,
   getDocTypesByRepo,
-  getDocTypeById,
+  getDocTypeByAttributes,
   updateDocType,
   deleteDocType,
 } from "../../services/apiServices";
@@ -182,15 +182,16 @@ export const fetchDocTypesByRepo = createAsyncThunk(
 );
 
 // Get Document Type by ID
-export const fetchDocTypeById = createAsyncThunk(
-  "docType/fetchDocTypeById",
+export const fetchtDocTypeByAttributes = createAsyncThunk(
+  "docType/fetchtDocTypeByAttributes",
   async (docTypeId, { rejectWithValue }) => {
     try {
-      const response = await getDocTypeById(docTypeId);
+      const response = await getDocTypeByAttributes(docTypeId);
 
       if (!response || !response.data) {
         throw new Error("No response received from server");
       }
+      console.log(response.data.response);
 
       return response.data.response || response.data;
     } catch (error) {

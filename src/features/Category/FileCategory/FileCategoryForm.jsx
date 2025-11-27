@@ -7,50 +7,50 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { fetchAllRepos } from "../../Repos/repoThunks";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchDocTypesByRepo } from "../../DocumentType/DocTypeThunks";
 
-// Zod schema
+// Updated Zod schema with securityLevel as optional number
 const schema = z.object({
   name: z.string().min(1, "Category Name is required"),
   DocType: z.string().min(1, "DocType is required"),
   Repo: z.string().min(1, "Repository is required"),
+  securityLevel: z.union([z.number(), z.string().transform(val => val === '' ? undefined : Number(val))]).optional(),
 });
-
-const staticDocTypes = [
-  { id: 1, name: "Invoices", repoId: 1 },
-  { id: 2, name: "Receipts", repoId: 1 },
-  { id: 3, name: "Contracts", repoId: 1 },
-  { id: 4, name: "Employee Records", repoId: 2 },
-  { id: 5, name: "Payroll", repoId: 2 },
-  { id: 6, name: "Legal Agreements", repoId: 3 },
-  { id: 7, name: "Compliance Documents", repoId: 3 },
-  { id: 8, name: "Technical Specifications", repoId: 4 },
-  { id: 9, name: "API Documentation", repoId: 4 },
-  { id: 10, name: "Process Documents", repoId: 5 },
-];
 
 const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocTypeId, currentParentCategoryId }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { repos } = useSelector((state) => state.repoReducer);
-
-  useEffect(() => {
-         dispatch(fetchAllRepos());
+  const { docTypes, status, error } = useSelector(
+    (state) => state.docTypeReducer
+  );
   
-  }, [dispatch])
+  useEffect(() => {
+    dispatch(fetchAllRepos());
+  }, [dispatch]);
+
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
+    defaultValues: {
+      securityLevel: ""
+    }
   });
+
+  // Watch securityLevel to handle empty values
+  const securityLevelValue = watch("securityLevel");
 
   // Local state
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [selectedDocType, setSelectedDocType] = useState(null);
   const [filteredDocTypes, setFilteredDocTypes] = useState([]);
+  const [currentRepoId, setCurrentRepoId] = useState(null);
 
   // Dropdown states
   const [repoSearchTerm, setRepoSearchTerm] = useState("");
@@ -88,22 +88,48 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
     setValue("Repo", repo.name, { shouldValidate: true });
     setRepoSearchTerm(repo.name);
     setSelectedRepo(repo);
+    setCurrentRepoId(repo.id);
     setShowRepoOptions(false);
     
-    // Filter document types based on selected repo
-    const docTypesForRepo = staticDocTypes.filter(type => type.repoId === repo.id);
-    setFilteredDocTypes(docTypesForRepo);
+    // Fetch document types for the selected repository
+    dispatch(fetchDocTypesByRepo(repo.id));
+    console.log("Selected repo ID:", repo.id);
     
     // Reset document type selection when repo changes
     setValue("DocType", "");
     setSearchTerm("");
     setSelectedDocType(null);
+    setFilteredDocTypes([]);
   };
+
+  // Update filteredDocTypes when docTypes changes
+  useEffect(() => {
+    console.log("docTypes updated:", docTypes);
+    console.log("currentRepoId:", currentRepoId);
+    
+    if (currentRepoId && docTypes && docTypes.length > 0) {
+      // Since your API returns all docTypes for the selected repo, we don't need to filter
+      // Just use all the docTypes that were fetched for this repo
+      setFilteredDocTypes(docTypes);
+      console.log("Setting filteredDocTypes:", docTypes);
+    } else if (currentRepoId && (!docTypes || docTypes.length === 0)) {
+      setFilteredDocTypes([]);
+    }
+  }, [docTypes, currentRepoId]);
 
   // Filter doc types based on search term
   const displayDocTypes = filteredDocTypes.filter((type) =>
     type.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Debug logs
+  useEffect(() => {
+    console.log("filteredDocTypes:", filteredDocTypes);
+    console.log("displayDocTypes:", displayDocTypes);
+    console.log("searchTerm:", searchTerm);
+    console.log("showOptions:", showOptions);
+    console.log("selectedRepo:", selectedRepo);
+  }, [filteredDocTypes, displayDocTypes, searchTerm, showOptions, selectedRepo]);
 
   // Handle doc type selection
   const handleSelectDocType = (docType) => {
@@ -117,7 +143,6 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
       onDocumentTypeSelect(docType.id);
     }
     
-    // Simulate API calls with static data
     console.log("Selected Document Type ID:", docType.id);
     
     // Simulate fetching categories for this doc type
@@ -135,6 +160,15 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
     console.log("Parent categories:", mockParentCategories);
   };
 
+  // Handle security level input change
+  const handleSecurityLevelChange = (e) => {
+    const value = e.target.value;
+    // Allow empty string or numbers
+    if (value === "" || !isNaN(value)) {
+      setValue("securityLevel", value === "" ? "" : Number(value), { shouldValidate: true });
+    }
+  };
+
   // Submit form
   const onSubmit = (data) => {
     if (!selectedDocType) {
@@ -146,12 +180,13 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
       return;
     }
     
+    // Prepare form data according to your backend requirements
     const formData = {
       name: data.name,
-      docTypeName: data.DocType,
       documentTypeId: selectedDocType.id,
-      repoId: selectedRepo.id,
-      parentCategoryId: 0,
+      parentCategoryId: currentParentCategoryId || 0,
+      securityLevel: data.securityLevel === "" ? 0 : Number(data.securityLevel) || 0, 
+      repositoryId: selectedRepo.id, 
     };
     
     console.log("Form Data Submitted:", formData);
@@ -168,11 +203,13 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
     setValue("name", "");
     setValue("Repo", "");
     setValue("DocType", "");
+    setValue("securityLevel", "");
     setRepoSearchTerm("");
     setSearchTerm("");
     setSelectedRepo(null);
     setSelectedDocType(null);
     setFilteredDocTypes([]);
+    setCurrentRepoId(null);
   };
 
   return (
@@ -206,6 +243,30 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
             {errors.name && (
               <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>
             )}
+          </div>
+
+          {/* Security Level Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t("securityLevel") || "Security Level"}
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.securityLevel ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder={t("enterSecurityLevel") || "Enter security level (optional)"}
+              value={securityLevelValue}
+              onChange={handleSecurityLevelChange}
+            />
+            {errors.securityLevel && (
+              <p className="mt-2 text-sm text-red-600">{errors.securityLevel.message}</p>
+            )}
+            <p className="mt-1 text-sm text-gray-500">
+              {t("securityLevelHint") || "Higher numbers indicate higher security levels"}
+            </p>
           </div>
 
           {/* Searchable Dropdown for repos */}
@@ -265,7 +326,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
                 </span>
               </div>
               <p className="text-green-700 font-semibold mt-1 text-sm">
-                {selectedRepo.name}
+                {selectedRepo.name} (ID: {selectedRepo.id})
               </p>
             </div>
           )}
@@ -312,9 +373,18 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
                       <span className="text-sm">{type.name}</span>
                     </li>
                   ))
+                ) : status === "loading" ? (
+                  <li className="px-4 py-3 text-gray-500">
+                    <span className="text-sm">{t("loading") || "Loading..."}</span>
+                  </li>
                 ) : (
                   <li className="px-4 py-3 text-gray-500">
-                    <span className="text-sm">{t("noMatchesFound") || "No matches found"}</span>
+                    <span className="text-sm">
+                      {filteredDocTypes.length === 0 
+                        ? (t("noDocumentTypesFound") || "No document types found for this repository")
+                        : (t("noMatchesFound") || "No matches found")
+                      }
+                    </span>
                   </li>
                 )}
               </ul>
@@ -336,7 +406,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
                 </span>
               </div>
               <p className="text-blue-700 font-semibold mt-1 text-sm">
-                {selectedDocType.name}
+                {selectedDocType.name} (ID: {selectedDocType.id})
               </p>
             </div>
           )}
@@ -360,6 +430,7 @@ const FileCategoryForm = ({ onDocumentTypeSelect, onCategoryCreated, currentDocT
               <li>• {t("instructionSelectRepo") || "Select a repository first to see available document types"}</li>
               <li>• {t("instructionChooseDocType") || "Choose a document type to create categories for"}</li>
               <li>• {t("instructionEnterName") || "Enter a name for your new category"}</li>
+              <li>• {t("instructionSecurityLevel") || "Set security level (optional) - higher numbers mean more security"}</li>
               <li>• {t("instructionSubmit") || "Submit the form to create the category"}</li>
             </ul>
           </div>

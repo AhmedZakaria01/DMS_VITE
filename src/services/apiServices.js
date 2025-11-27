@@ -208,7 +208,7 @@ export async function getDocTypesByRepo(repoId) {
   try {
     const response = await api.get(
       // `DocumentType/GetPermittedDocumentTypes/${repoId}`
-      `DocumentType/GetPermittedDocumentTypes/2`
+      `DocumentType/GetPermittedDocumentTypes/${repoId}`
     );
     console.log(response);
 
@@ -220,7 +220,7 @@ export async function getDocTypesByRepo(repoId) {
 }
 
 // Get Document Type by ID
-export async function getDocTypeById(docTypeId) {
+export async function getDocTypeByAttributes(docTypeId) {
   try {
     const response = await api.get(
       `DocumentType/GetPermittedDocumentTypeDetailsById/${docTypeId}`

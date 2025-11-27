@@ -18,7 +18,10 @@ import {
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
-import { updateDocTypeDetails, fetchDocTypeById } from "./DocTypeThunks";
+import {
+  updateDocTypeDetails,
+  fetchtDocTypeByAttributes,
+} from "./docTypeThunks";
 
 // Index field types configuration
 const indexFieldsTypes = [
@@ -350,8 +353,8 @@ const UpdateDocType = () => {
   useEffect(() => {
     console.log("Component mounted. docTypeId:", docTypeId, "repoId:", repoId);
     if (docTypeId) {
-      console.log("Dispatching fetchDocTypeById with:", docTypeId);
-      dispatch(fetchDocTypeById(docTypeId));
+      console.log("Dispatching fetchtDocTypeByAttributes with:", docTypeId);
+      dispatch(fetchtDocTypeByAttributes(docTypeId));
     }
   }, [dispatch, docTypeId]);
 

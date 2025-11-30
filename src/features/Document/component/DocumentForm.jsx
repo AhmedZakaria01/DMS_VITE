@@ -1183,7 +1183,7 @@ function DocumentForm() {
           fetchtDocTypeByAttributes(documentTypeId)
         );
 
-  console.log("Document Type ID:", documentTypeId);
+       console.log("Marwaaaaaaaaaaaaaaaaaaaaaaa Document Type ID:", documentTypeId);
         console.log("Full response:", response);
 
         // Access the payload from the Redux action

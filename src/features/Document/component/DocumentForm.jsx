@@ -1119,10 +1119,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
 import { fetchPrinciples } from "../../Permissions/permissionsThunks";
-import {
-  fetchtDocTypeByAttributes,
-  fetchDocTypesByRepo,
-} from "../../DocumentType/docTypeThunks";
+import { fetchDocTypesByRepo, fetchtDocTypeByAttributes } from "../../DocumentType/DocTypeThunks";
 
 function DocumentForm() {
   const { t } = useTranslation();
@@ -1186,27 +1183,24 @@ function DocumentForm() {
           fetchtDocTypeByAttributes(documentTypeId)
         );
 
-        console.log("Document Type ID:", documentTypeId);
+  console.log("Document Type ID:", documentTypeId);
         console.log("Full response:", response);
 
         // Access the payload from the Redux action
-        // The response structure is: { type: '...', payload: {...}, meta: {...} }
-        const attributeData = response?.payload || response;
+        // The response structure is: { type: '...', payload: {...}, meta: {...} }        const attributeData = response?.payload || response;
+    const attributeData = response?.payload || response;
 
         console.log("Attribute Data:", attributeData);
-
-        // Transform the API response to match our metadata format
         if (
           attributeData &&
           attributeData.attributeResponses &&
           Array.isArray(attributeData.attributeResponses)
         ) {
-          console.log(
+ console.log(
             "Transforming attributes:",
             attributeData.attributeResponses
-          );
-
-          const transformedMetadata = attributeData.attributeResponses.map(
+          );      
+              const transformedMetadata = attributeData.attributeResponses.map(
             (attr) => {
               const field = {
                 key: attr.attributeName,
@@ -1217,10 +1211,8 @@ function DocumentForm() {
                 attributeSize: attr.attributeSize || null,
               };
 
-              // If you have options for dropdown/select fields, add them here
-              // This would need to come from your API or be configured separately
               if (field.type === "dropdown") {
-                field.options = []; // Add options if available from API
+                field.options = [];
               }
 
               return field;
@@ -1243,11 +1235,10 @@ function DocumentForm() {
           });
           setJsonData(initialData);
         } else {
-          console.warn(
+             console.warn(
             "No attributeResponses found in response:",
             attributeData
-          );
-          setCurrentMetadata([]);
+          );          setCurrentMetadata([]);
           setJsonData({});
         }
       } catch (error) {
@@ -1297,7 +1288,6 @@ function DocumentForm() {
   // Log JSON data whenever it changes (ready for backend)
   useEffect(() => {
     if (selectedDocumentType && Object.keys(jsonData).length > 0) {
-      // Transform ACL Rules to match backend format
       const transformedAclRules =
         permissionsData.aclRules && permissionsData.aclRules.length > 0
           ? permissionsData.aclRules.map((rule) => {
@@ -1339,15 +1329,13 @@ function DocumentForm() {
 
       console.log("=== JSON Data (Ready for Backend) ===");
       console.log(JSON.stringify(completeJsonData, null, 2));
-      console.log("=====================================");
-
-      // This is what you would send to the backend:
+    // This is what you would send to the backend:
       // fetch('/api/documents', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(completeJsonData)
-      // });
-    }
+      // });   
+       }
   }, [jsonData, selectedDocumentType, selectedDocumentTypeId, permissionsData]);
 
   // Render input field based on metadata type
@@ -1360,7 +1348,7 @@ function DocumentForm() {
             value={jsonData[field.key] || ""}
             onChange={(e) => handleFieldChange(field.key, e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            placeholder={`Enter ${field.label}`}
+            placeholder={t('enterFieldPlaceholder', { field: field.label })}
             required={field.required}
             maxLength={field.attributeSize || undefined}
           />
@@ -1373,7 +1361,7 @@ function DocumentForm() {
             value={jsonData[field.key] || ""}
             onChange={(e) => handleFieldChange(field.key, e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            placeholder={`Enter ${field.label}`}
+            placeholder={t('enterFieldPlaceholder', { field: field.label })}
             required={field.required}
           />
         );
@@ -1397,7 +1385,7 @@ function DocumentForm() {
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white"
             required={field.required}
           >
-            <option value="">Select an option...</option>
+            <option value="">{t('selectOption')}</option>
             {field.options &&
               field.options.map((option, index) => (
                 <option key={index} value={option}>
@@ -1436,10 +1424,10 @@ function DocumentForm() {
             </div>
             <div className="text-left">
               <h1 className="text-xl font-bold text-gray-900">
-                Create New Document
+                {t('createNewDocument')}
               </h1>
               <p className="text-gray-600 text-sm mt-1">
-                Select document type and fill metadata - Data saved as JSON
+                {t('description')}
               </p>
             </div>
           </div>
@@ -1458,7 +1446,7 @@ function DocumentForm() {
                       <Database className="w-5 h-5 text-blue-600" />
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      Document Type
+                      {t('documentType')}
                     </h2>
                   </div>
                 </div>
@@ -1467,7 +1455,7 @@ function DocumentForm() {
                   {/* Document Type Dropdown */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Select Document Type
+                      {t('selectDocumentType')}
                       <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -1476,7 +1464,7 @@ function DocumentForm() {
                         onChange={handleDocumentTypeChange}
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white appearance-none"
                       >
-                        <option value="">Select a document type...</option>
+                        <option value="">{t('selectDocumentType')}...</option>
                         {docTypes &&
                           docTypes.map((type) => (
                             <option key={type.id} value={type.id}>
@@ -1492,8 +1480,7 @@ function DocumentForm() {
                   {!selectedDocumentType && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                       <p className="text-sm text-blue-800">
-                        Please select a document type to view and fill the
-                        metadata fields.
+                        {t('pleaseSelectDocumentType')}
                       </p>
                     </div>
                   )}
@@ -1502,10 +1489,10 @@ function DocumentForm() {
                   {selectedDocumentType && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
                       <p className="text-sm font-semibold text-green-900 mb-1">
-                        Selected: {selectedDocumentType}
+                        {t('selected')}: {selectedDocumentType}
                       </p>
                       <p className="text-xs text-green-700">
-                        {currentMetadata.length} metadata fields available
+                        {currentMetadata.length} {t('metadataFieldsAvailable')}
                       </p>
                     </div>
                   )}
@@ -1521,14 +1508,14 @@ function DocumentForm() {
                         <Shield className="w-5 h-5 text-orange-600" />
                       </div>
                       <h2 className="text-xl font-semibold text-gray-900">
-                        Permissions
+                        {t('permissions')}
                       </h2>
                     </div>
                   </div>
 
                   <div className="p-6">
                     <p className="text-sm text-gray-600 mb-4">
-                      Configure access control rules for this document
+                      {t('configurePermissions')}
                     </p>
                     <button
                       type="button"
@@ -1536,7 +1523,7 @@ function DocumentForm() {
                       className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
                     >
                       <Shield className="w-4 h-4" />
-                      Configure Permissions
+                      {t('configurePermissionsButton')}
                       {permissionsData.aclRules.length > 0 && (
                         <span className="bg-orange-800 text-white px-2 py-1 rounded-full text-xs">
                           {permissionsData.aclRules.length}
@@ -1558,7 +1545,7 @@ function DocumentForm() {
                         <FileText className="w-5 h-5 text-green-600" />
                       </div>
                       <h2 className="text-xl font-semibold text-gray-900">
-                        Document Metadata
+                        {t('documentMetadata')}
                       </h2>
                     </div>
                   </div>
@@ -1587,11 +1574,10 @@ function DocumentForm() {
                       <FileText className="w-8 h-8 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No Document Type Selected
+                      {t('noDocumentTypeSelected')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Select a document type from the left panel to view and
-                      fill the metadata fields.
+                      {t('selectDocumentTypeLeftPanel')}
                     </p>
                   </div>
                 </div>
@@ -1614,12 +1600,12 @@ function DocumentForm() {
             />
           )}
 
-          {/* JSON Preview Card (shows current JSON data) */}
+          {/* JSON Preview Card */}
           {selectedDocumentType && Object.keys(jsonData).length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  JSON Data Preview (Ready for Backend)
+                  {t('jsonDataPreview')}
                 </h3>
               </div>
               <div className="p-6">
@@ -1661,18 +1647,18 @@ function DocumentForm() {
                             accessType:
                               rule.accessType === 0 ? "deny" : "allow",
                           };
-                        }),
-                      },
+                        }),              
+                     },
                       null,
                       2
                     )}
                   </pre>
                 </div>
                 <p className="text-xs text-gray-500 mt-3">
-                  * JSON data is automatically logged to console on every change
+                  * {t('jsonDataAutomaticallyLogged')}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  * This JSON format is ready to be sent to your backend API
+                  * {t('jsonFormatReady')}
                 </p>
               </div>
             </div>

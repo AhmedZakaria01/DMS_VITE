@@ -130,8 +130,8 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
   const [uploadLoading, setUploadLoading] = useState({});
   const [previewFiles, setPreviewFiles] = useState({});
   
-  // Right panel state - tabs for files and preview
-  const [rightPanelTab, setRightPanelTab] = useState('files'); // 'files' or 'preview'
+  // Right panel state
+  const [rightPanelTab, setRightPanelTab] = useState('files');
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
 
@@ -165,7 +165,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
 
     if (docTypeId) {
       setLoading(true);
-      // Simulate API call delay
       setTimeout(() => {
         const filteredCategories = staticCategories.filter(
           category => category.documentTypeId === docTypeId
@@ -173,7 +172,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
         setParentCategories(filteredCategories);
         setLoading(false);
         
-        // Call parent callback if provided
         if (onDocumentTypeChange) {
           onDocumentTypeChange(docTypeId);
         }
@@ -188,7 +186,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
     const scanId = selectedScannerId ? parseInt(selectedScannerId) : null;
     setScannerId(scanId);
     console.log("Scanner selected:", scanId);
-    // You can add more logic here when a scanner is selected
   };
 
   // Toggle Expand and fetch children if needed
@@ -204,7 +201,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
     };
 
     if (!isCurrentlyExpanded) {
-      // For level 0 (parent categories): Close all other categories (accordion behavior)
       if (level === 0) {
         const collapseAll = () => {
           Object.keys(expanded).forEach((categoryId) => {
@@ -221,12 +217,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
         collapseAll();
       }
 
-      // Simulate fetching children with delay
       if (!childrenByParentId[id]) {
         setChildLoading(prev => ({ ...prev, [id]: true }));
         
         setTimeout(() => {
-          // Find the category in our static data and get its children
           const findCategoryChildren = (categories, targetId) => {
             for (const category of categories) {
               if (category.id === targetId) {
@@ -246,14 +240,12 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
         }, 300);
       }
 
-      // Expand this category
       if (level === 0) {
         setExpanded({ [id]: true });
       } else {
         setExpanded(prev => ({ ...prev, [id]: true }));
       }
     } else {
-      // When collapsing, recursively collapse all nested children
       collapseChildren(id);
       setExpanded(prev => ({ ...prev, [id]: false }));
     }
@@ -262,23 +254,20 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
   // Toggle Add Input
   const toggleAddForm = (categoryId) => {
     if (!documentTypeId) {
-      alert(t("pleaseSelectDocTypeFirst") || "Please select a document type first");
+      alert(t('selectDocTypeFirst'));
       return;
     }
 
-    // Close all other forms first
     const newShowAddForm = Object.keys(showAddForm).reduce((acc, key) => {
       acc[key] = false;
       return acc;
     }, {});
 
-    // Toggle the current form
     setShowAddForm({
       ...newShowAddForm,
       [categoryId]: !showAddForm[categoryId],
     });
 
-    // Reset the input for the current category
     setNewCategoryName(prev => ({ ...prev, [categoryId]: "" }));
   };
 
@@ -286,28 +275,26 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
     const categoryName = newCategoryName[parentCategoryId || "root"];
 
     if (!categoryName?.trim()) {
-      alert(t("pleaseEnterCategoryName") || "Please enter a category name");
+      alert(t('pleaseEnterCategoryName'));
       return;
     }
 
     if (!documentTypeId) {
-      alert(t("pleaseSelectDocTypeFirst") || "Please select a document type first");
+      alert(t('selectDocTypeFirst'));
       return;
     }
 
     setCreateLoading(true);
     setCreateError(null);
 
-    // Simulate API call
     setTimeout(() => {
       const newCategory = {
-        id: Date.now(), // Generate unique ID
+        id: Date.now(),
         name: categoryName.trim(),
         documentTypeId: documentTypeId,
         parentId: parentCategoryId,
         children: [],
       };
-
       // Update the appropriate state based on whether it's a root or child category
       if (parentCategoryId === null) {
         // Add to root categories
@@ -332,7 +319,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
       setNewCategoryName({});
       
       console.log("Category created:", newCategory);
-      alert(t("categoryCreatedSuccessAlert", { categoryName }) || `Category "${categoryName}" created successfully!`);
+      alert(t('categoryCreatedSuccessAlert', { categoryName }));
     }, 1000);
   };
 
@@ -368,7 +355,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
   // Handle file selection
   const handleFileSelect = (categoryId, categoryName) => {
     if (!documentTypeId) {
-      alert(t("pleaseSelectDocTypeFirst") || "Please select a document type first");
+      alert(t('selectDocTypeFirst'));
       return;
     }
 
@@ -388,7 +375,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
         type: file.type,
         size: file.size,
         lastModified: file.lastModified,
-        url: URL.createObjectURL(file), // Create object URL for preview
+        url: URL.createObjectURL(file),
       }));
 
       // Store files for this category
@@ -399,11 +386,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
           categoryName
         }
       }));
-
       console.log(`Files selected for category ${categoryId}:`, filesWithMetadata);
     };
 
-    fileInput.click();
+      fileInput.click();
   };
 
   // Handle file upload after preview
@@ -419,17 +405,16 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
       
       // Show success message
       alert(
-        t("filesUploadedSuccess", { 
+        t('filesUploadedSuccess', { 
           count: previewData.files.length, 
           category: previewData.categoryName 
-        }) || 
+        })|| 
         `Successfully uploaded ${previewData.files.length} file(s) to "${previewData.categoryName}"`
       );
       
       console.log(`Uploaded ${previewData.files.length} file(s) to category ${categoryId}:`, previewData.files);
-      
       // Clean up object URLs
-      previewData.files.forEach(fileData => {
+       previewData.files.forEach(fileData => {
         if (fileData.url) {
           URL.revokeObjectURL(fileData.url);
         }
@@ -537,7 +522,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
             >
               <div className="flex items-center justify-center gap-2">
                 <Upload className="w-4 h-4" />
-                <span>{t("files") || "Files"}</span>
+                <span>{t('files')}</span>
                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
                   {totalFilesCount}
                 </span>
@@ -553,7 +538,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
             >
               <div className="flex items-center justify-center gap-2">
                 <Eye className="w-4 h-4" />
-                <span>{t("preview") || "Preview"}</span>
+                <span>{t('preview')}</span>
                 {currentPreviewFile && (
                   <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
                     1
@@ -571,10 +556,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
             <div className="h-full overflow-y-auto bg-gray-50">
               <div className="sticky top-0 bg-white border-b border-gray-200 p-4 z-10">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {t("uploadedFiles") || "Uploaded Files"}
+                  {t('uploadedFiles')}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {totalFilesCount} {t("filesSelected") || "file(s) selected"}
+                  {totalFilesCount} {t('filesSelected')}
                 </p>
               </div>
 
@@ -595,7 +580,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                           onClick={() => handleCancelUpload(categoryId)}
                           disabled={uploadLoading[categoryId]}
                           className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                          title={t("clearFiles") || "Clear files"}
+                          title={t('clearFiles')}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -624,7 +609,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                             <button
                               onClick={() => handleShowFilePreview(categoryId, fileData)}
                               className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                              title={t("previewFile") || "Preview file"}
+                              title={t('previewFile')}
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -632,7 +617,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                               onClick={() => handleRemoveFile(categoryId, index)}
                               disabled={uploadLoading[categoryId]}
                               className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                              title={t("removeFile") || "Remove file"}
+                              title={t('removeFile')}
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -651,12 +636,12 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                         {uploadLoading[categoryId] ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            <span>{t("uploading") || "Uploading..."}</span>
+                            <span>{t('uploading')}</span>
                           </>
                         ) : (
                           <>
                             <Upload className="w-4 h-4" />
-                            <span>{t("Save") || "Saved"}</span>
+                            <span>{t('save')}</span>
                           </>
                         )}
                       </button>
@@ -665,7 +650,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                         disabled={uploadLoading[categoryId]}
                         className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                       >
-                        {t("cancel") || "Cancel"}
+                        {t('cancel')}
                       </button>
                     </div>
                   </div>
@@ -685,10 +670,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                         className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
                       >
                         <ArrowLeft className="w-4 h-4" />
-                        <span>{t("backToFiles") || "Back to Files"}</span>
+                        <span>{t('backToFiles')}</span>
                       </button>
                       <h3 className="text-lg font-bold text-gray-900">
-                        {t("filePreview") || "File Preview"}
+                        {t('filePreview')}
                       </h3>
                     </div>
                     
@@ -715,7 +700,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                         className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                       >
                         <Download className="w-4 h-4" />
-                        <span>{t("download") || "Download"}</span>
+                        <span>{t('download')}</span>
                       </button>
                     </div>
                   </div>
@@ -742,10 +727,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                       <div className="flex flex-col items-center justify-center h-full text-center bg-white rounded-lg shadow p-6">
                         <FileText className="w-16 h-16 text-blue-600 mb-3" />
                         <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                          {t("previewNotAvailable") || "Preview Not Available"}
+                          {t('previewNotAvailable')}
                         </h4>
                         <p className="text-sm text-gray-500 mb-4">
-                          {t("previewNotAvailableDesc") || "Preview is not available for this file type"}
+                          {t('previewNotAvailableDesc')}
                         </p>
                         <div className="text-xs text-gray-600 space-y-1 text-left bg-gray-50 p-3 rounded">
                           <p><span className="font-medium">Type:</span> {currentPreviewFile.type}</p>
@@ -759,7 +744,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                   {/* Preview Footer */}
                   <div className="bg-gray-50 border-t border-gray-200 p-3 flex-shrink-0">
                     <div className="text-xs text-gray-600">
-                      <p><span className="font-medium">Last modified:</span> {new Date(currentPreviewFile.lastModified).toLocaleDateString()} at {new Date(currentPreviewFile.lastModified).toLocaleTimeString()}</p>
+                      <p><span className="font-medium">{t('lastModified')}:</span> {new Date(currentPreviewFile.lastModified).toLocaleDateString()} at {new Date(currentPreviewFile.lastModified).toLocaleTimeString()}</p>
                     </div>
                   </div>
                 </>
@@ -768,16 +753,16 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 <div className="flex flex-col items-center justify-center h-full text-center p-8">
                   <Eye className="w-20 h-20 text-gray-300 mb-4" />
                   <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                    {t("noFileSelected") || "No File Selected"}
+                    {t('noFileSelected')}
                   </h3>
                   <p className="text-gray-500 mb-4">
-                    {t("selectFileToPreview") || "Click the preview button on any file to view it here"}
+                    {t('selectFileToPreview')}
                   </p>
                   <button
                     onClick={() => setRightPanelTab('files')}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    {t("goToFiles") || "Go to Files"}
+                    {t('goToFiles')}
                   </button>
                 </div>
               )}
@@ -786,13 +771,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
         </div>
       </div>
     );
-  };
-
-  // Render file list for a category in table tab
-  // This function is no longer needed as files are displayed in the right panel
-  const renderCategoryFilesList = (categoryId) => {
-    // Files are now shown in the right panel, not under categories
-    return null;
   };
 
   const renderAddForm = (categoryId) => {
@@ -806,7 +784,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
               type="text"
               value={newCategoryName[categoryId] || ""}
               onChange={(e) => handleInputChange(categoryId, e.target.value)}
-              placeholder={t("enterCategoryName") || "Enter category name"}
+              placeholder={t('enterCategoryName')}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
@@ -824,14 +802,14 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
             >
               <Plus className="w-4 h-4" />
               <span className="text-sm">
-                {createLoading ? (t("adding") || "Adding...") : (t("add") || "Add")}
+                {createLoading ? t('adding') : t('add')}
               </span>
             </button>
             <button
               onClick={() => toggleAddForm(categoryId)}
               className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
-              <span className="text-sm">{t("cancel") || "Cancel"}</span>
+              <span className="text-sm">{t('cancel')}</span>
             </button>
           </div>
           {createError && (
@@ -902,7 +880,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
               style={{ paddingLeft: `${level * 24}px` }}
               onClick={() => toggleExpand(item, level)}
             >
-              {/* Chevron Arrow - only show for categories with children */}
               {categoryHasChildren ? (
                 isOpen ? (
                   <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />
@@ -913,7 +890,6 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 <div className="w-4 h-4 flex-shrink-0" />
               )}
               
-              {/* Folder Icon */}
               {isOpen ? (
                 <FolderOpen className="w-5 h-5 text-blue-600 flex-shrink-0" />
               ) : (
@@ -931,39 +907,36 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
               {isLoadingChildren && (
                 <div className="flex items-center gap-1 text-gray-500">
                   <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-400"></div>
-                  <span className="text-xs">{t("loading") || "Loading..."}</span>
+                  <span className="text-xs">{t('loading')}</span>
                 </div>
               )}
             </div>
           </td>
           <td className="py-4 px-6 whitespace-nowrap text-right">
             <div className="flex items-center gap-2 justify-end">
-              {/* Scan Button - Always visible but disabled when no scanner selected */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log(`Scan initiated for category ${id} with scanner ${scannerId}`);
-                  alert(t("scanInitiated") || `Scan initiated for "${item.name}"`);
+                  alert(t('scanInitiated'));
                 }}
                 disabled={!documentTypeId || isUploading || !scannerId}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title={
                   !scannerId ? 
-                  (t("selectScannerFirst") || "Select scanner first") :
+                  t('selectScannerFirst') :
                   !documentTypeId ? 
-                  (t("selectDocTypeFirst") || "Select document type first") : 
-                  (t("scanToCategory", { category: item.name }) || `Scan to ${item.name}`)
+                  t('selectDocTypeFirst') : 
+                  t('scanToCategory', { category: item.name })
                 }
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span className="text-sm">
-                  {t("scan") || "Scan"}
+                  {t('scan')}
                 </span>
               </button>
-              
-              {/* Upload Button */}
+             {/* Upload Button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -973,13 +946,13 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title={
                   !documentTypeId ? 
-                  (t("selectDocTypeFirst") || "Select document type first") : 
-                  (t("uploadFilesToCategory", { category: item.name }) || `Upload files to ${item.name}`)
+                  t('selectDocTypeFirst') : 
+                  t('uploadFilesToCategory', { category: item.name })
                 }
               >
                 <Upload className="w-4 h-4" />
                 <span className="text-sm">
-                  {t("uploadFiles") || "Upload Files"}
+                  {t('uploadFiles')}
                 </span>
               </button>
             </div>
@@ -1006,7 +979,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                   style={{ paddingLeft: `${(level + 1) * 24}px` }}
                 >
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm">{t("loadingChildren") || "Loading children..."}</span>
+                  <span className="text-sm">{t('loadingChildren')}</span>
                 </div>
               </td>
             </tr>
@@ -1021,7 +994,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 className="px-6 py-4 text-center text-gray-500 italic"
               >
                 <div style={{ paddingLeft: `${(level + 1) * 24}px` }}>
-                  <span className="text-sm">{t("noChildCategories") || "No child categories found"}</span>
+                  <span className="text-sm">{t('noChildCategories')}</span>
                 </div>
               </td>
             </tr>
@@ -1041,10 +1014,10 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
             <Folder className="w-16 h-16 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-600 mb-2">
-            {t("noDocTypeSelected") || "No Document Type Selected"}
+            {t('noDocTypeSelected')}
           </h3>
           <p className="text-gray-500 mb-6">
-            {t("selectDocTypeFromDropdown") || "Please select a document type from the dropdown above to view categories"}
+            {t('selectDocTypeFromDropdown')}
           </p>
         </div>
       );
@@ -1056,17 +1029,17 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
           <Folder className="w-16 h-16 mx-auto" />
         </div>
         <h3 className="text-lg font-medium text-gray-600 mb-2">
-          {t("noCategoriesFound") || "No Categories Found"}
+          {t('noCategoriesFound')}
         </h3>
         <p className="text-gray-500 mb-6">
-          {t("getStartedCreating") || "Get started by creating your first category"}
+          {t('getStartedCreating')}
         </p>
         <button
           onClick={() => toggleAddForm("root")}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center gap-2 mx-auto"
         >
           <Plus className="w-5 h-5" />
-          <span className="text-base">{t("createFirstCategory") || "Create First Category"}</span>
+          <span className="text-base">{t('createFirstCategory')}</span>
         </button>
       </div>
     );
@@ -1078,11 +1051,11 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
       <section className="">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">{t("categories") || "Categories"}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t('categories')}</h2>
           </div>
           <div className="px-6 py-16 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">{t("loadingCategories") || "Loading categories..."}</p>
+            <p className="mt-4 text-gray-600">{t('loadingCategories')}</p>
           </div>
         </div>
       </section>
@@ -1101,13 +1074,13 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
           <div className="px-2 py-5 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{t("categories") || "Categories"}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t('categories')}</h2>
                 {documentTypeId && (
                   <p className="text-gray-600 text-sm mt-1">
-                    {t("manageCategoriesFor") || "Manage categories for selected document type"}
+                    {t('manageCategories')}
                     {hasAnyFiles && (
                       <span className="ml-2 text-blue-600 font-medium">
-                        • {totalFilesCount} {t("filesSelected") || "file(s) selected"}
+                        • {totalFilesCount} {t('filesSelected')}
                       </span>
                     )}
                   </p>
@@ -1118,14 +1091,14 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 {/* Document Type Selector */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
-                    {t("documentType") || "Document Type"}:
+                    {t('documentType')}:
                   </label>
                   <select
                     value={documentTypeId || ""}
                     onChange={(e) => handleDocumentTypeChange(e.target.value)}
                     className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
                   >
-                    <option value="" className="text-sm">{t("selectDocumentType") || "Select Document Type"}</option>
+                    <option value="" className="text-sm">{t('selectDocumentType')}</option>
                     {staticDocumentTypes.map((docType) => (
                       <option key={docType.id} value={docType.id} className="text-sm">
                         {docType.name}
@@ -1137,14 +1110,14 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                 {/* Scanners Selector */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
-                    {t("scanner") || "Scanner"}:
+                    {t('scanner')}:
                   </label>
                   <select
                     value={scannerId || ""}
                     onChange={(e) => handleScannerChange(e.target.value)}
                     className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
                   >
-                    <option value="" className="text-sm">{t("selectScanner") || "Select Scanner"}</option>
+                    <option value="" className="text-sm">{t('selectScanner')}</option>
                     {staticScanners.map((scanner) => (
                       <option key={scanner.id} value={scanner.id} className="text-sm">
                         {scanner.name}
@@ -1160,12 +1133,12 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                   className="px-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
                   title={
                     !documentTypeId ? 
-                    (t("selectDocTypeFirst") || "Select document type first") : 
-                    (t("addRootCategory") || "Add root category")
+                    t('selectDocTypeFirst') : 
+                    t('addRootCategory')
                   }
                 >
                   <Plus className="w-5 h-5" />
-                  <span className="text-sm">{t("addRootCategory") || "Add Root Category"}</span>
+                  <span className="text-sm">{t('addRootCategory')}</span>
                 </button>
               </div>
             </div>
@@ -1184,21 +1157,19 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                         colSpan={2}
                         className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        {t("categoryName") || "Category Name"}
+                        {t('categoryName')}
                       </th>
                       <th
                         scope="col"
                         className="px-1 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                       >
-                        {t("actions") || "Actions"}
+                        {t('actions')}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {/* Add root form */}
                     {showAddForm["root"] && renderAddForm("root")}
 
-                    {/* Categories or empty state */}
                     {documentTypeId && parentCategories && parentCategories.length > 0 ? (
                       renderRows(parentCategories)
                     ) : (

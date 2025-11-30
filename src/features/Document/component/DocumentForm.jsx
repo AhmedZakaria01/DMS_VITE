@@ -1111,7 +1111,7 @@
 // // export default DocumentForm;
 
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { FileText, Database, ChevronDown, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -1435,7 +1435,8 @@ function DocumentForm() {
 
         {/* Main Form Area */}
         <div className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8"> */}
+            <div>
             {/* Left Column - Document Type Selection */}
             <div className="space-y-6">
               {/* Document Type Selection Card */}
@@ -1485,6 +1486,49 @@ function DocumentForm() {
                     </div>
                   )}
 
+ {selectedDocumentType && currentMetadata.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <FileText className="w-5 h-5 text-green-600" />
+                      </div>
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {t('documentMetadata')}
+                      </h2>
+                    </div>
+                  </div>
+  {/* Empty state when no document type selected */}
+              {!selectedDocumentType && (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-12 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                      <FileText className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {t('noDocumentTypeSelected')}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {t('selectDocumentTypeLeftPanel')}
+                    </p>
+                  </div>
+                </div>
+              )}
+                  <div className="p-6 space-y-4">
+                    {currentMetadata.map((field, index) => (
+                      <div key={index}>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          {field.label}
+                          {field.required && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}
+                        </label>
+                        {renderField(field)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
                   {/* Display selected document type info */}
                   {selectedDocumentType && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
@@ -1536,53 +1580,11 @@ function DocumentForm() {
             </div>
 
             {/* Right Column - Dynamic Metadata Fields */}
-            <div className="space-y-6">
-              {selectedDocumentType && currentMetadata.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <FileText className="w-5 h-5 text-green-600" />
-                      </div>
-                      <h2 className="text-xl font-semibold text-gray-900">
-                        {t('documentMetadata')}
-                      </h2>
-                    </div>
-                  </div>
+            {/* <div className="space-y-6"> */}
+             
 
-                  <div className="p-6 space-y-4">
-                    {currentMetadata.map((field, index) => (
-                      <div key={index}>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          {field.label}
-                          {field.required && (
-                            <span className="text-red-500 ml-1">*</span>
-                          )}
-                        </label>
-                        {renderField(field)}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Empty state when no document type selected */}
-              {!selectedDocumentType && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="p-12 text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                      <FileText className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t('noDocumentTypeSelected')}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {t('selectDocumentTypeLeftPanel')}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            
+            {/* </div> */}
           </div>
 
           {/* Permissions Popup */}

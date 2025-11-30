@@ -2,17 +2,20 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Folder, FolderOpen, Upload, X, Eye, FileText, Image, File, ArrowLeft, Download, ChevronRight, ChevronDown } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTypeChange, onCategoryUpdate, initialCategories }) => {
   const { t } = useTranslation();
+  // Redux selectors
+  const { docTypes } = useSelector((state) => state.docTypeReducer);
 
-  // Static data
-  const staticDocumentTypes = [
-    { id: 1, name: "Invoices" },
-    { id: 2, name: "Contracts" },
-    { id: 3, name: "Employee Records" },
-    { id: 4, name: "Technical Documentation" },
-  ];
+  // // Static data
+  // const staticDocumentTypes = [
+  //   { id: 1, name: "Invoices" },
+  //   { id: 2, name: "Contracts" },
+  //   { id: 3, name: "Employee Records" },
+  //   { id: 4, name: "Technical Documentation" },
+  // ];
 
   const staticScanners = [
     { id: 1, name: "HP ScanJet Pro 3000" },
@@ -1099,7 +1102,7 @@ const CategoryTable = ({ currentDocTypeId, currentParentCategoryId, onDocumentTy
                     className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
                   >
                     <option value="" className="text-sm">{t('selectDocumentType')}</option>
-                    {staticDocumentTypes.map((docType) => (
+                    {docTypes.map((docType) => (
                       <option key={docType.id} value={docType.id} className="text-sm">
                         {docType.name}
                       </option>

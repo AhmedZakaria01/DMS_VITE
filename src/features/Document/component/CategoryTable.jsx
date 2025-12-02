@@ -24,16 +24,12 @@ const CategoryTable = ({
   onDocumentTypeChange,
   onCategoryUpdate,
   initialCategories,
+  docTypesList,
 }) => {
   const { t } = useTranslation();
 
-  // Static data
-  const staticDocumentTypes = [
-    { id: 1, name: "Invoices" },
-    { id: 2, name: "Contracts" },
-    { id: 3, name: "Employee Records" },
-    { id: 4, name: "Technical Documentation" },
-  ];
+  // Use docTypesList prop
+  const docTypes = docTypesList || [];
 
   const staticScanners = [
     { id: 1, name: "HP ScanJet Pro 3000" },
@@ -156,22 +152,20 @@ const CategoryTable = ({
   const [previewFiles, setPreviewFiles] = useState({});
 
   // Right panel state - tabs for files and preview
-  const [rightPanelTab, setRightPanelTab] = useState("files"); // 'files' or 'preview'
+  const [rightPanelTab, setRightPanelTab] = useState("files");
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
 
   // Update when props change
   useEffect(() => {
+    console.log("CategoryTable received currentDocTypeId:", currentDocTypeId);
+    console.log("CategoryTable received docTypesList:", docTypesList);
+
     if (currentDocTypeId) {
       setDocumentTypeId(currentDocTypeId);
+      handleDocumentTypeChange(currentDocTypeId.toString());
     }
-  }, [currentDocTypeId]);
-
-  useEffect(() => {
-    if (initialCategories) {
-      setParentCategories(initialCategories);
-    }
-  }, [initialCategories]);
+  }, [currentDocTypeId, docTypesList]);
 
   // Handle document type selection
   const handleDocumentTypeChange = (selectedDocTypeId) => {
@@ -190,7 +184,6 @@ const CategoryTable = ({
 
     if (docTypeId) {
       setLoading(true);
-      // Simulate API call delay
       setTimeout(() => {
         const filteredCategories = staticCategories.filter(
           (category) => category.documentTypeId === docTypeId
@@ -213,7 +206,6 @@ const CategoryTable = ({
     const scanId = selectedScannerId ? parseInt(selectedScannerId) : null;
     setScannerId(scanId);
     console.log("Scanner selected:", scanId);
-    // You can add more logic here when a scanner is selected
   };
 
   // Toggle Expand and fetch children if needed
@@ -229,7 +221,6 @@ const CategoryTable = ({
     };
 
     if (!isCurrentlyExpanded) {
-      // For level 0 (parent categories): Close all other categories (accordion behavior)
       if (level === 0) {
         const collapseAll = () => {
           Object.keys(expanded).forEach((categoryId) => {
@@ -246,12 +237,10 @@ const CategoryTable = ({
         collapseAll();
       }
 
-      // Simulate fetching children with delay
       if (!childrenByParentId[id]) {
         setChildLoading((prev) => ({ ...prev, [id]: true }));
 
         setTimeout(() => {
-          // Find the category in our static data and get its children
           const findCategoryChildren = (categories, targetId) => {
             for (const category of categories) {
               if (category.id === targetId) {
@@ -271,14 +260,12 @@ const CategoryTable = ({
         }, 300);
       }
 
-      // Expand this category
       if (level === 0) {
         setExpanded({ [id]: true });
       } else {
         setExpanded((prev) => ({ ...prev, [id]: true }));
       }
     } else {
-      // When collapsing, recursively collapse all nested children
       collapseChildren(id);
       setExpanded((prev) => ({ ...prev, [id]: false }));
     }
@@ -293,13 +280,11 @@ const CategoryTable = ({
       return;
     }
 
-    // Close all other forms first
     const newShowAddForm = Object.keys(showAddForm).reduce((acc, key) => {
       acc[key] = false;
       return acc;
     }, {});
 
-    // Toggle the current form
     setShowAddForm({
       ...newShowAddForm,
       [categoryId]: !showAddForm[categoryId],
@@ -327,19 +312,16 @@ const CategoryTable = ({
     setCreateLoading(true);
     setCreateError(null);
 
-    // Simulate API call
     setTimeout(() => {
       const newCategory = {
-        id: Date.now(), // Generate unique ID
+        id: Date.now(),
         name: categoryName.trim(),
         documentTypeId: documentTypeId,
         parentId: parentCategoryId,
         children: [],
       };
 
-      // Update the appropriate state based on whether it's a root or child category
       if (parentCategoryId === null) {
-        // Add to root categories
         const updatedCategories = [...parentCategories, newCategory];
         setParentCategories(updatedCategories);
 
@@ -348,7 +330,6 @@ const CategoryTable = ({
           onCategoryUpdate(updatedCategories);
         }
       } else {
-        // Add to children
         const updatedChildren = {
           ...childrenByParentId,
           [parentCategoryId]: [
@@ -372,7 +353,7 @@ const CategoryTable = ({
   };
 
   const handleInputChange = (categoryId, value) => {
-    // setNewCategoryName(prev => ({ ...prev, [categoryId]: value }));
+    setNewCategoryName((prev) => ({ ...prev, [categoryId]: value }));
     setCategoryName(value);
   };
 
@@ -426,7 +407,7 @@ const CategoryTable = ({
         type: file.type,
         size: file.size,
         lastModified: file.lastModified,
-        url: URL.createObjectURL(file), // Create object URL for preview
+        url: URL.createObjectURL(file),
       }));
 
       // Store files for this category
@@ -454,7 +435,6 @@ const CategoryTable = ({
 
     setUploadLoading((prev) => ({ ...prev, [categoryId]: true }));
 
-    // Simulate file upload process
     setTimeout(() => {
       setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
 
@@ -562,6 +542,13 @@ const CategoryTable = ({
     document.body.removeChild(link);
   };
 
+  // Check if there are any files uploaded
+  const hasAnyFiles = Object.keys(previewFiles).length > 0;
+  const totalFilesCount = Object.values(previewFiles).reduce(
+    (sum, data) => sum + data.files.length,
+    0
+  );
+
   // Render Right Panel with Tabs (Files and Preview)
   const renderRightPanel = () => {
     if (!hasAnyFiles) return null;
@@ -618,7 +605,7 @@ const CategoryTable = ({
                   {t("uploadedFiles") || "Uploaded Files"}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  {totalFilesCount} {t("filesSelected") || "file(s) selected"}
+                  {totalFilesCount} {t("filesSelected") || "files selected"}
                 </p>
               </div>
 
@@ -710,7 +697,7 @@ const CategoryTable = ({
                           ) : (
                             <>
                               <Upload className="w-4 h-4" />
-                              <span>{t("Save") || "Saved"}</span>
+                              <span>{t("Save") || "Save"}</span>
                             </>
                           )}
                         </button>
@@ -865,13 +852,6 @@ const CategoryTable = ({
     );
   };
 
-  // Render file list for a category in table tab
-  // This function is no longer needed as files are displayed in the right panel
-  const renderCategoryFilesList = (categoryId) => {
-    // Files are now shown in the right panel, not under categories
-    return null;
-  };
-
   const renderAddForm = (categoryId) => {
     if (!showAddForm[categoryId]) return null;
 
@@ -978,7 +958,6 @@ const CategoryTable = ({
               style={{ paddingLeft: `${level * 24}px` }}
               onClick={() => toggleExpand(item, level)}
             >
-              {/* Chevron Arrow - only show for categories with children */}
               {categoryHasChildren ? (
                 isOpen ? (
                   <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />
@@ -1016,7 +995,6 @@ const CategoryTable = ({
           </td>
           <td className="py-4 px-6 whitespace-nowrap text-right">
             <div className="flex items-center gap-2 justify-end">
-              {/* Scan Button - Always visible but disabled when no scanner selected */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1070,9 +1048,7 @@ const CategoryTable = ({
                 }
               >
                 <Upload className="w-4 h-4" />
-                <span className="text-sm">
-                  {t("uploadFiles") || "Upload Files"}
-                </span>
+                <span className="text-sm">{t("uploadFiles") || "Upload"}</span>
               </button>
             </div>
           </td>
@@ -1156,15 +1132,6 @@ const CategoryTable = ({
           {t("getStartedCreating") ||
             "Get started by creating your first category"}
         </p>
-        <button
-          onClick={() => toggleAddForm("root")}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center gap-2 mx-auto"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="text-base">
-            {t("createFirstCategory") || "Create First Category"}
-          </span>
-        </button>
       </div>
     );
   };
@@ -1190,20 +1157,13 @@ const CategoryTable = ({
     );
   }
 
-  // Check if there are any files uploaded
-  const hasAnyFiles = Object.keys(previewFiles).length > 0;
-  const totalFilesCount = Object.values(previewFiles).reduce(
-    (sum, data) => sum + data.files.length,
-    0
-  );
-
   return (
     <>
       <section className="">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header with Document Type Selector */}
           <div className="px-2 py-5 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-3">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
                   {t("categories") || "Categories"}
@@ -1223,31 +1183,6 @@ const CategoryTable = ({
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                {/* Document Type Selector */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
-                    {t("documentType") || "Document Type"}:
-                  </label>
-                  <select
-                    value={documentTypeId || ""}
-                    onChange={(e) => handleDocumentTypeChange(e.target.value)}
-                    className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
-                  >
-                    <option value="" className="text-sm">
-                      {t("selectDocumentType") || "Select Document Type"}
-                    </option>
-                    {staticDocumentTypes.map((docType) => (
-                      <option
-                        key={docType.id}
-                        value={docType.id}
-                        className="text-sm"
-                      >
-                        {docType.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 {/* Scanners Selector */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
@@ -1277,7 +1212,7 @@ const CategoryTable = ({
                 <button
                   onClick={() => toggleAddForm("root")}
                   disabled={!documentTypeId}
-                  className="px-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
                   title={
                     !documentTypeId
                       ? t("selectDocTypeFirst") || "Select document type first"
@@ -1323,7 +1258,6 @@ const CategoryTable = ({
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {/* Add root form */}
                     {showAddForm["root"] && renderAddForm("root")}
 
                     {/* Categories or empty state */}
@@ -1354,10 +1288,7 @@ const CategoryTable = ({
 
 CategoryTable.defaultProps = {
   currentDocTypeId: null,
-  currentParentCategoryId: null,
-  onDocumentTypeChange: () => {},
-  onCategoryUpdate: () => {},
-  initialCategories: [],
+  docTypesList: [],
 };
 
 export default React.memo(CategoryTable);

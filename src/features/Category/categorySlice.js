@@ -1,131 +1,3 @@
-// import { createSlice } from "@reduxjs/toolkit";
-// import { fetchCategoryChilds } from "./categoryThunks";
-
-// const categorySlice = createSlice({
-//   name: "category",
-//   initialState: {
-//     // Category form data that will be sent to backend
-//     categoryData: {
-//       name: "",
-//       documentTypeId: null,
-//       parentCategoryId: null,
-//       securityLevel: 0,
-//       aclRules: [],
-//     },
-//     // List of categories
-//     categories: [],
-//     status: "idle",
-//     error: null,
-//   },
-//   reducers: {
-//     // Set category name
-//     setCategoryName: (state, action) => {
-//       state.categoryData.name = action.payload;
-//       console.log(action.payload);
-//     },
-
-//     // Set document type ID
-//     setDocumentTypeId: (state, action) => {
-//       state.categoryData.documentTypeId = action.payload;
-//       console.log(action.payload);
-//     },
-
-//     // Set parent category ID
-//     setParentCategoryId: (state, action) => {
-//       state.categoryData.parentCategoryId = action.payload || 0;
-//     },
-
-//     // Set security level
-//     setSecurityLevel: (state, action) => {
-//       state.categoryData.securityLevel = action.payload || 0;
-//       console.log(action.payload);
-//       console.log(state.categoryData.securityLevel);
-//     },
-
-//     // Set ACL rules (permissions)
-//     setAclRules: (state, action) => {
-//       state.categoryData.aclRules = action.payload.map((ele) => ({
-//         principalId: ele.principalId,
-//         principalType: ele.principalType,
-//         permissions: ele.permissions?.map((ele) => ele.code),
-//         accessType: ele.accessType,
-//       }));
-
-//       console.log(state.categoryData.aclRules);
-//     },
-
-//     // Set complete category form data at once
-//     setcategoryData: (state, action) => {
-//       state.categoryData = {
-//         ...state.categoryData,
-//         ...action.payload,
-//       };
-//     },
-
-//     // Reset category form data
-//     resetcategoryData: (state) => {
-//       state.categoryData = {
-//         name: "",
-//         documentTypeId: null,
-//         parentCategoryId: null,
-//         securityLevel: 0,
-//         aclRules: [],
-//       };
-//       state.childCategories = null;
-//     },
-
-//     // Add a new category to the list
-//     addCategory: (state, action) => {
-//       state.categories.push(action.payload);
-//     },
-
-//     // Set categories list
-//     setCategories: (state, action) => {
-//       state.categories = action.payload;
-//     },
-
-//     // Set loading status
-//     setCategoryStatus: (state, action) => {
-//       state.status = action.payload;
-//     },
-
-//     // Set error
-//     setCategoryError: (state, action) => {
-//       state.error = action.payload;
-//     },
-//   },
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(fetchCategoryChilds.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(fetchCategoryChilds.fulfilled, (state, action) => {
-//         state.childCategories = action.payload;
-//         state.status = "succeeded";
-//       })
-//       .addCase(fetchCategoryChilds.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message;
-//       });
-//   },
-// });
-
-// export const {
-//   setCategoryName,
-//   setDocumentTypeId,
-//   setParentCategoryId,
-//   setSecurityLevel,
-//   setAclRules,
-//   setcategoryData,
-//   resetcategoryData,
-//   addCategory,
-//   setCategories,
-//   setCategoryStatus,
-//   setCategoryError,
-// } = categorySlice.actions;
-
-// export default categorySlice.reducer;
-
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchCategoryChilds,
@@ -144,11 +16,8 @@ const categorySlice = createSlice({
       securityLevel: 0,
       aclRules: [],
     },
-    // List of parent categories
-    categories: [],
-    // Child categories organized by parent ID
+    parentCategories: [],
     childCategories: {},
-    // Loading states
     loading: false,
     childLoading: {},
     status: "idle",
@@ -261,7 +130,7 @@ const categorySlice = createSlice({
         console.log("✅ REDUCER: getParentCategories.fulfilled");
         console.log("✅ REDUCER: action.payload:", action.payload);
         state.loading = false;
-        state.categories = action.payload; // 🔥 THIS IS THE KEY LINE
+        state.parentCategories = action.payload; // 🔥 THIS IS THE KEY LINE
         state.error = null;
       })
       .addCase(getParentCategories.rejected, (state, action) => {
@@ -281,6 +150,8 @@ const categorySlice = createSlice({
         };
       })
       .addCase(fetchCategoryChilds.fulfilled, (state, action) => {
+        console.log(action.payload);
+
         const parentId = action.meta.arg;
         state.childLoading = {
           ...state.childLoading,

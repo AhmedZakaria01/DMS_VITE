@@ -103,6 +103,8 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
 
   // Handle doc type selection
   const handleSelectDocType = (docType) => {
+    console.log(docType);
+
     dispatch(setDocumentTypeId(docType.id));
     setSelectedDocType(docType);
     setValue("DocType", docType.name, { shouldValidate: true });
@@ -132,8 +134,6 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
 
     console.log("Form Data Submitted:", formData);
 
-
- 
     // Reset form
     setSelectedRepo(null);
     setSelectedDocType(null);
@@ -146,7 +146,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
 
   return (
     <section className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      {/* <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {t("fileCategoryForm") || "File Category Form"}
@@ -156,7 +156,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
               "Create and manage file categories for your repositories"}
           </p>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-white rounded-lg shadow-lg p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -202,19 +202,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
           </div>
 
           {/* Selected repo display */}
-          {selectedRepo && (
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-green-800">
-                  {t("selectedRepository") || "Selected Repository"}
-                </span>
-              </div>
-              <p className="text-green-700 font-semibold mt-1 text-sm">
-                {selectedRepo.name} (ID: {selectedRepo.id})
-              </p>
-            </div>
-          )}
+            
 
           {/* Document Type Dropdown */}
           <div className="relative" ref={docTypeDropdownRef}>
@@ -280,21 +268,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
             )}
           </div>
 
-          {/* Selected DocumentType display */}
-          {selectedDocType && (
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium text-blue-800">
-                  {t("selectedDocumentType") || "Selected Document Type"}
-                </span>
-              </div>
-              <p className="text-blue-700 font-semibold mt-1 text-sm">
-                {selectedDocType.name} (ID: {selectedDocType.id})
-              </p>
-            </div>
-          )}
-
+   
           {/* Security Level Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -328,39 +302,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
             </p>
           </div>
 
-          {/* Instructions */}
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">
-              {t("instructions") || "Instructions"}
-            </h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>
-                •{" "}
-                {t("instructionSelectRepo") ||
-                  "Select a repository first to see available document types"}
-              </li>
-              <li>
-                •{" "}
-                {t("instructionChooseDocType") ||
-                  "Choose a document type to create categories for"}
-              </li>
-              <li>
-                •{" "}
-                {t("instructionEnterName") ||
-                  "Enter a name for your new category"}
-              </li>
-              <li>
-                •{" "}
-                {t("instructionSecurityLevel") ||
-                  "Set security level (optional) - higher numbers mean more security"}
-              </li>
-              <li>
-                •{" "}
-                {t("instructionSubmit") ||
-                  "Submit the form to create the category"}
-              </li>
-            </ul>
-          </div>
+   
         </form>
       </div>
     </section>

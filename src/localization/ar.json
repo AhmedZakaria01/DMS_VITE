@@ -317,7 +317,7 @@
   "instructionEnterName": "أدخل اسم لفئتك الجديدة",
   "instructionSubmit": "أرسل النموذج لإنشاء الفئة",
   "categoryCreatedSuccess": "تم إنشاء الفئة \"{{categoryName}}\" بنجاح لـ {{docType}} في {{repo}}",
-  "noDocumentTypeSelected": "لم يتم اختيار نوع مستند",
+  "No Document Type Selected": "لم يتم اختيار نوع مستند",
   "noRepositorySelected": "لم يتم اختيار مستودع",
   "childCategories": "الفئات الفرعية",
   "categoriesForDocType": "الفئات لنوع المستند",

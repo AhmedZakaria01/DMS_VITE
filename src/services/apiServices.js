@@ -36,6 +36,7 @@ const api = axios.create({
   baseURL: VITE_APP_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
@@ -410,6 +411,8 @@ export async function getDocumentFiles(repoId, folderId) {
 export async function createNewCategory(categoryData) {
   try {
     const response = await api.post("Category/Create", categoryData);
+    console.log(response);
+
     return response.data;
   } catch (err) {
     console.error("Failed To Create a New Category ", err);
@@ -420,7 +423,7 @@ export async function createNewCategory(categoryData) {
 export async function fetchParentCategories(documentTypeId) {
   try {
     const response = await api.get(
-      `Category/GetCategoriesByDocumentType/${documentTypeId}`
+      `Category/GetParentCategoriesByDocumentType/${documentTypeId}`
     );
     const data = response.data;
 
@@ -435,6 +438,19 @@ export async function fetchParentCategories(documentTypeId) {
   }
 }
 
+// Get Childs From Parent
+
+export async function getChildCategories(parentCategoryId) {
+  try {
+    const data = await api.get(
+      `Category/GetChildCategories/${parentCategoryId}`
+    );
+    console.log(data.response);
+    return data.response;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 // Get All Users
 export async function getPrinciples(id) {
   try {

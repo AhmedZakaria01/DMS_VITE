@@ -9,6 +9,7 @@ import folderContentsReducer from "../features/FolderContent/folderContentsSlice
 import categoryReducer from "../features/Category/categorySlice";
 import permissionsReducer from "../features/Permissions/permissionsSlice";
 import docTypeReducer from "../features/DocumentType/docTypeSlice";
+import parentCategoriesReducer from "../features/Category/parentCategoriesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export const store = configureStore({
     categoryReducer,
     permissionsReducer,
     docTypeReducer,
+    parentCategoriesReducer,
   },
 });

@@ -5,51 +5,54 @@
 
 // redux/thunks/categoryThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createNewCategory, fetchParentCategories } from "../../services/apiServices";
-
-// Fetch User Repositories
-// export const fetchUserRepos = createAsyncThunk(
-//   "repo/fetchUserRepos",
-//   async (userId) => {
-//     const response = await getUserRepos(userId);
-//     return response.data;
-//   }
-// );
-
-
-
-
-
-
+import {
+  createNewCategory,
+  fetchParentCategories,
+  getChildCategories,
+} from "../../services/apiServices";
 
 // Create New Category Thunk
-export const createNewRepo = createAsyncThunk(
-  "repo/createNewCategory",
+export const createCategory = createAsyncThunk(
+  "category/createNewCategory",
   async (categoryData, { rejectWithValue }) => {
     try {
       const response = await createNewCategory(categoryData);
       return response;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Failed to create category"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create category"
       );
     }
   }
 );
 
-
-
 // Fetch Parent Categories Thunk
 export const getParentCategories = createAsyncThunk(
-  "repo/GetCategoriesByDocumentType",
+  "category/GetCategoriesByDocumentType",
   async (documentTypeId, { rejectWithValue }) => {
     try {
       const categories = await fetchParentCategories(documentTypeId);
       return categories;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Failed to fetch parent categories"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch parent categories"
       );
+    }
+  }
+);
+
+export const fetchCategoryChilds = createAsyncThunk(
+  "category/get/childs",
+  async (parentCategoryId) => {
+    try {
+      const childCategories = await getChildCategories(parentCategoryId);
+      return childCategories;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 );

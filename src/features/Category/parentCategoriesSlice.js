@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getParentCategories } from "./CategoryThunks";
-
+import { getParentCategories } from "./categoryThunks";
+ 
 const parentCategoriesSlice = createSlice({
   name: "parentCategories",
   initialState: {

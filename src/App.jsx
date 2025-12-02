@@ -34,7 +34,6 @@ import CreateDocument from "./features/Document/component/CreateDocument";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
-
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -64,7 +63,7 @@ function App() {
           <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />
           <Route path="/FileCategoryForm" element={<FileCategoryForm />} />
           {/* <Route path="/CategoryTable" element={<CategoryTable />} /> */}
-                    <Route path="/documentCategoryTable" element={<CreateDocument />} />
+          <Route path="/documentCategoryTable" element={<CreateDocument />} />
 
           <Route path="/CreateCategory" element={<CreateCategory />} />
 

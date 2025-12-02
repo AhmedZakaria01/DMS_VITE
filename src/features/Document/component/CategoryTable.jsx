@@ -16,11 +16,19 @@ import {
   ChevronRight,
   ChevronDown,
 } from "lucide-react";
+import { setCategoryName } from "../../Category/categorySlice";
 
-const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
+const CategoryTable = ({
+  currentDocTypeId,
+  currentParentCategoryId,
+  onDocumentTypeChange,
+  onCategoryUpdate,
+  initialCategories,
+  docTypesList,
+}) => {
   const { t } = useTranslation();
 
-  // ✅ Use docTypesList prop
+  // Use docTypesList prop
   const docTypes = docTypesList || [];
 
   const staticScanners = [
@@ -129,7 +137,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
     currentDocTypeId || null
   );
   const [scannerId, setScannerId] = useState(null);
-  const [parentCategories, setParentCategories] = useState([]);
+  const [parentCategories, setParentCategories] = useState(
+    initialCategories || []
+  );
   const [childrenByParentId, setChildrenByParentId] = useState({});
   const [expanded, setExpanded] = useState({});
   const [showAddForm, setShowAddForm] = useState({});
@@ -141,18 +151,17 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
   const [uploadLoading, setUploadLoading] = useState({});
   const [previewFiles, setPreviewFiles] = useState({});
 
-  // Right panel state
+  // Right panel state - tabs for files and preview
   const [rightPanelTab, setRightPanelTab] = useState("files");
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
 
-  // ✅ Update when props change
+  // Update when props change
   useEffect(() => {
     console.log("CategoryTable received currentDocTypeId:", currentDocTypeId);
     console.log("CategoryTable received docTypesList:", docTypesList);
 
     if (currentDocTypeId) {
-      // ✅ Set local state to match the prop
       setDocumentTypeId(currentDocTypeId);
       handleDocumentTypeChange(currentDocTypeId.toString());
     }
@@ -181,6 +190,11 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
         );
         setParentCategories(filteredCategories);
         setLoading(false);
+
+        // Call parent callback if provided
+        if (onDocumentTypeChange) {
+          onDocumentTypeChange(docTypeId);
+        }
       }, 500);
     } else {
       setParentCategories([]);
@@ -260,7 +274,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
   // Toggle Add Input
   const toggleAddForm = (categoryId) => {
     if (!documentTypeId) {
-      alert(t("selectDocTypeFirst") || "Please select a document type first");
+      alert(
+        t("pleaseSelectDocTypeFirst") || "Please select a document type first"
+      );
       return;
     }
 
@@ -274,6 +290,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       [categoryId]: !showAddForm[categoryId],
     });
 
+    // Reset the input for the current category
     setNewCategoryName((prev) => ({ ...prev, [categoryId]: "" }));
   };
 
@@ -286,7 +303,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
     }
 
     if (!documentTypeId) {
-      alert(t("selectDocTypeFirst") || "Please select a document type first");
+      alert(
+        t("pleaseSelectDocTypeFirst") || "Please select a document type first"
+      );
       return;
     }
 
@@ -305,6 +324,11 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       if (parentCategoryId === null) {
         const updatedCategories = [...parentCategories, newCategory];
         setParentCategories(updatedCategories);
+
+        // Call parent callback if provided
+        if (onCategoryUpdate) {
+          onCategoryUpdate(updatedCategories);
+        }
       } else {
         const updatedChildren = {
           ...childrenByParentId,
@@ -321,12 +345,16 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       setNewCategoryName({});
 
       console.log("Category created:", newCategory);
-      alert(`Category "${categoryName}" created successfully!`);
+      alert(
+        t("categoryCreatedSuccessAlert", { categoryName }) ||
+          `Category "${categoryName}" created successfully!`
+      );
     }, 1000);
   };
 
   const handleInputChange = (categoryId, value) => {
     setNewCategoryName((prev) => ({ ...prev, [categoryId]: value }));
+    setCategoryName(value);
   };
 
   // Get file icon based on file type
@@ -336,10 +364,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       return <Image className="w-5 h-5 text-green-600" />;
     } else if (fileType === "application/pdf") {
       return <FileText className="w-5 h-5 text-red-600" />;
-    } else if (
-      fileType.includes("document") ||
-      fileType.includes("word")
-    ) {
+    } else if (fileType.includes("document") || fileType.includes("word")) {
       return <FileText className="w-5 h-5 text-blue-600" />;
     } else if (fileType.includes("sheet") || fileType.includes("excel")) {
       return <FileText className="w-5 h-5 text-green-600" />;
@@ -360,7 +385,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
   // Handle file selection
   const handleFileSelect = (categoryId, categoryName) => {
     if (!documentTypeId) {
-      alert(t("selectDocTypeFirst") || "Please select a document type first");
+      alert(
+        t("pleaseSelectDocTypeFirst") || "Please select a document type first"
+      );
       return;
     }
 
@@ -373,6 +400,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
 
+      // Store files with metadata
       const filesWithMetadata = files.map((file) => ({
         file: file,
         name: file.name,
@@ -382,6 +410,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
         url: URL.createObjectURL(file),
       }));
 
+      // Store files for this category
       setPreviewFiles((prev) => ({
         ...prev,
         [categoryId]: {
@@ -389,6 +418,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
           categoryName,
         },
       }));
+
       console.log(
         `Files selected for category ${categoryId}:`,
         filesWithMetadata
@@ -408,8 +438,13 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
     setTimeout(() => {
       setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
 
+      // Show success message
       alert(
-        `Successfully uploaded ${previewData.files.length} file(s) to "${previewData.categoryName}"`
+        t("filesUploadedSuccess", {
+          count: previewData.files.length,
+          category: previewData.categoryName,
+        }) ||
+          `Successfully uploaded ${previewData.files.length} file(s) to "${previewData.categoryName}"`
       );
 
       console.log(
@@ -417,12 +452,14 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
         previewData.files
       );
 
+      // Clean up object URLs
       previewData.files.forEach((fileData) => {
         if (fileData.url) {
           URL.revokeObjectURL(fileData.url);
         }
       });
 
+      // Clear preview after upload
       setPreviewFiles((prev) => {
         const newPreviewFiles = { ...prev };
         delete newPreviewFiles[categoryId];
@@ -435,6 +472,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
   const handleCancelUpload = (categoryId) => {
     const previewData = previewFiles[categoryId];
 
+    // Clean up object URLs
     if (previewData && previewData.files) {
       previewData.files.forEach((fileData) => {
         if (fileData.url) {
@@ -459,6 +497,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
       const updatedFiles = [...previewData.files];
       const removedFile = updatedFiles[fileIndex];
 
+      // Clean up object URL
       if (removedFile.url) {
         URL.revokeObjectURL(removedFile.url);
       }
@@ -645,7 +684,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
 
                       {/* Action Buttons */}
                       <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex items-center gap-2">
-                        {/* <button
+                        <button
                           onClick={() => handleUploadConfirmed(categoryId)}
                           disabled={uploadLoading[categoryId]}
                           className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm font-medium"
@@ -657,18 +696,18 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                             </>
                           ) : (
                             <>
-                            <Upload className="w-4 h-4" />
-                              <span>{t("save") || "Save"}</span>
+                              <Upload className="w-4 h-4" />
+                              <span>{t("Save") || "Save"}</span>
                             </>
                           )}
-                        </button> */}
-                        {/* <button
+                        </button>
+                        <button
                           onClick={() => handleCancelUpload(categoryId)}
                           disabled={uploadLoading[categoryId]}
                           className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                         >
                           {t("cancel") || "Cancel"}
-                        </button> */}
+                        </button>
                       </div>
                     </div>
                   )
@@ -705,9 +744,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                           {previewFiles[currentCategoryId]?.categoryName}
                         </p>
                         <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                          <span>
-                            {formatFileSize(currentPreviewFile.size)}
-                          </span>
+                          <span>{formatFileSize(currentPreviewFile.size)}</span>
                           <span>•</span>
                           <span>{currentPreviewFile.type}</span>
                         </div>
@@ -747,12 +784,11 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                       <div className="flex flex-col items-center justify-center h-full text-center bg-white rounded-lg shadow p-6">
                         <FileText className="w-16 h-16 text-blue-600 mb-3" />
                         <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                          {t("previewNotAvailable") ||
-                            "Preview Not Available"}
+                          {t("previewNotAvailable") || "Preview Not Available"}
                         </h4>
                         <p className="text-sm text-gray-500 mb-4">
                           {t("previewNotAvailableDesc") ||
-                            "This file type cannot be previewed. Please download to view."}
+                            "Preview is not available for this file type"}
                         </p>
                         <div className="text-xs text-gray-600 space-y-1 text-left bg-gray-50 p-3 rounded">
                           <p>
@@ -778,9 +814,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                   <div className="bg-gray-50 border-t border-gray-200 p-3 flex-shrink-0">
                     <div className="text-xs text-gray-600">
                       <p>
-                        <span className="font-medium">
-                          {t("lastModified") || "Last Modified"}:
-                        </span>{" "}
+                        <span className="font-medium">Last modified:</span>{" "}
                         {new Date(
                           currentPreviewFile.lastModified
                         ).toLocaleDateString()}{" "}
@@ -801,7 +835,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                   </h3>
                   <p className="text-gray-500 mb-4">
                     {t("selectFileToPreview") ||
-                      "Select a file from the files tab to preview"}
+                      "Click the preview button on any file to view it here"}
                   </p>
                   <button
                     onClick={() => setRightPanelTab("files")}
@@ -833,9 +867,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               onKeyPress={(e) => {
                 if (e.key === "Enter") {
-                  handleAddCategory(
-                    categoryId === "root" ? null : categoryId
-                  );
+                  handleAddCategory(categoryId === "root" ? null : categoryId);
                 }
               }}
               autoFocus
@@ -917,9 +949,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
         <tr
           key={id}
           className={`transition-all duration-200 ${
-            level === 0
-              ? "bg-blue-50 border-l-4 border-blue-400"
-              : "bg-white"
+            level === 0 ? "bg-blue-50 border-l-4 border-blue-400" : "bg-white"
           } hover:bg-gray-50`}
         >
           <td className="py-4 px-6 whitespace-nowrap text-gray-700" colSpan={2}>
@@ -938,6 +968,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                 <div className="w-4 h-4 flex-shrink-0" />
               )}
 
+              {/* Folder Icon */}
               {isOpen ? (
                 <FolderOpen className="w-5 h-5 text-blue-600 flex-shrink-0" />
               ) : (
@@ -955,7 +986,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
               {isLoadingChildren && (
                 <div className="flex items-center gap-1 text-gray-500">
                   <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-400"></div>
-                  <span className="text-xs">{t("loading") || "Loading..."}</span>
+                  <span className="text-xs">
+                    {t("loading") || "Loading..."}
+                  </span>
                 </div>
               )}
             </div>
@@ -965,17 +998,22 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  alert(t("scanInitiated") || "Scan initiated!");
+                  console.log(
+                    `Scan initiated for category ${id} with scanner ${scannerId}`
+                  );
+                  alert(
+                    t("scanInitiated") || `Scan initiated for "${item.name}"`
+                  );
                 }}
                 disabled={!documentTypeId || isUploading || !scannerId}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title={
                   !scannerId
-                    ? t("selectScannerFirst") || "Please select a scanner first"
+                    ? t("selectScannerFirst") || "Select scanner first"
                     : !documentTypeId
-                    ? t("selectDocTypeFirst") ||
-                      "Please select a document type first"
-                    : `Scan to ${item.name}`
+                    ? t("selectDocTypeFirst") || "Select document type first"
+                    : t("scanToCategory", { category: item.name }) ||
+                      `Scan to ${item.name}`
                 }
               >
                 <svg
@@ -993,6 +1031,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                 </svg>
                 <span className="text-sm">{t("scan") || "Scan"}</span>
               </button>
+
               {/* Upload Button */}
               <button
                 onClick={(e) => {
@@ -1003,9 +1042,9 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title={
                   !documentTypeId
-                    ? t("selectDocTypeFirst") ||
-                      "Please select a document type first"
-                    : `Upload files to ${item.name}`
+                    ? t("selectDocTypeFirst") || "Select document type first"
+                    : t("uploadFilesToCategory", { category: item.name }) ||
+                      `Upload files to ${item.name}`
                 }
               >
                 <Upload className="w-4 h-4" />
@@ -1050,7 +1089,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
               >
                 <div style={{ paddingLeft: `${(level + 1) * 24}px` }}>
                   <span className="text-sm">
-                    {t("noChildCategories") || "No child categories"}
+                    {t("noChildCategories") || "No child categories found"}
                   </span>
                 </div>
               </td>
@@ -1075,7 +1114,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
           </h3>
           <p className="text-gray-500 mb-6">
             {t("selectDocTypeFromDropdown") ||
-              "Please select a document type from the dropdown above"}
+              "Please select a document type from the dropdown above to view categories"}
           </p>
         </div>
       );
@@ -1093,16 +1132,6 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
           {t("getStartedCreating") ||
             "Get started by creating your first category"}
         </p>
-        {/* Create First Category */}
-        {/* <button
-          onClick={() => toggleAddForm("root")}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center gap-2 mx-auto"
-        >
-          <Plus className="w-5 h-5" />
-          <span className="text-base">
-            {t("createFirstCategory") || "Create First Category"}
-          </span>
-        </button> */}
       </div>
     );
   };
@@ -1141,12 +1170,12 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                 </h2>
                 {documentTypeId && (
                   <p className="text-gray-600 text-sm mt-1">
-                    {t("manageCategories") ||
+                    {t("manageCategoriesFor") ||
                       "Manage categories for selected document type"}
                     {hasAnyFiles && (
                       <span className="ml-2 text-blue-600 font-medium">
                         • {totalFilesCount}{" "}
-                        {t("filesSelected") || "files selected"}
+                        {t("filesSelected") || "file(s) selected"}
                       </span>
                     )}
                   </p>
@@ -1154,32 +1183,6 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                {/* ✅ Document Type Selector - Shows selected value from form, disabled */}
-                {/* <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
-                    {t("documentType") || "Document Type"}:
-                  </label>
-                  <select
-                    value={currentDocTypeId || documentTypeId || ""}
-                    onChange={(e) => handleDocumentTypeChange(e.target.value)}
-                    disabled={true}
-                    className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-75"
-                  >
-                    <option value="">Select Document Type</option>
-                    {docTypes && docTypes.length > 0 ? (
-                      docTypes.map((docType) => (
-                        <option key={docType.id} value={docType.id}>
-                          {docType.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="" disabled>
-                        No document types available
-                      </option>
-                    )}
-                  </select>
-                </div> */}
-
                 {/* Scanners Selector */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
@@ -1212,14 +1215,13 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                   className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
                   title={
                     !documentTypeId
-                      ? t("selectDocTypeFirst") ||
-                        "Please select a document type first"
-                      : t("addRootCategory") || "Add Root Category"
+                      ? t("selectDocTypeFirst") || "Select document type first"
+                      : t("addRootCategory") || "Add root category"
                   }
                 >
                   <Plus className="w-5 h-5" />
                   <span className="text-sm">
-                    {t("addRootCategory") || "Add Root"}
+                    {t("addRootCategory") || "Add Root Category"}
                   </span>
                 </button>
               </div>
@@ -1258,6 +1260,7 @@ const CategoryTable = ({ currentDocTypeId, docTypesList }) => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {showAddForm["root"] && renderAddForm("root")}
 
+                    {/* Categories or empty state */}
                     {documentTypeId &&
                     parentCategories &&
                     parentCategories.length > 0 ? (

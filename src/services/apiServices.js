@@ -445,8 +445,10 @@ export async function getChildCategories(parentCategoryId) {
     const data = await api.get(
       `Category/GetChildCategories/${parentCategoryId}`
     );
-    console.log(data.response);
-    return data.response;
+    console.log(parentCategoryId);
+
+    console.log(data.data.response);
+    return data.data.response;
   } catch (error) {
     throw new Error(error);
   }

@@ -28,7 +28,7 @@ function Breadcrumbs() {
     // Home page only
     return null;
   } else if (currentPath.match(/^\/audit$/)) {
-    breadcrumbs.push({ name: t("auditTrail"), path: "/audit", isLast: true });
+    breadcrumbs.push({ name: t("auditTrail"), path: "/audit", isLast: true })
     } else if (currentPath.match(/^\/search$/)) {
     breadcrumbs.push({ name: t("search"), path: "/search", isLast: true });
     } else if (currentPath.match(/^\/category$/)) {

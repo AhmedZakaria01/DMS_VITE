@@ -393,5 +393,6 @@
   "selectFileToPreview": "انقر على زر المعاينة على أي ملف لعرضه هنا",
   "goToFiles": "الذهاب إلى الملفات",
   "lastModified": "آخر تعديل",
-  "filesUploadedSuccess": "تم رفع {count} ملف/ملفات بنجاح إلى \"{category}\""
+  "filesUploadedSuccess": "تم رفع {count} ملف/ملفات بنجاح إلى \"{category}\"",
+  "Permission Rules Configured ": "الصلاحيات التي تم تطبيقها "
 }

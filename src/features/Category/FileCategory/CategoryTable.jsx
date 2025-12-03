@@ -6,14 +6,6 @@
 //   Plus,
 //   Folder,
 //   FolderOpen,
-//   Upload,
-//   X,
-//   Eye,
-//   FileText,
-//   Image,
-//   File,
-//   ArrowLeft,
-//   Download,
 //   ChevronRight,
 //   ChevronDown,
 // } from "lucide-react";
@@ -23,11 +15,7 @@
 //   createCategory,
 // } from "../categoryThunks";
 
-// const CategoryTable = ({
-//   onCategoryUpdate,
-//   initialCategories,
-//   docTypesList,
-// }) => {
+// const CategoryTable = () => {
 //   const { t } = useTranslation();
 //   const dispatch = useDispatch();
 
@@ -38,7 +26,6 @@
 //     childCategories,
 //     loading,
 //     childLoading,
-//     error,
 //   } = useSelector((state) => state.categoryReducer);
 
 //   const { securityLevel, aclRules } = useSelector(
@@ -54,29 +41,12 @@
 //     }
 //   }, [securityLevel, aclRules]);
 
-//   // Static scanners (as requested to keep static)
-//   const staticScanners = [
-//     { id: 1, name: "HP ScanJet Pro 3000" },
-//     { id: 2, name: "Canon imageFORMULA DR-C225" },
-//     { id: 3, name: "Epson WorkForce ES-500W" },
-//     { id: 4, name: "Fujitsu ScanSnap iX1600" },
-//     { id: 5, name: "Brother ADS-2700W" },
-//   ];
-
 //   // Local component state
-//   const [scannerId, setScannerId] = useState(null);
 //   const [expanded, setExpanded] = useState({});
 //   const [showAddForm, setShowAddForm] = useState({});
 //   const [newCategoryName, setNewCategoryName] = useState({});
 //   const [createLoading, setCreateLoading] = useState(false);
 //   const [createError, setCreateError] = useState(null);
-
-//   // Upload and preview state
-//   const [uploadLoading, setUploadLoading] = useState({});
-//   const [previewFiles, setPreviewFiles] = useState({});
-//   const [rightPanelTab, setRightPanelTab] = useState("files");
-//   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
-//   const [currentCategoryId, setCurrentCategoryId] = useState(null);
 
 //   // Effect to fetch parent categories when document type changes
 //   useEffect(() => {
@@ -88,13 +58,6 @@
 //       dispatch(getParentCategories(documentTypeId));
 //     }
 //   }, [documentTypeId, dispatch]);
-
-//   // Handle scanner selection
-//   const handleScannerChange = (selectedScannerId) => {
-//     const scanId = selectedScannerId ? parseInt(selectedScannerId) : null;
-//     setScannerId(scanId);
-//     console.log("Scanner selected:", scanId);
-//   };
 
 //   // Collapse all children recursively
 //   const collapseChildrenRecursively = useCallback(
@@ -218,181 +181,6 @@
 //     setNewCategoryName((prev) => ({ ...prev, [categoryId]: value }));
 //   }, []);
 
-//   // File handling functions
-//   const getFileIcon = (file) => {
-//     const fileType = file.type;
-//     if (fileType.startsWith("image/")) {
-//       return <Image className="w-5 h-5 text-green-600" />;
-//     } else if (fileType === "application/pdf") {
-//       return <FileText className="w-5 h-5 text-red-600" />;
-//     } else if (fileType.includes("document") || fileType.includes("word")) {
-//       return <FileText className="w-5 h-5 text-blue-600" />;
-//     } else if (fileType.includes("sheet") || fileType.includes("excel")) {
-//       return <FileText className="w-5 h-5 text-green-600" />;
-//     } else {
-//       return <File className="w-5 h-5 text-gray-600" />;
-//     }
-//   };
-
-//   const formatFileSize = (bytes) => {
-//     if (bytes === 0) return "0 Bytes";
-//     const k = 1024;
-//     const sizes = ["Bytes", "KB", "MB", "GB"];
-//     const i = Math.floor(Math.log(bytes) / Math.log(k));
-//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-//   };
-
-//   const handleFileSelect = (categoryId, categoryName) => {
-//     if (!documentTypeId) {
-//       alert(
-//         t("pleaseSelectDocTypeFirst") || "Please select a document type first"
-//       );
-//       return;
-//     }
-
-//     const fileInput = document.createElement("input");
-//     fileInput.type = "file";
-//     fileInput.multiple = true;
-//     fileInput.accept = ".pdf,.xls,.xlsx,.jpg,.jpeg,.png";
-
-//     fileInput.onchange = (e) => {
-//       const files = Array.from(e.target.files);
-//       if (files.length === 0) return;
-
-//       const filesWithMetadata = files.map((file) => ({
-//         file: file,
-//         name: file.name,
-//         type: file.type,
-//         size: file.size,
-//         lastModified: file.lastModified,
-//         url: URL.createObjectURL(file),
-//       }));
-
-//       setPreviewFiles((prev) => ({
-//         ...prev,
-//         [categoryId]: {
-//           files: filesWithMetadata,
-//           categoryName,
-//         },
-//       }));
-
-//       console.log(
-//         `Files selected for category ${categoryId}:`,
-//         filesWithMetadata
-//       );
-//     };
-
-//     fileInput.click();
-//   };
-
-//   const handleUploadConfirmed = (categoryId) => {
-//     const previewData = previewFiles[categoryId];
-//     if (!previewData || previewData.files.length === 0) return;
-
-//     setUploadLoading((prev) => ({ ...prev, [categoryId]: true }));
-
-//     // Simulate upload process - replace with actual API call
-//     setTimeout(() => {
-//       setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
-
-//       alert(
-//         t("filesUploadedSuccess", {
-//           count: previewData.files.length,
-//           category: previewData.categoryName,
-//         }) ||
-//           `Successfully uploaded ${previewData.files.length} file(s) to "${previewData.categoryName}"`
-//       );
-
-//       // Clean up object URLs
-//       previewData.files.forEach((fileData) => {
-//         if (fileData.url) {
-//           URL.revokeObjectURL(fileData.url);
-//         }
-//       });
-
-//       // Clear preview
-//       setPreviewFiles((prev) => {
-//         const newPreviewFiles = { ...prev };
-//         delete newPreviewFiles[categoryId];
-//         return newPreviewFiles;
-//       });
-//     }, 1500);
-//   };
-
-//   const handleCancelUpload = (categoryId) => {
-//     const previewData = previewFiles[categoryId];
-
-//     if (previewData && previewData.files) {
-//       previewData.files.forEach((fileData) => {
-//         if (fileData.url) {
-//           URL.revokeObjectURL(fileData.url);
-//         }
-//       });
-//     }
-
-//     setPreviewFiles((prev) => {
-//       const newPreviewFiles = { ...prev };
-//       delete newPreviewFiles[categoryId];
-//       return newPreviewFiles;
-//     });
-//   };
-
-//   const handleRemoveFile = (categoryId, fileIndex) => {
-//     setPreviewFiles((prev) => {
-//       const previewData = prev[categoryId];
-//       if (!previewData) return prev;
-
-//       const updatedFiles = [...previewData.files];
-//       const removedFile = updatedFiles[fileIndex];
-
-//       if (removedFile.url) {
-//         URL.revokeObjectURL(removedFile.url);
-//       }
-
-//       updatedFiles.splice(fileIndex, 1);
-
-//       if (updatedFiles.length === 0) {
-//         const newPreviewFiles = { ...prev };
-//         delete newPreviewFiles[categoryId];
-//         return newPreviewFiles;
-//       }
-
-//       return {
-//         ...prev,
-//         [categoryId]: {
-//           ...previewData,
-//           files: updatedFiles,
-//         },
-//       };
-//     });
-//   };
-
-//   const handleShowFilePreview = (categoryId, fileData) => {
-//     setCurrentPreviewFile(fileData);
-//     setCurrentCategoryId(categoryId);
-//     setRightPanelTab("preview");
-//   };
-
-//   const handleBackToFiles = () => {
-//     setRightPanelTab("files");
-//   };
-
-//   const handleDownloadFile = (fileData) => {
-//     const link = document.createElement("a");
-//     link.href = fileData.url;
-//     link.download = fileData.name;
-//     document.body.appendChild(link);
-//     link.click();
-//     document.body.removeChild(link);
-//   };
-
-//   // Utility functions
-//   const hasAnyFiles = Object.keys(previewFiles).length > 0;
-//   const totalFilesCount = Object.values(previewFiles).reduce(
-//     (sum, data) => sum + data.files.length,
-//     0
-//   );
-
 //   // Render add form
 //   const renderAddForm = (categoryId) => {
 //     if (!showAddForm[categoryId]) return null;
@@ -464,8 +252,6 @@
 //       const hasChildren = item.hasChildren || children.length > 0;
 //       const isOpen = expanded[id];
 //       const isLoadingChildren = childLoading[id];
-//       const isUploading = uploadLoading[id];
-//       const hasFiles = previewFiles[id];
 
 //       const rows = [
 //         <tr
@@ -504,12 +290,6 @@
 
 //               <span className="font-medium text-sm">{item.name}</span>
 
-//               {hasFiles && (
-//                 <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-//                   {previewFiles[id].files.length} files
-//                 </span>
-//               )}
-
 //               {/* {isLoadingChildren && (
 //                 <div className="flex items-center gap-1 text-gray-500">
 //                   <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-400"></div>
@@ -534,63 +314,6 @@
 //               >
 //                 <Plus className="w-4 h-4" />
 //                 <span className="text-sm">{t("add") || "Add"}</span>
-//               </button>
-
-//               {/* Scan Button */}
-//               <button
-//                 onClick={(e) => {
-//                   e.stopPropagation();
-//                   console.log(
-//                     `Scan initiated for category ${id} with scanner ${scannerId}`
-//                   );
-//                   alert(
-//                     t("scanInitiated") || `Scan initiated for "${item.name}"`
-//                   );
-//                 }}
-//                 disabled={!documentTypeId || isUploading || !scannerId}
-//                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-//                 title={
-//                   !scannerId
-//                     ? t("selectScannerFirst") || "Select scanner first"
-//                     : !documentTypeId
-//                     ? t("selectDocTypeFirst") || "Select document type first"
-//                     : t("scanToCategory", { category: item.name }) ||
-//                       `Scan to ${item.name}`
-//                 }
-//               >
-//                 <svg
-//                   className="w-4 h-4"
-//                   fill="none"
-//                   stroke="currentColor"
-//                   viewBox="0 0 24 24"
-//                 >
-//                   <path
-//                     strokeLinecap="round"
-//                     strokeLinejoin="round"
-//                     strokeWidth={2}
-//                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-//                   />
-//                 </svg>
-//                 <span className="text-sm">{t("scan") || "Scan"}</span>
-//               </button>
-
-//               {/* Upload Button */}
-//               <button
-//                 onClick={(e) => {
-//                   e.stopPropagation();
-//                   handleFileSelect(id, item.name);
-//                 }}
-//                 disabled={!documentTypeId || isUploading}
-//                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-//                 title={
-//                   !documentTypeId
-//                     ? t("selectDocTypeFirst") || "Select document type first"
-//                     : t("uploadFilesToCategory", { category: item.name }) ||
-//                       `Upload files to ${item.name}`
-//                 }
-//               >
-//                 <Upload className="w-4 h-4" />
-//                 <span className="text-sm">{t("uploadFiles") || "Upload"}</span>
 //               </button>
 //             </div>
 //           </td>
@@ -645,298 +368,6 @@
 //   };
 
 //   // Render right panel with file management
-//   const renderRightPanel = () => {
-//     if (!hasAnyFiles) return null;
-
-//     return (
-//       <div className="w-1/2 bg-white border-l border-gray-200 flex flex-col">
-//         {/* Tabs Header */}
-//         <div className="border-b border-gray-200 bg-gray-50">
-//           <nav className="flex">
-//             <button
-//               onClick={() => setRightPanelTab("files")}
-//               className={`flex-1 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-//                 rightPanelTab === "files"
-//                   ? "border-blue-600 text-blue-600 bg-white"
-//                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-//               }`}
-//             >
-//               <div className="flex items-center justify-center gap-2">
-//                 <Upload className="w-4 h-4" />
-//                 <span>{t("files") || "Files"}</span>
-//                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-//                   {totalFilesCount}
-//                 </span>
-//               </div>
-//             </button>
-//             <button
-//               onClick={() => setRightPanelTab("preview")}
-//               className={`flex-1 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-//                 rightPanelTab === "preview"
-//                   ? "border-blue-600 text-blue-600 bg-white"
-//                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-//               }`}
-//             >
-//               <div className="flex items-center justify-center gap-2">
-//                 <Eye className="w-4 h-4" />
-//                 <span>{t("preview") || "Preview"}</span>
-//                 {currentPreviewFile && (
-//                   <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-//                     1
-//                   </span>
-//                 )}
-//               </div>
-//             </button>
-//           </nav>
-//         </div>
-
-//         {/* Tab Content */}
-//         <div className="flex-1 overflow-hidden">
-//           {rightPanelTab === "files" ? (
-//             <div className="h-full overflow-y-auto bg-gray-50">
-//               <div className="sticky top-0 bg-white border-b border-gray-200 p-4 z-10">
-//                 <h3 className="text-lg font-semibold text-gray-900">
-//                   {t("uploadedFiles") || "Uploaded Files"}
-//                 </h3>
-//                 <p className="text-sm text-gray-600 mt-1">
-//                   {totalFilesCount} {t("filesSelected") || "files selected"}
-//                 </p>
-//               </div>
-
-//               <div className="p-4 space-y-6">
-//                 {Object.entries(previewFiles).map(
-//                   ([categoryId, previewData]) => (
-//                     <div
-//                       key={categoryId}
-//                       className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
-//                     >
-//                       <div className="bg-blue-50 border-b border-blue-100 px-4 py-3">
-//                         <div className="flex items-center justify-between">
-//                           <div className="flex items-center gap-2">
-//                             <Folder className="w-5 h-5 text-blue-600" />
-//                             <h4 className="font-semibold text-gray-900">
-//                               {previewData.categoryName}
-//                             </h4>
-//                             <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-//                               {previewData.files.length}
-//                             </span>
-//                           </div>
-//                           <button
-//                             onClick={() => handleCancelUpload(categoryId)}
-//                             disabled={uploadLoading[categoryId]}
-//                             className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-//                             title={t("clearFiles") || "Clear files"}
-//                           >
-//                             <X className="w-4 h-4" />
-//                           </button>
-//                         </div>
-//                       </div>
-
-//                       <div className="p-3 space-y-2">
-//                         {previewData.files.map((fileData, index) => (
-//                           <div
-//                             key={index}
-//                             className="flex items-center justify-between p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-//                           >
-//                             <div className="flex items-center gap-2 flex-1 min-w-0">
-//                               {getFileIcon(fileData)}
-//                               <div className="flex-1 min-w-0">
-//                                 <p className="text-sm font-medium text-gray-800 truncate">
-//                                   {fileData.name}
-//                                 </p>
-//                                 <p className="text-xs text-gray-500">
-//                                   {formatFileSize(fileData.size)}
-//                                 </p>
-//                               </div>
-//                             </div>
-//                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-//                               <button
-//                                 onClick={() =>
-//                                   handleShowFilePreview(categoryId, fileData)
-//                                 }
-//                                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-//                                 title={t("previewFile") || "Preview file"}
-//                               >
-//                                 <Eye className="w-4 h-4" />
-//                               </button>
-//                               <button
-//                                 onClick={() =>
-//                                   handleRemoveFile(categoryId, index)
-//                                 }
-//                                 disabled={uploadLoading[categoryId]}
-//                                 className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-//                                 title={t("removeFile") || "Remove file"}
-//                               >
-//                                 <X className="w-4 h-4" />
-//                               </button>
-//                             </div>
-//                           </div>
-//                         ))}
-//                       </div>
-
-//                       <div className="bg-gray-50 border-t border-gray-200 px-4 py-3 flex items-center gap-2">
-//                         <button
-//                           onClick={() => handleUploadConfirmed(categoryId)}
-//                           disabled={uploadLoading[categoryId]}
-//                           className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-//                         >
-//                           {uploadLoading[categoryId] ? (
-//                             <>
-//                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-//                               <span>{t("uploading") || "Uploading..."}</span>
-//                             </>
-//                           ) : (
-//                             <>
-//                               <Upload className="w-4 h-4" />
-//                               <span>{t("Save") || "Save"}</span>
-//                             </>
-//                           )}
-//                         </button>
-//                         <button
-//                           onClick={() => handleCancelUpload(categoryId)}
-//                           disabled={uploadLoading[categoryId]}
-//                           className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-//                         >
-//                           {t("cancel") || "Cancel"}
-//                         </button>
-//                       </div>
-//                     </div>
-//                   )
-//                 )}
-//               </div>
-//             </div>
-//           ) : (
-//             <div className="h-full flex flex-col bg-white">
-//               {currentPreviewFile && currentCategoryId ? (
-//                 <>
-//                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200 p-4 flex-shrink-0">
-//                     <div className="flex items-center justify-between mb-3">
-//                       <button
-//                         onClick={handleBackToFiles}
-//                         className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
-//                       >
-//                         <ArrowLeft className="w-4 h-4" />
-//                         <span>{t("backToFiles") || "Back to Files"}</span>
-//                       </button>
-//                       <h3 className="text-lg font-bold text-gray-900">
-//                         {t("filePreview") || "File Preview"}
-//                       </h3>
-//                     </div>
-
-//                     <div className="flex items-start gap-3">
-//                       {getFileIcon(currentPreviewFile)}
-//                       <div className="flex-1 min-w-0">
-//                         <p className="text-sm font-semibold text-gray-900 truncate">
-//                           {currentPreviewFile.name}
-//                         </p>
-//                         <p className="text-xs text-gray-600 mt-1">
-//                           {previewFiles[currentCategoryId]?.categoryName}
-//                         </p>
-//                         <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-//                           <span>{formatFileSize(currentPreviewFile.size)}</span>
-//                           <span>•</span>
-//                           <span>{currentPreviewFile.type}</span>
-//                         </div>
-//                       </div>
-//                     </div>
-
-//                     <div className="mt-3 flex gap-2">
-//                       <button
-//                         onClick={() => handleDownloadFile(currentPreviewFile)}
-//                         className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-//                       >
-//                         <Download className="w-4 h-4" />
-//                         <span>{t("download") || "Download"}</span>
-//                       </button>
-//                     </div>
-//                   </div>
-
-//                   <div className="flex-1 overflow-auto bg-gray-50 p-4">
-//                     {currentPreviewFile.type.startsWith("image/") ? (
-//                       <div className="flex justify-center items-start h-full">
-//                         <img
-//                           src={currentPreviewFile.url}
-//                           alt={currentPreviewFile.name}
-//                           className="max-w-full h-auto rounded shadow-lg"
-//                         />
-//                       </div>
-//                     ) : currentPreviewFile.type === "application/pdf" ? (
-//                       <div className="h-full">
-//                         <embed
-//                           src={currentPreviewFile.url}
-//                           type="application/pdf"
-//                           className="w-full h-full min-h-[500px] rounded shadow-lg border border-gray-200"
-//                         />
-//                       </div>
-//                     ) : (
-//                       <div className="flex flex-col items-center justify-center h-full text-center bg-white rounded-lg shadow p-6">
-//                         <FileText className="w-16 h-16 text-blue-600 mb-3" />
-//                         <h4 className="text-lg font-semibold text-gray-700 mb-2">
-//                           {t("previewNotAvailable") || "Preview Not Available"}
-//                         </h4>
-//                         <p className="text-sm text-gray-500 mb-4">
-//                           {t("previewNotAvailableDesc") ||
-//                             "Preview is not available for this file type"}
-//                         </p>
-//                         <div className="text-xs text-gray-600 space-y-1 text-left bg-gray-50 p-3 rounded">
-//                           <p>
-//                             <span className="font-medium">Type:</span>{" "}
-//                             {currentPreviewFile.type}
-//                           </p>
-//                           <p>
-//                             <span className="font-medium">Size:</span>{" "}
-//                             {formatFileSize(currentPreviewFile.size)}
-//                           </p>
-//                           <p>
-//                             <span className="font-medium">Modified:</span>{" "}
-//                             {new Date(
-//                               currentPreviewFile.lastModified
-//                             ).toLocaleDateString()}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
-
-//                   <div className="bg-gray-50 border-t border-gray-200 p-3 flex-shrink-0">
-//                     <div className="text-xs text-gray-600">
-//                       <p>
-//                         <span className="font-medium">Last modified:</span>{" "}
-//                         {new Date(
-//                           currentPreviewFile.lastModified
-//                         ).toLocaleDateString()}{" "}
-//                         at{" "}
-//                         {new Date(
-//                           currentPreviewFile.lastModified
-//                         ).toLocaleTimeString()}
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </>
-//               ) : (
-//                 <div className="flex flex-col items-center justify-center h-full text-center p-8">
-//                   <Eye className="w-20 h-20 text-gray-300 mb-4" />
-//                   <h3 className="text-xl font-semibold text-gray-600 mb-2">
-//                     {t("noFileSelected") || "No File Selected"}
-//                   </h3>
-//                   <p className="text-gray-500 mb-4">
-//                     {t("selectFileToPreview") ||
-//                       "Click the preview button on any file to view it here"}
-//                   </p>
-//                   <button
-//                     onClick={() => setRightPanelTab("files")}
-//                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-//                   >
-//                     {t("goToFiles") || "Go to Files"}
-//                   </button>
-//                 </div>
-//               )}
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     );
-//   };
 
 //   // Render empty state
 //   const renderEmptyState = () => {
@@ -1004,46 +435,9 @@
 //               <h2 className="text-2xl font-bold text-gray-900">
 //                 {t("categories") || "Categories"}
 //               </h2>
-//               {documentTypeId && (
-//                 <p className="text-gray-600 text-sm mt-1">
-//                   {t("manageCategoriesFor") ||
-//                     "Manage categories for selected document type"}
-//                   {hasAnyFiles && (
-//                     <span className="ml-2 text-blue-600 font-medium">
-//                       • {totalFilesCount}{" "}
-//                       {t("filesSelected") || "file(s) selected"}
-//                     </span>
-//                   )}
-//                 </p>
-//               )}
 //             </div>
 
 //             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-//               {/* Scanner Selector */}
-//               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-//                 <label className="text-gray-700 text-sm font-medium whitespace-nowrap">
-//                   {t("scanner") || "Scanner"}:
-//                 </label>
-//                 <select
-//                   value={scannerId || ""}
-//                   onChange={(e) => handleScannerChange(e.target.value)}
-//                   className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
-//                 >
-//                   <option value="" className="text-sm">
-//                     {t("selectScanner") || "Select Scanner"}
-//                   </option>
-//                   {staticScanners.map((scanner) => (
-//                     <option
-//                       key={scanner.id}
-//                       value={scanner.id}
-//                       className="text-sm"
-//                     >
-//                       {scanner.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-
 //               {/* Add Root Category Button */}
 //               <button
 //                 onClick={() => toggleAddForm("root")}
@@ -1069,11 +463,7 @@
 //           <div className="flex">
 //             {/* Left Side - Categories Table */}
 //             <div
-//               className={`${
-//                 hasAnyFiles ? "w-1/2" : "w-full"
-//               } transition-all duration-300 overflow-x-auto ${
-//                 hasAnyFiles ? "border-r border-gray-200" : ""
-//               }`}
+//               className={`${"w-full"} transition-all duration-300 overflow-x-auto  `}
 //             >
 //               <table className="min-w-full divide-y divide-gray-200">
 //                 <thead className="bg-gray-50 sticky top-0 z-10">
@@ -1110,8 +500,6 @@
 //                 </tbody>
 //               </table>
 //             </div>
-//             {/* Right Side - Tabbed Panel */}
-//             {renderRightPanel()}
 //           </div>
 //         </div>
 //       </div>
@@ -1126,26 +514,21 @@
 
 // export default React.memo(CategoryTable);
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Plus,
   Folder,
   FolderOpen,
-  Upload,
-  X,
-  Eye,
-  FileText,
-  Image,
-  File,
-  ArrowLeft,
-  Download,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
+  Search,
+  ArrowUpDown,
+  MoreHorizontal,
 } from "lucide-react";
 import {
   fetchCategoryChilds,
@@ -1153,11 +536,7 @@ import {
   createCategory,
 } from "../categoryThunks";
 
-const CategoryTable = ({
-  onCategoryUpdate,
-  initialCategories,
-  docTypesList,
-}) => {
+const CategoryTable = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
@@ -1168,12 +547,25 @@ const CategoryTable = ({
     childCategories,
     loading,
     childLoading,
-    error,
   } = useSelector((state) => state.categoryReducer);
 
   const { securityLevel, aclRules } = useSelector(
     (state) => state.categoryReducer.categoryData
   );
+
+  // Local component state
+  const [expanded, setExpanded] = useState({});
+  const [showAddForm, setShowAddForm] = useState({});
+  const [newCategoryName, setNewCategoryName] = useState({});
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState(null);
+
+  // Pagination and sorting state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortBy, setSortBy] = useState("name");
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (securityLevel > 0) {
@@ -1184,15 +576,6 @@ const CategoryTable = ({
     }
   }, [securityLevel, aclRules]);
 
-  // Local component state
-  const [expanded, setExpanded] = useState({});
-  const [showAddForm, setShowAddForm] = useState({});
-  const [newCategoryName, setNewCategoryName] = useState({});
-  const [createLoading, setCreateLoading] = useState(false);
-  const [createError, setCreateError] = useState(null);
-
-  const [currentCategoryId, setCurrentCategoryId] = useState(null);
-
   // Effect to fetch parent categories when document type changes
   useEffect(() => {
     if (documentTypeId) {
@@ -1201,8 +584,66 @@ const CategoryTable = ({
         documentTypeId
       );
       dispatch(getParentCategories(documentTypeId));
+      // Reset pagination when document type changes
+      setCurrentPage(1);
+      setSearchTerm("");
     }
   }, [documentTypeId, dispatch]);
+
+  // Reset pagination when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Filter and sort categories
+  const processedCategories = useMemo(() => {
+    if (!parentCategories) return [];
+
+    let filtered = parentCategories;
+
+    // Apply search filter
+    if (searchTerm.trim()) {
+      filtered = parentCategories.filter((category) =>
+        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      // Handle different data types
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (aValue < bValue) {
+        return sortDirection === "asc" ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortDirection === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+
+    return sorted;
+  }, [parentCategories, searchTerm, sortBy, sortDirection]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(processedCategories.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCategories = processedCategories.slice(startIndex, endIndex);
+
+  // Pagination info
+  const paginationInfo = useMemo(() => {
+    const start = processedCategories.length === 0 ? 0 : startIndex + 1;
+    const end = Math.min(endIndex, processedCategories.length);
+    const total = processedCategories.length;
+    return { start, end, total };
+  }, [startIndex, endIndex, processedCategories.length]);
 
   // Collapse all children recursively
   const collapseChildrenRecursively = useCallback(
@@ -1244,6 +685,29 @@ const CategoryTable = ({
     },
     [expanded, collapseChildrenRecursively]
   );
+
+  // Handle sorting
+  const handleSort = useCallback((field) => {
+    setSortBy((prevField) => {
+      if (prevField === field) {
+        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      } else {
+        setSortDirection("asc");
+      }
+      return field;
+    });
+  }, []);
+
+  // Handle page change
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+  }, []);
+
+  // Handle items per page change
+  const handleItemsPerPageChange = useCallback((value) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  }, []);
 
   // Toggle add form visibility
   const toggleAddForm = useCallback(
@@ -1318,7 +782,7 @@ const CategoryTable = ({
         setCreateLoading(false);
       }
     },
-    [newCategoryName, documentTypeId, dispatch, t]
+    [newCategoryName, documentTypeId, securityLevel, aclRules, dispatch, t]
   );
 
   // Handle input change for category name
@@ -1326,13 +790,199 @@ const CategoryTable = ({
     setNewCategoryName((prev) => ({ ...prev, [categoryId]: value }));
   }, []);
 
+  // Render pagination component
+  const renderPagination = () => {
+    // Standard behavior: Hide pagination when all items fit on one page
+    if (totalPages <= 1) return null;
+
+    // Alternative: Always show pagination when there are items (uncomment line below and comment line above)
+    // if (processedCategories.length === 0) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Previous button
+    pages.push(
+      <button
+        key="prev"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-3 py-2 mx-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-colors"
+      >
+        {"<"}
+      </button>
+    );
+
+    // First page + ellipsis if needed
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className="px-3 py-2 mx-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          1
+        </button>
+      );
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-2 mx-1 text-sm font-medium rounded-lg transition-colors ${
+            i === currentPage
+              ? "text-white bg-blue-600 border border-blue-600"
+              : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // Last page + ellipsis if needed
+    if (endPage < totalPages) {
+      pages.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className="px-3 py-2 mx-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    // Next button
+    pages.push(
+      <button
+        key="next"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-2 mx-1 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-500 transition-colors"
+      >
+        {">"}
+      </button>
+    );
+
+    return (
+      <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200">
+        <div className="text-sm text-gray-700">
+          {t("showing") || "Showing"} {paginationInfo.start} {t("to") || "to"}{" "}
+          {paginationInfo.end} {t("of") || "of"} {paginationInfo.total}{" "}
+          {t("results") || "results"}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
+            <label className="text-sm text-gray-700">
+              {t("itemsPerPage") || "Items per page"}:
+            </label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+              className="px-8 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          <div className="flex">{pages}</div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render table header with sorting
+  const renderTableHeader = () => (
+    <thead className="bg-gray-50 sticky top-0 z-10">
+      <tr>
+        <th
+          scope="col"
+          className="px-6 py-4 text-left cursor-pointer hover:bg-gray-100 transition-colors group"
+          onClick={() => handleSort("name")}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              {t("categoryName") || "Category Name"}
+            </span>
+            <div className="flex flex-col">
+              {sortBy === "name" ? (
+                sortDirection === "asc" ? (
+                  <ChevronUp className="w-3 h-3 text-blue-600" />
+                ) : (
+                  <ChevronDown className="w-3 h-3 text-blue-600" />
+                )
+              ) : (
+                <ArrowUpDown className="w-3 h-3 text-gray-400 group-hover:text-gray-600" />
+              )}
+            </div>
+          </div>
+        </th>
+        <th
+          scope="col"
+          className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          {t("actions") || "Actions"}
+        </th>
+      </tr>
+    </thead>
+  );
+
+  // Render search controls
+  const renderSearchControls = () => (
+    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        {/* Search */}
+        <div className="relative flex-1 max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            placeholder={t("searchCategories") || "Search categories..."}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <span className="text-gray-400 hover:text-gray-600 text-lg">
+                ×
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   // Render add form
   const renderAddForm = (categoryId) => {
     if (!showAddForm[categoryId]) return null;
 
     return (
-      <tr key={`add-form-${categoryId}`} className="bg-gray-50">
-        <td colSpan={3} className="px-6 py-4">
+      <tr
+        key={`add-form-${categoryId}`}
+        className="bg-blue-50 border-l-4 border-blue-400"
+      >
+        <td colSpan={2} className="px-6 py-4">
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -1402,20 +1052,21 @@ const CategoryTable = ({
         <tr
           key={id}
           className={`transition-all duration-200 ${
-            level === 0 ? "bg-blue-50 border-l-4 border-blue-400" : "bg-white"
-          } hover:bg-gray-50`}
+            level === 0
+              ? "bg-white hover:bg-gray-50"
+              : "bg-gray-50 hover:bg-gray-100"
+          } border-b border-gray-200`}
         >
-          <td className="py-4 px-6 whitespace-nowrap text-gray-700" colSpan={2}>
+          <td className="py-4 px-6 whitespace-nowrap text-gray-900">
             <div
               className="flex items-center gap-3 cursor-pointer select-none"
               style={{ paddingLeft: `${level * 24}px` }}
               onClick={() => {
-                // Dispatch fetchCategoryChilds when clicking on table row
                 dispatch(fetchCategoryChilds(id));
                 toggleExpand(item, level);
               }}
             >
-              {/* Expand/Collapse Icon */}
+              {/* Expand/Collapse Icon - Show for all rows */}
               {hasChildren ? (
                 isOpen ? (
                   <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />
@@ -1423,7 +1074,7 @@ const CategoryTable = ({
                   <ChevronRight className="w-4 h-4 text-gray-600 flex-shrink-0" />
                 )
               ) : (
-                <div className="w-4 h-4 flex-shrink-0" />
+                <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0" />
               )}
 
               {/* Folder Icon */}
@@ -1434,20 +1085,11 @@ const CategoryTable = ({
               )}
 
               <span className="font-medium text-sm">{item.name}</span>
-
-              {/* {isLoadingChildren && (
-                <div className="flex items-center gap-1 text-gray-500">
-                  <div className="animate-spin rounded-full h-3 w-3 border-b border-gray-400"></div>
-                  <span className="text-xs">
-                    {t("loading") || "Loading..."}
-                  </span>
-                </div>
-              )} */}
             </div>
           </td>
+
           <td className="py-4 px-6 whitespace-nowrap text-right">
             <div className="flex items-center gap-2 justify-end">
-              {/* Add Subcategory Button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -1475,7 +1117,7 @@ const CategoryTable = ({
         if (isLoadingChildren) {
           rows.push(
             <tr key={`loading-${id}`} className="bg-gray-50">
-              <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+              <td colSpan={2} className="px-6 py-4 text-center text-gray-500">
                 <div
                   className="flex items-center justify-center gap-2"
                   style={{ paddingLeft: `${(level + 1) * 24}px` }}
@@ -1494,7 +1136,7 @@ const CategoryTable = ({
           rows.push(
             <tr key={`empty-${id}`} className="bg-gray-50">
               <td
-                colSpan={3}
+                colSpan={2}
                 className="px-6 py-4 text-center text-gray-500 italic"
               >
                 <div style={{ paddingLeft: `${(level + 1) * 24}px` }}>
@@ -1512,8 +1154,6 @@ const CategoryTable = ({
     });
   };
 
-  // Render right panel with file management
-
   // Render empty state
   const renderEmptyState = () => {
     if (!documentTypeId) {
@@ -1529,6 +1169,29 @@ const CategoryTable = ({
             {t("selectDocTypeFromDropdown") ||
               "Please select a document type from the dropdown above to view categories"}
           </p>
+        </div>
+      );
+    }
+
+    if (searchTerm.trim() && processedCategories.length === 0) {
+      return (
+        <div className="text-center py-16">
+          <div className="text-gray-400 mb-4">
+            <Search className="w-16 h-16 mx-auto" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-600 mb-2">
+            {t("noSearchResults") || "No Search Results"}
+          </h3>
+          <p className="text-gray-500 mb-6">
+            {t("tryDifferentSearch") ||
+              "Try adjusting your search terms or clearing filters"}
+          </p>
+          <button
+            onClick={() => setSearchTerm("")}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            {t("clearSearch") || "Clear Search"}
+          </button>
         </div>
       );
     }
@@ -1574,20 +1237,28 @@ const CategoryTable = ({
     <section className="">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="px-2 py-5 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-3">
+        <div className="px-6 py-5 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
                 {t("categories") || "Categories"}
               </h2>
+              {processedCategories.length > 0 && (
+                <p className="mt-1 text-sm text-gray-600">
+                  {t("totalCategories") || "Total"}:{" "}
+                  {processedCategories.length}{" "}
+                  {processedCategories.length === 1
+                    ? t("category") || "category"
+                    : t("categories") || "categories"}
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              {/* Add Root Category Button */}
               <button
                 onClick={() => toggleAddForm("root")}
                 disabled={!documentTypeId}
-                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
                 title={
                   !documentTypeId
                     ? t("selectDocTypeFirst") || "Select document type first"
@@ -1603,50 +1274,33 @@ const CategoryTable = ({
           </div>
         </div>
 
-        {/* Content */}
-        <div className="min-h-[600px]">
-          <div className="flex">
-            {/* Left Side - Categories Table */}
-            <div
-              className={`${"w-full"} transition-all duration-300 overflow-x-auto  `}
-            >
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 sticky top-0 z-10">
-                  <tr>
-                    <th
-                      scope="col"
-                      colSpan={2}
-                      className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {t("categoryName") || "Category Name"}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-1 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {t("actions") || "Actions"}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {showAddForm["root"] && renderAddForm("root")}
+        {/* Search Controls */}
+        {documentTypeId && renderSearchControls()}
 
-                  {documentTypeId &&
-                  parentCategories &&
-                  parentCategories.length > 0 ? (
-                    renderRows(parentCategories)
-                  ) : (
-                    <tr>
-                      <td colSpan={3} className="p-0">
-                        {renderEmptyState()}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+        {/* Content */}
+        <div className="min-h-[400px]">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              {renderTableHeader()}
+              <tbody className="bg-white divide-y divide-gray-200">
+                {showAddForm["root"] && renderAddForm("root")}
+
+                {documentTypeId && currentCategories.length > 0 ? (
+                  renderRows(currentCategories)
+                ) : (
+                  <tr>
+                    <td colSpan={2} className="p-0">
+                      {renderEmptyState()}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {renderPagination()}
       </div>
     </section>
   );

@@ -332,9 +332,11 @@ export function UserSearchForm() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Search Filters */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 sticky top-6 overflow-hidden">
-              <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
-                <div className="flex items-center gap-2">
+            <div className="bg-white rounded-2xl shadow-sm sticky top-6 overflow-hidden
+            
+            modern-table-container audit-trail-table">
+              <div className="px-6 py-3 bg-gray-50 border-b border-gray-200 ">
+                <div className="flex items-center gap-2 ">
                   <div className="p-1 bg-blue-100 rounded-lg">
                     <Filter className="w-5 h-5 text-blue-600" />
                   </div>
@@ -344,20 +346,13 @@ export function UserSearchForm() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="p-2 space-y-1">
+              <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-3 ">
                 {/* Repository Selection */}
                 <div className="space-y-2">
-                      {!selectedRepoId && (
-                    <div className="p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <p className="text-sm text-yellow-700">
-                        {t("selectRepositoryFirst") || "Please select a repository first to view folders"}
-                      </p>
-                    </div>
-                  )}
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+                    {/* <div className="p-2 bg-blue-100 rounded-lg">
                       <Database className="w-4 h-4 text-blue-600" />
-                    </div>
+                    </div> */}
                     <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
                       {t("repositorySelection") || "Repository"}
                     </h3>
@@ -378,9 +373,9 @@ export function UserSearchForm() {
                 {/* Folder Selection */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-green-100 rounded-lg">
+                    {/* <div className="p-2 bg-green-100 rounded-lg">
                       <Folder className="w-4 h-4 text-green-600" />
-                    </div>
+                    </div> */}
                     <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
                       {t("folderSelection") || "Folder"}
                     </h3>
@@ -400,9 +395,9 @@ export function UserSearchForm() {
                 {/* Document Type Selection */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-purple-100 rounded-lg">
+                    {/* <div className="p-2 bg-purple-100 rounded-lg">
                       <FileText className="w-4 h-4 text-purple-600" />
-                    </div>
+                    </div> */}
                     <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
                       {t("documentTypeSelection") || "Document Type"}
                     </h3>
@@ -419,7 +414,13 @@ export function UserSearchForm() {
                     icon={FileText}
                   />
                 </div>
-
+       {!selectedRepoId && (
+                    <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-700">
+                        {t("selectRepositoryFirst") || "Please select a repository first to view folders"}
+                      </p>
+                    </div>
+                  )}
                 {/* Search Value Input */}
                 {/* <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -471,15 +472,15 @@ export function UserSearchForm() {
           </div>
 
           {/* Right Column - Results Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 ">
             {responsData.length > 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm overflow-hidden modern-table-container audit-trail-table">
                 <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
+                      {/* <div className="p-2 bg-blue-100 rounded-lg">
                         <Database className="w-5 h-5 text-blue-600" />
-                      </div>
+                      </div> */}
                       <div>
                         <h2 className="text-xl font-semibold text-gray-900">
                           {t("searchResults") || "Search Results"}
@@ -517,12 +518,12 @@ export function UserSearchForm() {
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-sm overflow-hidden modern-table-container audit-trail-table">
                 <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
+                    {/* <div className="p-2 bg-blue-100 rounded-lg">
                       <Database className="w-5 h-5 text-blue-600" />
-                    </div>
+                    </div> */}
                     <h2 className="text-xl font-semibold text-gray-900">
                       {t("searchResults") || "Search Results"}
                     </h2>

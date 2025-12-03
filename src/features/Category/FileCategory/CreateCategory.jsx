@@ -372,10 +372,6 @@ function CreateCategory() {
             </div>
 
             <div className="p-6">
-              <p className="text-sm text-gray-600 mb-4">
-                {t("configureAccessControl") ||
-                  "Configure access control rules for new categories"}
-              </p>
               <button
                 type="button"
                 onClick={handlePermissions}
@@ -394,13 +390,8 @@ function CreateCategory() {
               {permissionsData.aclRules.length > 0 && (
                 <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm font-semibold text-green-900">
-                    {permissionsData.aclRules.length}{" "}
-                    {t("permissionRulesConfigured") ||
-                      "permission rule(s) configured"}
-                  </p>
-                  <p className="text-xs text-green-700 mt-1">
-                    {t("permissionsWillBeApplied") ||
-                      "These permissions will be applied to new categories"}
+                    {t("Permission Rules Configured ")}
+                    {permissionsData.aclRules.length}
                   </p>
                 </div>
               )}

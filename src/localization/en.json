@@ -101,7 +101,6 @@
   "rolesDescription": "Manage system roles and permissions",
   "editRoleDescription": "Update role information and permissions",
   "updateRole": "Update Role",
-
   "updatingRole": "Updating Role...",
   "roleUpdated": "Role updated successfully",
   "advancesSearch": "Search",
@@ -393,5 +392,5 @@
   "selectFileToPreview": "Click the preview button on any file to view it here",
   "goToFiles": "Go to Files",
   "lastModified": "Last modified",
-  "filesUploadedSuccess": "Successfully uploaded {count} file(s) to \"{category}\""
-}
+  "filesUploadedSuccess": "Successfully uploaded {count} file(s) to \"{category}\"" 
+ }

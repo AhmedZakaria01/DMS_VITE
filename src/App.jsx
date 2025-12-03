@@ -31,6 +31,7 @@ import FileCategoryForm from "./features/Category/FileCategory/FileCategoryForm"
 import CreateCategory from "./features/Category/FileCategory/CreateCategory";
 import CategoryTable from "./features/Document/component/CategoryTable";
 import CreateDocument from "./features/Document/component/CreateDocument";
+import UserSearchForm from "./features/Search/UserSearchForm";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -54,7 +55,6 @@ function App() {
           {/* Nested routes -  Outlet */}
           <Route index="true" element={<Repositories />} />
           <Route path="/audit" element={<Audit />} />
-          <Route path="/advancesSearch" element={<Search />} />
           {/* <Route path="/category" element={<CreateCategory />} /> */}
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
@@ -64,6 +64,9 @@ function App() {
           <Route path="/FileCategoryForm" element={<FileCategoryForm />} />
           {/* <Route path="/CategoryTable" element={<CategoryTable />} /> */}
           <Route path="/documentCategoryTable" element={<CreateDocument />} />
+                    <Route path="/search" element={<UserSearchForm />} />
+
+          
 
           <Route path="/CreateCategory" element={<CreateCategory />} />
 

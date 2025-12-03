@@ -39,8 +39,8 @@ export default function Sidebar({
       ? [{ name: t("auditTrail"), link: "/audit", icon: "📈" }]
       : []),
     {
-      name: t("advancedSearch"),
-      link: "/advancesSearch",
+      name: t("search"),
+      link: "/search",
       icon: "🔍",
     },
 
@@ -52,12 +52,13 @@ export default function Sidebar({
             icon: "📁",
           },
         ]
-      : []),
-    {
-      name: t("docTypeForm"),
-      link: "/docTypeForm",
-      icon: "📋",
-    },
+      : [])
+      //,
+    // {
+    //   name: t("docTypeForm"),
+    //   link: "/docTypeForm",
+    //   icon: "📋",
+    // },
     // { name: t("settings"), link: "/settings", icon: "⚙️" },
   ];
 

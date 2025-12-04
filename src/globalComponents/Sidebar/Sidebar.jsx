@@ -64,7 +64,7 @@ export default function Sidebar({
     //   link: "/docTypeForm",
     //   icon: "📋",
     // },
-   ...(canViewSettings ?[{ name: t("settings"), link: "/settings", icon: "⚙️" }]:[]) ,
+  //  ...(canViewSettings ?[{ name: t("settings"), link: "/settings", icon: "⚙️" }]:[]) ,
   ];
 
   const handleNavClick = () => {

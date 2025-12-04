@@ -535,10 +535,12 @@ import {
   getParentCategories,
   createCategory,
 } from "../categoryThunks";
+import usePermission from "../../auth/usePermission";
 
 const CategoryTable = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const canCreateCategory = usePermission("screens.categories.create");
 
   // Redux selectors
   const {
@@ -997,6 +999,7 @@ const CategoryTable = () => {
               }}
               autoFocus
             />
+           {canCreateCategory && ( 
             <button
               onClick={() =>
                 handleAddCategory(categoryId === "root" ? null : categoryId)
@@ -1008,7 +1011,7 @@ const CategoryTable = () => {
               <span className="text-sm">
                 {createLoading ? t("adding") || "Adding..." : t("add") || "Add"}
               </span>
-            </button>
+            </button>)}
             <button
               onClick={() => toggleAddForm(categoryId)}
               className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
@@ -1235,7 +1238,8 @@ const CategoryTable = () => {
 
   return (
     <section className="">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+     {canCreateCategory ? 
+     ( <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
         <div className="px-6 py-5 border-b border-gray-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1255,7 +1259,7 @@ const CategoryTable = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-              <button
+            { canCreateCategory && (<button
                 onClick={() => toggleAddForm("root")}
                 disabled={!documentTypeId}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
@@ -1269,7 +1273,7 @@ const CategoryTable = () => {
                 <span className="text-sm">
                   {t("addRootCategory") || "Add Root Category"}
                 </span>
-              </button>
+              </button>)}
             </div>
           </div>
         </div>
@@ -1301,7 +1305,9 @@ const CategoryTable = () => {
 
         {/* Pagination */}
         {renderPagination()}
-      </div>
+      </div>) : <div>can not create category 
+        {/* , your premission not access for you */}
+         </div>}
     </section>
   );
 };

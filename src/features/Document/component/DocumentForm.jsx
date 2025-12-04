@@ -52,7 +52,7 @@
 //       setSelectedDocumentTypeId(null);
 //       setCurrentMetadata([]);
 //       setJsonData({});
-      
+
 //       // ✅ Notify parent component
 //       if (onDocumentTypeChange) {
 //         onDocumentTypeChange(null, []);
@@ -555,7 +555,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
 import { fetchPrinciples } from "../../Permissions/permissionsThunks";
-import { fetchDocTypesByRepo, fetchtDocTypeByAttributes } from "../../DocumentType/DocTypeThunks";
+import {
+  fetchDocTypesByRepo,
+  fetchtDocTypeByAttributes,
+} from "../../DocumentType/DocTypeThunks";
+import { setDocumentData } from "../documentViewerSlice";
 
 function DocumentForm({ onDocumentTypeChange }) {
   const { t } = useTranslation();
@@ -600,7 +604,7 @@ function DocumentForm({ onDocumentTypeChange }) {
       setSelectedDocumentTypeId(null);
       setCurrentMetadata([]);
       setJsonData({});
-      
+
       if (onDocumentTypeChange) {
         onDocumentTypeChange(null, []);
       }
@@ -765,11 +769,13 @@ function DocumentForm({ onDocumentTypeChange }) {
         metadata: jsonData,
         aclRules: transformedAclRules,
       };
+      dispatch(setDocumentData(completeJsonData));
+      
 
       console.log("=== JSON Data (Ready for Backend) ===");
       console.log(JSON.stringify(completeJsonData, null, 2));
     }
-  }, [jsonData, selectedDocumentType, selectedDocumentTypeId, permissionsData]);
+  }, [jsonData, selectedDocumentType, selectedDocumentTypeId, permissionsData ,dispatch]);
 
   // Render input field based on metadata type
   const renderField = (field) => {
@@ -903,17 +909,7 @@ function DocumentForm({ onDocumentTypeChange }) {
             </div>
           )}
 
-          {/* Display selected document type info */}
-          {selectedDocumentType && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-              <p className="text-sm font-semibold text-green-900 mb-1">
-                {t("selected")}: {selectedDocumentType}
-              </p>
-              <p className="text-xs text-green-700">
-                {currentMetadata.length} {t("metadataFieldsAvailable")}
-              </p>
-            </div>
-          )}
+        
         </div>
       </div>
 

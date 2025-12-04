@@ -60,32 +60,43 @@
 
 // export default CreateDocument;
 import { useState } from "react";
-import CategoryTable from "./CategoryTable";
 import DocumentForm from "./DocumentForm";
+import DocumentCategoryTable from "./DocumentCategoryTable";
 
 function CreateDocument() {
   const [selectedDocTypeId, setSelectedDocTypeId] = useState(null);
   const [docTypesList, setDocTypesList] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]); // ✅ NEW: Track uploaded files
 
   const handleDocumentTypeChange = (docTypeId, docTypes) => {
     console.log("CreateDocument received:", docTypeId, docTypes);
     setSelectedDocTypeId(docTypeId);
     setDocTypesList(docTypes || []);
+    setUploadedFiles([]); // Clear files when document type changes
+  };
+
+  // ✅ NEW: Handle files change from DocumentCategoryTable
+  const handleFilesChange = (files) => {
+    setUploadedFiles(files);
   };
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 p-6 bg-gray-50 min-h-screen">
-      {/* DocumentForm - 40% width on large screens */}
-      <div className="flex-1 xl:flex-[0.4]">
-        <DocumentForm onDocumentTypeChange={handleDocumentTypeChange} />
+      {/* DocumentForm */}
+      <div className="flex-1 xl:flex-[0.2]">
+        <DocumentForm
+          onDocumentTypeChange={handleDocumentTypeChange}
+          uploadedFiles={uploadedFiles}
+        />
       </div>
 
       {/* CategoryTable - 60% width on large screens */}
-      <div className="flex-1 xl:flex-[0.6]">
+      <div className="flex-1 xl:flex-[0.8]">
         {selectedDocTypeId && docTypesList.length > 0 ? (
-          <CategoryTable
+          <DocumentCategoryTable
             currentDocTypeId={selectedDocTypeId}
             docTypesList={docTypesList}
+            onFilesChange={handleFilesChange}
           />
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">

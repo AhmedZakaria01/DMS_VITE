@@ -301,10 +301,10 @@ function CreateCategory() {
   };
 
   return (
-    <section className="p-1">
+    <section className="p-8">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="mb-1">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 ">
           {getPageTitle()}
         </h1>
         <p className="text-gray-600">{getDescription()}</p>

@@ -22,7 +22,8 @@ export default function Sidebar({
   const canViewFileCategory = usePermission("screens.categories.view");
   const canViewRole = usePermission("screens.roles.view");
   const canViewUser = usePermission("screens.users.view");
-
+  const canViewSearch = usePermission("screens.search.use");
+ const canViewSettings = usePermission("screens.settings.view")
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("Dashboard");
 
@@ -38,11 +39,15 @@ export default function Sidebar({
     ...(canViewAudit
       ? [{ name: t("auditTrail"), link: "/audit", icon: "📈" }]
       : []),
-    {
-      name: t("search"),
-      link: "/search",
-      icon: "🔍",
-    },
+    ...(canViewSearch
+      ? [
+          {
+            name: t("search"),
+            link: "/search",
+            icon: "🔍",
+          },
+        ]
+      : []),
 
     ...(canViewFileCategory
       ? [
@@ -52,14 +57,14 @@ export default function Sidebar({
             icon: "📁",
           },
         ]
-      : [])
-      //,
+      : []),
+    //,
     // {
     //   name: t("docTypeForm"),
     //   link: "/docTypeForm",
     //   icon: "📋",
     // },
-    // { name: t("settings"), link: "/settings", icon: "⚙️" },
+   ...(canViewSettings ?[{ name: t("settings"), link: "/settings", icon: "⚙️" }]:[]) ,
   ];
 
   const handleNavClick = () => {

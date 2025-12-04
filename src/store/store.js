@@ -10,6 +10,7 @@ import categoryReducer from "../features/Category/categorySlice";
 import permissionsReducer from "../features/Permissions/permissionsSlice";
 import docTypeReducer from "../features/DocumentType/docTypeSlice";
 import parentCategoriesReducer from "../features/Category/parentCategoriesSlice";
+import documentViewerReducer from "../features/Document/documentViewerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export const store = configureStore({
     permissionsReducer,
     docTypeReducer,
     parentCategoriesReducer,
+    documentViewerReducer,
   },
 });

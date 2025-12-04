@@ -29,7 +29,6 @@ import UpdateDocType from "./features/DocumentType/UpdateDocType";
 import FileCategoryForm from "./features/Category/FileCategory/FileCategoryForm";
 // import CategoryTable from "./features/Category/FileCategory/CategoryTable";
 import CreateCategory from "./features/Category/FileCategory/CreateCategory";
-import CategoryTable from "./features/Document/component/CategoryTable";
 import CreateDocument from "./features/Document/component/CreateDocument";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
@@ -62,7 +61,6 @@ function App() {
           <Route path="/updateDocType/:docTypeId" element={<UpdateDocType />} />
           <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />
           <Route path="/FileCategoryForm" element={<FileCategoryForm />} />
-          {/* <Route path="/CategoryTable" element={<CategoryTable />} /> */}
           <Route path="/documentCategoryTable" element={<CreateDocument />} />
 
           <Route path="/CreateCategory" element={<CreateCategory />} />

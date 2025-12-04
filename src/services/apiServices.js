@@ -425,6 +425,8 @@ export async function fetchParentCategories(documentTypeId) {
     const response = await api.get(
       `Category/GetParentCategoriesByDocumentType/${documentTypeId}`
     );
+    console.log(response);
+
     const data = response.data;
 
     if (data.statusCode === 200) {

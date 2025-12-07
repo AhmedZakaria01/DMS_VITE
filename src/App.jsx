@@ -31,6 +31,7 @@ import FileCategoryForm from "./features/Category/FileCategory/FileCategoryForm"
 import CreateCategory from "./features/Category/FileCategory/CreateCategory";
 import CreateDocument from "./features/Document/component/CreateDocument";
 import UserSearchForm from "./features/Search/UserSearchForm";
+import CreateDocumentOnly from "./features/Document/component/CreateDocumentOnly";
 // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
@@ -98,6 +99,11 @@ function App() {
             path="/repoContents/:repoId/folderContent/*"
             element={<FolderContents />}
           />
+          <Route
+            path="CreateDocumentOnly"
+            element={<CreateDocumentOnly />}
+          />
+          
           <Route path="/createRepo" element={<RepoForm />} />
           <Route
             path="/repos/:repoId/update-details"

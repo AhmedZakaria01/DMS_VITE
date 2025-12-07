@@ -535,7 +535,9 @@ import {
   getParentCategories,
   createCategory,
 } from "../categoryThunks";
+import { resetCategoryState } from "../categorySlice";
 import usePermission from "../../auth/usePermission";
+import Loading from "../../../globalComponents/Loading";
 
 const CategoryTable = () => {
   const { t } = useTranslation();
@@ -596,6 +598,13 @@ const CategoryTable = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
+
+  // Cleanup: Reset category state when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(resetCategoryState());
+    };
+  }, [dispatch]);
 
   // Filter and sort categories
   const processedCategories = useMemo(() => {
@@ -999,19 +1008,22 @@ const CategoryTable = () => {
               }}
               autoFocus
             />
-           {canCreateCategory && ( 
-            <button
-              onClick={() =>
-                handleAddCategory(categoryId === "root" ? null : categoryId)
-              }
-              disabled={createLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="text-sm">
-                {createLoading ? t("adding") || "Adding..." : t("add") || "Add"}
-              </span>
-            </button>)}
+            {canCreateCategory && (
+              <button
+                onClick={() =>
+                  handleAddCategory(categoryId === "root" ? null : categoryId)
+                }
+                disabled={createLoading}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="text-sm">
+                  {createLoading
+                    ? t("adding") || "Adding..."
+                    : t("add") || "Add"}
+                </span>
+              </button>
+            )}
             <button
               onClick={() => toggleAddForm(categoryId)}
               className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
@@ -1120,15 +1132,13 @@ const CategoryTable = () => {
         if (isLoadingChildren) {
           rows.push(
             <tr key={`loading-${id}`} className="bg-gray-50">
-              <td colSpan={2} className="px-6 py-4 text-center text-gray-500">
-                <div
-                  className="flex items-center justify-center gap-2"
-                  style={{ paddingLeft: `${(level + 1) * 24}px` }}
-                >
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm">
-                    {t("loadingChildren") || "Loading children..."}
-                  </span>
+              <td colSpan={2} className="px-6 py-4">
+                <div style={{ paddingLeft: `${(level + 1) * 24}px` }}>
+                  <Loading
+                    variant="inline"
+                    size="sm"
+                    message={t("loadingChildren") || "Loading children..."}
+                  />
                 </div>
               </td>
             </tr>
@@ -1215,99 +1225,99 @@ const CategoryTable = () => {
     );
   };
 
-  // Loading state
-  if (loading && documentTypeId) {
-    return (
-      <section className="">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {t("categories") || "Categories"}
-            </h2>
-          </div>
-          <div className="px-6 py-16 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">
-              {t("loadingCategories") || "Loading categories..."}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Loading state - now handled inline within the table instead of full page replacement
 
   return (
     <section className="">
-     {canCreateCategory ? 
-     ( <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t("categories") || "Categories"}
-              </h2>
-              {processedCategories.length > 0 && (
-                <p className="mt-1 text-sm text-gray-600">
-                  {t("totalCategories") || "Total"}:{" "}
-                  {processedCategories.length}{" "}
-                  {processedCategories.length === 1
-                    ? t("category") || "category"
-                    : t("categories") || "categories"}
-                </p>
-              )}
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            { canCreateCategory && (<button
-                onClick={() => toggleAddForm("root")}
-                disabled={!documentTypeId}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
-                title={
-                  !documentTypeId
-                    ? t("selectDocTypeFirst") || "Select document type first"
-                    : t("addRootCategory") || "Add root category"
-                }
-              >
-                <Plus className="w-5 h-5" />
-                <span className="text-sm">
-                  {t("addRootCategory") || "Add Root Category"}
-                </span>
-              </button>)}
-            </div>
-          </div>
-        </div>
-
-        {/* Search Controls */}
-        {documentTypeId && renderSearchControls()}
-
-        {/* Content */}
-        <div className="min-h-[400px]">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              {renderTableHeader()}
-              <tbody className="bg-white divide-y divide-gray-200">
-                {showAddForm["root"] && renderAddForm("root")}
-
-                {documentTypeId && currentCategories.length > 0 ? (
-                  renderRows(currentCategories)
-                ) : (
-                  <tr>
-                    <td colSpan={2} className="p-0">
-                      {renderEmptyState()}
-                    </td>
-                  </tr>
+      {canCreateCategory ? (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {t("categories") || "Categories"}
+                </h2>
+                {processedCategories.length > 0 && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    {t("totalCategories") || "Total"}:{" "}
+                    {processedCategories.length}{" "}
+                    {processedCategories.length === 1
+                      ? t("category") || "category"
+                      : t("categories") || "categories"}
+                  </p>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </div>
 
-        {/* Pagination */}
-        {renderPagination()}
-      </div>) : <div>can not create category 
-        {/* , your premission not access for you */}
-         </div>}
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                {canCreateCategory && (
+                  <button
+                    onClick={() => toggleAddForm("root")}
+                    disabled={!documentTypeId}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                    title={
+                      !documentTypeId
+                        ? t("selectDocTypeFirst") ||
+                          "Select document type first"
+                        : t("addRootCategory") || "Add root category"
+                    }
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span className="text-sm">
+                      {t("addRootCategory") || "Add Root Category"}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Search Controls */}
+          {documentTypeId && renderSearchControls()}
+
+          {/* Loading Indicator - Inline at top of table */}
+
+          {/* Content */}
+          <div className="min-h-[400px]">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                {renderTableHeader()}
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {showAddForm["root"] && renderAddForm("root")}
+
+                  {documentTypeId && currentCategories.length > 0 ? (
+                    renderRows(currentCategories)
+                  ) : loading && documentTypeId ? (
+                    <tr>
+                      <td colSpan={2} className="p-0">
+                        <Loading
+                          variant="card"
+                          size="lg"
+                          message={t("Loading categories...")}
+                        />
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td colSpan={2} className="p-0">
+                        {renderEmptyState()}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          {renderPagination()}
+        </div>
+      ) : (
+        <div>
+          can not create category
+          {/* , your premission not access for you */}
+        </div>
+      )}
     </section>
   );
 };

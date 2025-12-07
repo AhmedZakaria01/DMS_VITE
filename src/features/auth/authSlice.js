@@ -25,7 +25,6 @@ const authSlice = createSlice({
       state.user = { name: null, id: null, roles: [] };
       // 🔥 NEW: Reset isAdmin state too
       state.isAdmin = false;
-      
 
       // 🔥 NEW: Clear from localStorage with logging
       console.log("Before logout - localStorage items:");

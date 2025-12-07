@@ -117,6 +117,23 @@ const categorySlice = createSlice({
       state.categories = [];
       state.childCategories = {};
     },
+
+    // Reset entire category state (for component unmount)
+    resetCategoryState: (state) => {
+      state.categoryData = {
+        name: "",
+        documentTypeId: null,
+        parentCategoryId: null,
+        securityLevel: 0,
+        aclRules: [],
+      };
+      state.parentCategories = [];
+      state.childCategories = {};
+      state.loading = false;
+      state.childLoading = {};
+      state.status = "idle";
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -196,6 +213,7 @@ export const {
   setCategoryStatus,
   setCategoryError,
   clearCategories,
+  resetCategoryState,
 } = categorySlice.actions;
 
 export default categorySlice.reducer;

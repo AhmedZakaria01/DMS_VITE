@@ -202,7 +202,6 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
           </div>
 
           {/* Selected repo display */}
-            
 
           {/* Document Type Dropdown */}
           <div className="relative" ref={docTypeDropdownRef}>
@@ -268,7 +267,6 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
             )}
           </div>
 
-   
           {/* Security Level Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -296,13 +294,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
                 {errors.securityLevel.message}
               </p>
             )}
-            <p className="mt-1 text-sm text-gray-500">
-              {t("securityLevelHint") ||
-                "Higher numbers indicate higher security levels"}
-            </p>
           </div>
-
-   
         </form>
       </div>
     </section>

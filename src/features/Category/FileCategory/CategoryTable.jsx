@@ -591,6 +591,9 @@ const CategoryTable = () => {
       // Reset pagination when document type changes
       setCurrentPage(1);
       setSearchTerm("");
+      // Reset expanded state when document type changes
+      setExpanded({});
+      setShowAddForm({});
     }
   }, [documentTypeId, dispatch]);
 
@@ -1285,9 +1288,7 @@ const CategoryTable = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {showAddForm["root"] && renderAddForm("root")}
 
-                  {documentTypeId && currentCategories.length > 0 ? (
-                    renderRows(currentCategories)
-                  ) : loading && documentTypeId ? (
+                  {loading && documentTypeId ? (
                     <tr>
                       <td colSpan={2} className="p-0">
                         <Loading
@@ -1297,6 +1298,8 @@ const CategoryTable = () => {
                         />
                       </td>
                     </tr>
+                  ) : documentTypeId && currentCategories.length > 0 ? (
+                    renderRows(currentCategories)
                   ) : (
                     <tr>
                       <td colSpan={2} className="p-0">

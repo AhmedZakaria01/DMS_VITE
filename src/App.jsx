@@ -117,7 +117,6 @@ function App() {
         {/* Page Not Found */}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-      <div>abc</div>
     </BrowserRouter>
   );
 }

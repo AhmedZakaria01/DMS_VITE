@@ -32,7 +32,8 @@ import CreateCategory from "./features/Category/FileCategory/CreateCategory";
 import CreateDocument from "./features/Document/component/CreateDocument";
 import UserSearchForm from "./features/Search/UserSearchForm";
 import CreateDocumentOnly from "./features/Document/component/CreateDocumentOnly";
-// import ScreenPermissions from "./features/Permissions/screenPermissions";
+import Annotations from "./Annotations/Annotations";
+ // import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
           {/* <Route path="/category" element={<CreateCategory />} /> */}
           <Route path="/category" element={<Category />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/Annotations" element={<Annotations />} />
           <Route path="/documentTypes/:repoId" element={<DocumentTypes />} />
           <Route path="/updateDocType/:docTypeId" element={<UpdateDocType />} />
           <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />

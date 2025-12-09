@@ -453,7 +453,7 @@ function RoleForm({ mode = "create", initialData = null, onSuccess, onCancel }) 
                     title="Toggle all permissions"
                   >
                     {getSelectAllIcon()}
-                    {selectAllState === 'all' ? 'Deselect All' : 'Select All'}
+                    {selectAllState === 'all' ? t('deselect') : t('selectAll')}
                   </button>
                   <button
                     type="button"
@@ -475,7 +475,7 @@ function RoleForm({ mode = "create", initialData = null, onSuccess, onCancel }) 
                   <span className="text-gray-700 truncate">
                     {selectedPermissions.length > 0 
                       ? `${selectedPermissions.length} permission(s) selected`
-                      : "Click to select permissions"
+                      : t("clickToSelect")
                     }
                   </span>
                   <div className="flex items-center gap-2">
@@ -507,7 +507,7 @@ function RoleForm({ mode = "create", initialData = null, onSuccess, onCancel }) 
                           type="text"
                           value={permissionSearchTerm}
                           onChange={handleSearchChange}
-                          placeholder="Search permissions..."
+                          placeholder={t("searchPermissions")}
                           className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                         />
                         {permissionSearchTerm && (
@@ -533,7 +533,8 @@ function RoleForm({ mode = "create", initialData = null, onSuccess, onCancel }) 
                               onClick={handleSelectAllInView}
                               className="text-blue-600 hover:text-blue-700 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                             >
-                              Select all in view
+                              
+                              {t("selectAllInView")}
                             </button>
                             <button
                               type="button"

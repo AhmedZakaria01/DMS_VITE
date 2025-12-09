@@ -4044,6 +4044,7 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronLeft,
+  Shield,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -4055,6 +4056,9 @@ import {
   removeFilesFromCategory,
   clearAllFiles,
 } from "../documentViewerSlice";
+import Popup from "../../../globalComponents/Popup";
+import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
+import { setAclRules } from "../../Category/categorySlice";
 
 const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
   const { t } = useTranslation();
@@ -4082,6 +4086,20 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     { id: 4, name: "Fujitsu ScanSnap iX1600" },
     { id: 5, name: "Brother ADS-2700W" },
   ];
+  // Handle permissions button click
+  const handlePermissions = () => {
+    setOpenPermissions(true);
+  };
+  // Handle permissions data from UsersRolesPermissionsTable
+  const handlePermissionsDataChange = (data) => {
+    setPermissionsData(data);
+    console.log("====================================");
+    console.log(data);
+    console.log("====================================");
+    setOpenPermissions(false);
+    dispatch(setAclRules(data.aclRules));
+    console.log(data.aclRules);
+  };
 
   // Local state
   const [documentTypeId, setDocumentTypeId] = useState(
@@ -4098,6 +4116,11 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
   const [uploadLoading, setUploadLoading] = useState({});
   const [previewFiles, setPreviewFiles] = useState({});
   const [uploadedFiles, setUploadedFiles] = useState([]); // ✅ NEW: Store uploaded files for backend
+  // Permissions state
+  const [openPermissions, setOpenPermissions] = useState(false);
+  const [permissionsData, setPermissionsData] = useState({
+    aclRules: [],
+  });
 
   // Right panel state
   const [rightPanelTab, setRightPanelTab] = useState("files");
@@ -4763,6 +4786,38 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
                                     >
                                       <X className="w-4 h-4" />
                                     </button>
+
+                                    {/* /////////////////marwa///////////////// */}
+                                    {/* Permissions Popup */}
+                                    {openPermissions && (
+                                      <Popup
+                                        isOpen={openPermissions}
+                                        setIsOpen={setOpenPermissions}
+                                        component={
+                                          <UsersRolesPermissionsTable
+                                            entityType="category"
+                                            onDone={handlePermissionsDataChange}
+                                            savedData={permissionsData}
+                                          />
+                                        }
+                                      />
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={handlePermissions}
+                                      className="w-full inline-flex items-center justify-center gap-1 px-1 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-small"
+                                    >
+                                      <Shield className="w-4 h-4" />
+                                      {/* {t("configurePermissions") ||
+                                        "Configure Permissions"} */}
+                                      {permissionsData.aclRules.length > 0 && (
+                                        <span className="bg-orange-800 text-white px-2 py-1 rounded-full text-xs">
+                                          {permissionsData.aclRules.length}
+                                        </span>
+                                      )}
+                                    </button>
+
+                                    {/* /////////////////marwa///////////////// */}
                                   </div>
                                 </div>
                               ))}

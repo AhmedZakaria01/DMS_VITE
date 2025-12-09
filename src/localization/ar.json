@@ -112,7 +112,6 @@
   "auditTitle": "سجل التدقيق",
 
   "searchFilters": "فلاتر البحث",
-  
   "repositorySelection": "المخزن",
   "selectRepository": "اختر مخزن",
 
@@ -133,7 +132,7 @@
   "foundDocuments": "تم العثور على {{count}} مستندًا",
 
   "documentName": "اسم المستند",
-    "advancedSearchDescription":"إدارة البحث المتقدم  ",
+
   "auditDescription": "تتبع ومراقبة أنشطة النظام والتغييرات",
   "information": "معلومات",
   "reposDescription": "إدارة واستكشاف المخازن",
@@ -328,12 +327,16 @@
   "enterCategoryName": "أدخل اسم الفئة",
   "repository": "المخزن",
   "searchOrSelectRepo": "ابحث أو اختر مخزن",
-    "noSearchResults":"لا توجد نتائج بحث",
-      "searchTips":"نصائح البحث",
-    "noSearchResultsDescription":"لا يوجد وصف لنتائج البحث",
-   "selectRepositoryTip": "حدد المخزن اولاً",
-    "tryDifferentFilters":  "جرب مرشحات مختلفة",
-    "useSpecificTerms":"استخدم شروطًا محددة",
+  "noSearchResults":"لا توجد نتائج بحث",
+  "searchTips":"نصائح البحث",
+  "noSearchResultsDescription":"لا يوجد وصف لنتائج البحث",
+  "selectRepositoryTip": "حدد المخزن اولاً",
+  "tryDifferentFilters": "جرب مرشحات مختلفة",
+  "useSpecificTerms":"استخدم شروطًا محددة",
+  "advancedSearchDescription": "إدارة البحث المتقدم  ",
+  "noDataAvailable": "لا توجد بيانات متاحة.",
+  "Tryagain": "حاول تعديل الفلاتر أو البحث مرة أخرى.",
+  "noDocumentTypesFound": "لم يتم العثور على أنواع المستندات",
   "noMatchesFound": "لم يتم العثور على نتائج مطابقة",
   "selectedRepository": "المخزن المحدد",
   "docTypeName": "نوع المستند",

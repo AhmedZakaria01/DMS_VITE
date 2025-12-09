@@ -391,8 +391,8 @@ const ReUsableTable = ({
               <tr>
                 <td colSpan={columns.length} className="empty-state">
                   <div className="empty-icon">📭</div>
-                  <p>No data available</p>
-                  <small>Try adjusting filters or searching again.</small>
+                  <p>{t("noDataAvailable")}</p>
+                  <small> {t("Tryagain")}  </small>
                 </td>
               </tr>
             ) : (

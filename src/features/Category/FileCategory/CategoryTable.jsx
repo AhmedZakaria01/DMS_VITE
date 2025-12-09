@@ -378,7 +378,7 @@
 //             <Folder className="w-16 h-16 mx-auto" />
 //           </div>
 //           <h3 className="text-lg font-medium text-gray-600 mb-2">
-//             {t("No Document Type Selected")}
+//             {t("noDocumentTypeSelected")}
 //           </h3>
 //           <p className="text-gray-500 mb-6">
 //             {t("selectDocTypeFromDropdown") ||
@@ -1179,7 +1179,7 @@ const CategoryTable = () => {
             <Folder className="w-16 h-16 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-600 mb-2">
-            {t("No Document Type Selected")}
+            {t("noDocumentTypeSelected")}
           </h3>
           <p className="text-gray-500 mb-6">
             {t("selectDocTypeFromDropdown") ||
@@ -1317,7 +1317,7 @@ const CategoryTable = () => {
         </div>
       ) : (
         <div>
-          can not create category
+          {t("canNotCreateCategory")}
           {/* , your premission not access for you */}
         </div>
       )}

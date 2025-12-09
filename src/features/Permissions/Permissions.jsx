@@ -475,7 +475,7 @@ function Permissions({
             <div className="sticky top-0 bg-white p-3 border-b border-gray-200">
               <input
                 type="text"
-                placeholder="Search permissions..."
+                placeholder={t("searchPermissions")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -504,7 +504,7 @@ function Permissions({
                     onClick={(e) => e.stopPropagation()}
                   />
                   <span className="ml-3 text-sm font-medium text-gray-700">
-                    Select All ({filteredPermissions.length})
+                    {t("selectAll")} ({filteredPermissions.length})
                   </span>
                 </label>
               </div>
@@ -568,7 +568,7 @@ function Permissions({
       {/* Error State */}
       {error && (
         <div className="text-sm text-red-600 mt-1">
-          Error loading permissions
+          {t("errorLoadingPermissions")}  
         </div>
       )}
     </div>

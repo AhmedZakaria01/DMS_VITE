@@ -62,11 +62,16 @@
 import { useState } from "react";
 import DocumentForm from "./DocumentForm";
 import DocumentCategoryTable from "./DocumentCategoryTable";
+import { useTranslation } from "react-i18next";
+
 
 function CreateDocument() {
+    const { t } = useTranslation();
+  
   const [selectedDocTypeId, setSelectedDocTypeId] = useState(null);
   const [docTypesList, setDocTypesList] = useState([]);
-  const [uploadedFiles, setUploadedFiles] = useState([]); // ✅ NEW: Track uploaded files
+  // NEW: Track uploaded files
+  const [uploadedFiles, setUploadedFiles] = useState([]); 
 
   const handleDocumentTypeChange = (docTypeId, docTypes) => {
     console.log("CreateDocument received:", docTypeId, docTypes);
@@ -75,7 +80,7 @@ function CreateDocument() {
     setUploadedFiles([]); // Clear files when document type changes
   };
 
-  // ✅ NEW: Handle files change from DocumentCategoryTable
+  // NEW: Handle files change from DocumentCategoryTable
   const handleFilesChange = (files) => {
     setUploadedFiles(files);
   };
@@ -116,10 +121,10 @@ function CreateDocument() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Document Type Selected
+              {t("noDocumentTypeSelected")}
             </h3>
             <p className="text-sm text-gray-600">
-              Please select a document type from the form to view categories
+              {t("PleaseSelectDocumenttype")}
             </p>
           </div>
         )}

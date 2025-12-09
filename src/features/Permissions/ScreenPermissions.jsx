@@ -1271,7 +1271,7 @@ function ScreenPermissions({ onClose }) {
                     title="Toggle all permissions"
                   >
                     {getSelectAllIcon()}
-                    {selectAllState === 'all' ? 'Deselect All' : 'Select All'}
+                    {selectAllState === 'all' ? t('deselect') : t('selectAll')}
                   </button>
                   <button
                     type="button"
@@ -1351,14 +1351,14 @@ function ScreenPermissions({ onClose }) {
                               onClick={handleSelectAllInView}
                               className="text-blue-600 hover:text-blue-700 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                             >
-                              Select all in view
+                              {t("selectAllInView")}
                             </button>
                             <button
                               type="button"
                               onClick={handleClearAllInView}
                               className="text-gray-600 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-50 transition-colors"
                             >
-                              Clear all in view
+                              {t("clearAllInView")}
                             </button>
                           </div>
                         </div>
@@ -1412,7 +1412,7 @@ function ScreenPermissions({ onClose }) {
                           <p className="text-gray-500 text-sm">
                             {permissionSearchTerm ? (
                               <>
-                                No permissions found for {permissionSearchTerm}
+                                {t("noPermissionsFoundFor")} {permissionSearchTerm}
                                 <br />
                                 <button
                                   type="button"
@@ -1442,7 +1442,7 @@ function ScreenPermissions({ onClose }) {
                             onClick={clearSearch}
                             className="text-blue-600 hover:text-blue-700"
                           >
-                            Show all
+                            {t("showAll")} 
                           </button>
                         )}
                       </div>

@@ -41,15 +41,37 @@ const config = {
           "0%": { opacity: 0 },
           "100%": { opacity: 1 },
         },
+        "fade-in-up": {
+          "0%": { opacity: 0, transform: "translateY(20px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
         moveRight: {
           "0%": { transform: "translateX(0)" },
           "50%": { transform: "translateX(5px)" },
           "100%": { transform: "translateX(0)" },
         },
+        blob: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        shake: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-5px)" },
+          "75%": { transform: "translateX(5px)" },
+        },
       },
       animation: {
         fadeIn: "fadeIn 1s ease-out forwards",
+        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
         moveRight: "moveRight 1s ease-in-out infinite",
+        blob: "blob 7s infinite",
+        float: "float 3s ease-in-out infinite",
+        shake: "shake 0.3s ease-in-out",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

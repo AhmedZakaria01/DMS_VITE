@@ -2,5 +2,34 @@
     background-image: url('../../../assets/loginBackground.png');
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: cover;
+}
+
+/* Animation delay utilities */
+.animation-delay-200 {
+    animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+    animation-delay: 0.3s;
+}
+
+.animation-delay-400 {
+    animation-delay: 0.4s;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+}
+
+.animation-delay-1000 {
+    animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
 }

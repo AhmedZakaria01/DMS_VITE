@@ -20,12 +20,13 @@ import {
 } from "lucide-react";
 
 function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, status, error } = useSelector((state) => state.authReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const isRTL = i18n.language === 'ar';
 
   // Login Schema Config
   const loginSchema = z.object({
@@ -77,9 +78,11 @@ function Login() {
   };
 
   return (
-    <section className="min-h-screen flex">
-      {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100">
+    <section 
+      className="min-h-screen flex" 
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 ${isRTL ? 'lg:order-2' : ''}`}>
         <div className="w-full max-w-md">
           {/* Glassmorphism Card */}
           <div className="backdrop-blur-md bg-white/70 rounded-2xl shadow-xl border border-white/50 p-8">
@@ -88,7 +91,15 @@ function Login() {
               <img src={logo} alt="logo" className="w-80 h-auto" />
             </div>
 
-      
+            {/* Welcome Text */}
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-800 mb-2" dir="auto">
+                {t("loginTitle")}
+              </h1>
+              <p className="text-gray-600" dir="auto">
+                {t("loginSubtitle")}
+              </p>
+            </div>
 
             {/* Login Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -97,16 +108,17 @@ function Login() {
                 <label
                   htmlFor="email"
                   className="block text-gray-700 text-sm font-medium"
+                  dir="auto"
                 >
                   {t("email")}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
                     <Mail className="h-5 w-5 text-black" />
                   </div>
                   <input
                     autoComplete="true"
-                    className={`w-full pl-11 pr-4 py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
                       errors.email
                         ? "border-red-500 ring-2 ring-red-500/50"
                         : "border-gray-300"
@@ -116,10 +128,11 @@ function Login() {
                     id="email"
                     placeholder={t("emailPlaceholder") || "Enter your email"}
                     {...register("email")}
+                    dir="auto"
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1" dir="auto">
                     <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
                     {errors.email.message}
                   </p>
@@ -131,15 +144,16 @@ function Login() {
                 <label
                   htmlFor="password"
                   className="block text-gray-700 text-sm font-medium"
+                  dir="auto"
                 >
                   {t("password")}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
                     <Lock className="h-5 w-5 text-black" />
                   </div>
                   <input
-                    className={`w-full pl-11 pr-12 py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    className={`w-full ${isRTL ? 'pr-11' : 'pl-11'} ${isRTL ? 'pl-12' : 'pr-12'} py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
                       errors.password
                         ? "border-red-500 ring-2 ring-red-500/50"
                         : "border-gray-300"
@@ -148,15 +162,15 @@ function Login() {
                     name="password"
                     id="password"
                     autoComplete="true"
-                    placeholder={
-                      t("passwordPlaceholderCreate") || "Enter your password"
-                    }
+                    placeholder={t("passwordPlaceholder") || "Enter your password"}
                     {...register("password")}
+                    dir="auto"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 transition-colors"
+                    className={`absolute inset-y-0 ${isRTL ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center text-gray-500 hover:text-gray-700 transition-colors`}
+                    aria-label={showPassword ? t("hidePassword") || "Hide password" : t("showPassword") || "Show password"}
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -166,7 +180,7 @@ function Login() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1" dir="auto">
                     <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
                     {errors.password.message}
                   </p>
@@ -176,7 +190,7 @@ function Login() {
               {/* Error Message */}
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 text-sm text-center">{error}</p>
+                  <p className="text-red-600 text-sm text-center" dir="auto">{error}</p>
                 </div>
               )}
 
@@ -212,72 +226,74 @@ function Login() {
                   </>
                 ) : (
                   <>
-                    <LogIn className="h-5 w-5" />
-                    {t("login")}
+                    {!isRTL && <LogIn className="h-5 w-5" />}
+                    <span dir="auto">{t("login")}</span>
+                    {isRTL && <LogIn className="h-5 w-5" />}
                   </>
                 )}
               </button>
             </form>
-
- 
           </div>
         </div>
       </div>
 
-      {/* Right Side - Brand/Features */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 relative overflow-hidden">
+      <div className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 relative overflow-hidden ${isRTL ? 'lg:order-1' : ''}`}>
         {/* Content - Centered */}
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
           <div className="max-w-lg space-y-8">
             {/* Main heading */}
             <div className="space-y-4 text-center">
-              <h2 className="text-4xl font-bold leading-tight">
-                Document Management System
+              <h2 className="text-4xl font-bold leading-tight" dir="auto">
+                {t("documentManagementSystem")}
               </h2>
-              <p className="text-xl text-white/90">
-                Secure, efficient, and intelligent document organization
+              <p className="text-xl text-white/90" dir="auto">
+                {t("systemDescription")}
               </p>
             </div>
 
             {/* Features */}
             <div className="space-y-6 mt-12">
-              <div className="flex items-start gap-4 text-left bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              {/* Secure Storage Feature */}
+              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Shield className="h-6 w-6" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Secure Storage</h3>
-                  <p className="text-white/80 text-sm">
-                    Enterprise-grade security with encrypted storage and access
-                    controls
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-1" dir="auto">
+                    {t("secureStorage")}
+                  </h3>
+                  <p className="text-white/80 text-sm" dir="auto">
+                    {t("secureStorageDesc")}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 text-left bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              {/* Fast Access Feature */}
+              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Zap className="h-6 w-6" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">Fast Access</h3>
-                  <p className="text-white/80 text-sm">
-                    Lightning-fast document retrieval with advanced search
-                    capabilities
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-1" dir="auto">
+                    {t("fastAccess")}
+                  </h3>
+                  <p className="text-white/80 text-sm" dir="auto">
+                    {t("fastAccessDesc")}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 text-left bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              {/* Team Collaboration Feature */}
+              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Users className="h-6 w-6" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-1">
-                    Team Collaboration
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-1" dir="auto">
+                    {t("teamCollaboration")}
                   </h3>
-                  <p className="text-white/80 text-sm">
-                    Work together seamlessly with role-based permissions and
-                    sharing
+                  <p className="text-white/80 text-sm" dir="auto">
+                    {t("teamCollaborationDesc")}
                   </p>
                 </div>
               </div>

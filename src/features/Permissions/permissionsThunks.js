@@ -14,13 +14,14 @@ import { getAvailablePermission, getPermissions, getPrinciples, getScreensPermis
 // Fetch User - Role 
 export const fetchPrinciples = createAsyncThunk(
   "permissions/fetchPrinciples",
-  async (id) => {
-    const response = await getPrinciples(id);
+  async (repoId) => {
+    const response = await getPrinciples(repoId || 1);
     console.log(response);
     
     return response.data;
   }
 );
+
 // Fetch User Repositories
 export const fetchAvailablePermission = createAsyncThunk(
   "permissions/fetchAvailablePermissions",
@@ -29,8 +30,6 @@ export const fetchAvailablePermission = createAsyncThunk(
     return response.data;
   }
 );
-
-
 
 // Fetch screen permissions
 export const fetchScreensPermissions = createAsyncThunk(

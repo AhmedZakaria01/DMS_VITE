@@ -84,6 +84,17 @@ api.interceptors.response.use(
   }
 );
 
+//! Authentication
+// Check if user is authenticated
+export const isAuthenticated = () => {
+  const encryptedToken = localStorage.getItem("token");
+  if (!encryptedToken) return false;
+
+  const token = decryptToken(encryptedToken);
+
+  return !!token; // Returns true if token exists and can be decrypted
+};
+
 // Login Method
 export const loginUser = async (credentials) => {
   try {
@@ -118,59 +129,13 @@ export const loginUser = async (credentials) => {
   }
 };
 
-// Register Method
-export const registerUser = async (data) => {
-  try {
-    const response = await api.post("/Authenticate/signup", data);
-    return response.data;
-  } catch (error) {
-    console.error("Registration failed:", error);
-    throw error;
-  }
-};
-
-// Check if user is authenticated
-export const isAuthenticated = () => {
-  const encryptedToken = localStorage.getItem("token");
-  if (!encryptedToken) return false;
-
-  const token = decryptToken(encryptedToken);
-
-  return !!token; // Returns true if token exists and can be decrypted
-};
-
 // Get decrypted token (for debugging or other use cases)
 export const getToken = () => {
   const encryptedToken = localStorage.getItem("token");
   return encryptedToken ? decryptToken(encryptedToken) : null;
 };
 
-// Get User Repos
-export async function getUserRepos(userId) {
-  try {
-    if (!userId) return;
-
-    const response = await api.get(
-      `Repository/GetRepositoriesByUser/${userId}`
-    );
-    console.log(response);
-    return response;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
-// Get All Repos
-export async function getAllRepos() {
-  try {
-    const response = await api.get(`Repository/GetAllRepositories`);
-    console.log(response);
-    return response;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
+//! Audit Trail
 // Fetch Audit Trail
 export async function getAuditTrail() {
   try {
@@ -182,17 +147,19 @@ export async function getAuditTrail() {
   }
 }
 
-// Create User
-export async function createNewUser(userData) {
+//! Document
+export async function createNewDocument(data) {
   try {
-    const response = await api.post("Users/AddUser/AddUser", userData);
+    const response = await api.post("Document/Create", data);
+    console.log(response);
+
     return response;
   } catch (err) {
-    console.error("Failed to Create User", err);
-    throw err;
+    throw new Error("Create Document Failed", err);
   }
 }
 
+//! Document Types
 // Create Document Type
 export async function createDocType(DocTypeData) {
   try {
@@ -258,28 +225,7 @@ export async function deleteDocType(docTypeId) {
   }
 }
 
-// Create New Role
-export async function createNewRole(roleData) {
-  try {
-    const response = await api.post("Roles/CreateRolePermissions", roleData);
-    return response;
-  } catch (err) {
-    console.error("Failed to Create Role", err);
-    throw err;
-  }
-}
-// Update Role
-export async function updateRole(roleData) {
-  try {
-    const { id, ...updateData } = roleData;
-    const response = await api.put(`/Roles/${id}`, updateData);
-    return response;
-  } catch (err) {
-    console.error("Failed to Update Role", err);
-    throw err;
-  }
-}
-
+//! Repository
 // Create New Repository
 export async function createNewRepository(repoData) {
   try {
@@ -306,6 +252,17 @@ export async function createNewRepository(repoData) {
 
     // Fallback to generic error
     throw new Error("Failed to create repository. Please try again.");
+  }
+}
+
+// Get All Repositories
+export async function getAllRepos() {
+  try {
+    const response = await api.get(`Repository/GetAllRepositories`);
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw new Error(error);
   }
 }
 
@@ -366,6 +323,7 @@ export async function getRepositoryById(id) {
     throw new Error("Failed to get repository. Please try again.");
   }
 }
+
 // Fetch Repo Contents
 export async function getRepoContents(id) {
   try {
@@ -379,6 +337,34 @@ export async function getRepoContents(id) {
     console.err("Failed to Fetch Repos Contents", err);
   }
 }
+
+// Get User Repos
+export async function getUserRepos(userId) {
+  try {
+    if (!userId) return;
+
+    const response = await api.get(
+      `Repository/GetRepositoriesByUser/${userId}`
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+//! Folder
+// Create Folder
+export async function createFolder(data) {
+  try {
+    const response = await api.post("Folder/CreateFolder", data);
+    console.log(response);
+    return response;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 // Fetch Folder Contents
 export async function getFolderContents(repoId, folderId) {
   try {
@@ -393,20 +379,37 @@ export async function getFolderContents(repoId, folderId) {
   }
 }
 
-// Fetch Document Files
-export async function getDocumentFiles(repoId, folderId) {
+//! Files
+// Upload Single File
+export async function upload_Single_File(file) {
   try {
-    const response = await api.get(
-      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
-    );
-    console.log(repoId, folderId);
-    return response;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post(`temp-files/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(response);
+    return response.data;
   } catch (err) {
-    console.error("Failed to Fetch Folder Contents", err);
+    console.error("Failed to Upload File", err);
+    throw err;
+  }
+} // Delete Single File
+export async function delete_Single_File(id) {
+  try {
+    const response = await api.delete(`temp-files/${id}`);
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("delete to Upload File", err);
     throw err;
   }
 }
 
+//! Category
 // Create a New Category
 export async function createNewCategory(categoryData) {
   try {
@@ -441,7 +444,6 @@ export async function fetchParentCategories(documentTypeId) {
 }
 
 // Get Childs From Parent
-
 export async function getChildCategories(parentCategoryId) {
   try {
     const data = await api.get(
@@ -455,7 +457,8 @@ export async function getChildCategories(parentCategoryId) {
     throw new Error(error);
   }
 }
-// Get All Users
+
+//! Principles
 export async function getPrinciples(id) {
   try {
     const response = await api.get(
@@ -467,16 +470,7 @@ export async function getPrinciples(id) {
   }
 }
 
-export async function createFolder(data) {
-  try {
-    const response = await api.post("Folder/CreateFolder", data);
-    console.log(response);
-    return response;
-  } catch (error) {
-    throw new Error(error);
-  }
-}
-
+//! Users
 // Get All Users
 export async function getAllUsers() {
   try {
@@ -487,6 +481,18 @@ export async function getAllUsers() {
   }
 }
 
+// Create User
+export async function createNewUser(userData) {
+  try {
+    const response = await api.post("Users/AddUser/AddUser", userData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Create User", err);
+    throw err;
+  }
+}
+
+//! Roles
 // Fetch Roles
 export async function getRoles() {
   try {
@@ -498,6 +504,30 @@ export async function getRoles() {
   }
 }
 
+// Create New Role
+export async function createNewRole(roleData) {
+  try {
+    const response = await api.post("Roles/CreateRolePermissions", roleData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Create Role", err);
+    throw err;
+  }
+}
+
+// Update Role
+export async function updateRole(roleData) {
+  try {
+    const { id, ...updateData } = roleData;
+    const response = await api.put(`/Roles/${id}`, updateData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Update Role", err);
+    throw err;
+  }
+}
+
+//! Permissions
 // Fetch Permissions for Repository
 export async function getPermissions() {
   try {
@@ -508,6 +538,8 @@ export async function getPermissions() {
     throw err;
   }
 }
+
+// available Permissions for Entity Type
 export async function getAvailablePermission(type) {
   try {
     const response = await api.get(

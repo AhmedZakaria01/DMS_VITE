@@ -1,55 +1,12 @@
-// import { createSlice } from "@reduxjs/toolkit";
-// import {
-//   fetchCategoryChilds,
-//   getParentCategories,
-// } from "./documentViewerThunk";
-
-// const documentViewerSlice = createSlice({
-//   name: "document",
-//   initialState: {
-//     parentCategories: [],
-//     childCategories: [],
-//     status: "idle",
-//     error: null,
-//   },
-//   reducers: {},
-//   extraReducers: (builder) => {
-//     builder
-//       // Fetch Parent Categories Repos
-//       .addCase(getParentCategories.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(getParentCategories.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.parentCategories = action.payload;
-//       })
-//       .addCase(getParentCategories.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message;
-//       })
-
-//       // Fetch Childs Categories
-//       .addCase(fetchCategoryChilds.pending, (state) => {
-//         state.status = "loading";
-//       })
-//       .addCase(fetchCategoryChilds.fulfilled, (state, action) => {
-//         state.status = "succeeded";
-//         state.childCategories = action.payload;
-//       })
-//       .addCase(fetchCategoryChilds.rejected, (state, action) => {
-//         state.status = "failed";
-//         state.error = action.error.message;
-//       });
-//   },
-// });
-
-// export default documentViewerSlice.reducer;
-
 import { createSlice, current } from "@reduxjs/toolkit";
 import {
   fetchCategoryChilds,
   getParentCategories,
+  upload_File,
+  delete_File,
+  createDocument,
 } from "./documentViewerThunk";
+import { unknown } from "zod";
 
 const documentViewerSlice = createSlice({
   name: "document",
@@ -63,13 +20,19 @@ const documentViewerSlice = createSlice({
     childCategoriesLoading: false,
     loadingChildrenFor: null,
 
+    // Document creation status (separate from categories loading)
+    documentCreationStatus: "idle",
+    documentCreationError: null,
+
     // Data will be send to backend
     completeJsonData: {
+      repositoryId: null,
       documentTypeId: "",
-      documentType: "",
-      metadata: null,
+      title: "",
+      securityLevel: 0, // Document-level security level (0-99), defaults to 0
+      attributes: [], // Array of { attributeId: number, value: string }
       aclRules: [],
-      Files: [],
+      filesMetaData: [], // Store all file metadata (tempFileId, originalName, categoryId, securityLevel, aclRules)
     },
   },
   reducers: {
@@ -86,52 +49,50 @@ const documentViewerSlice = createSlice({
     },
 
     setDocumentData: (state, action) => {
+      state.completeJsonData.repositoryId = action.payload.repoId;
       state.completeJsonData.documentTypeId = action.payload.documentTypeId;
-      state.completeJsonData.documentType = action.payload.documentType;
-      state.completeJsonData.metadata = action.payload.metadata;
+      state.completeJsonData.title = "unknown";
+      state.completeJsonData.securityLevel = action.payload.securityLevel ?? 0;
+      state.completeJsonData.attributes = action.payload.attributes;
       state.completeJsonData.aclRules = action.payload.aclRules;
-      console.log(current(state.completeJsonData));
     },
 
-    addFilesToCategory: (state, action) => {
-      const { categoryId, files } = action.payload;
-
-      // Check if files for this category already exist
-      const existingFileIndex = state.completeJsonData.Files.findIndex(
-        (item) => item.categoryId === categoryId
-      );
-
-      if (existingFileIndex !== -1) {
-        // Update existing category files
-        state.completeJsonData.Files[existingFileIndex].files = files;
-      } else {
-        // Add new category with files
-        state.completeJsonData.Files.push({
-          categoryId,
-          files,
-        });
-      }
-
-      console.log("Files updated:", current(state.completeJsonData.Files));
-      console.log("Complete Json Data:", current(state.completeJsonData));
-    },
-
-    // ✅ Action to remove files for a specific category
-    removeFilesFromCategory: (state, action) => {
-      const { categoryId } = action.payload;
-      state.completeJsonData.Files = state.completeJsonData.Files.filter(
-        (item) => item.categoryId !== categoryId
-      );
-      console.log(
-        "Files after removal:",
-        current(state.completeJsonData.Files)
-      );
-    },
-
-    // ✅ Action to clear all files
+    // ✅ Action to clear all files metadata
     clearAllFiles: (state) => {
-      state.completeJsonData.Files = [];
-      console.log("All files cleared");
+      state.completeJsonData.filesMetaData = [];
+    },
+
+    // Set security level for a file
+    setFileSecurityLevel: (state, action) => {
+      const { tempFileId, securityLevel } = action.payload;
+      const fileIndex = state.completeJsonData.filesMetaData.findIndex(
+        (file) => file.tempFileId === tempFileId
+      );
+
+      if (fileIndex !== -1) {
+        state.completeJsonData.filesMetaData[fileIndex].securityLevel =
+          securityLevel;
+        console.log(
+          "📁 Files Metadata:",
+          current(state.completeJsonData.filesMetaData)
+        );
+      }
+    },
+
+    // Set ACL rules for a file
+    setFileAclRules: (state, action) => {
+      const { tempFileId, aclRules } = action.payload;
+      const fileIndex = state.completeJsonData.filesMetaData.findIndex(
+        (file) => file.tempFileId === tempFileId
+      );
+
+      if (fileIndex !== -1) {
+        state.completeJsonData.filesMetaData[fileIndex].aclRules = aclRules;
+        console.log(
+          "📁 Files Metadata:",
+          current(state.completeJsonData.filesMetaData)
+        );
+      }
     },
   },
   extraReducers: (builder) => {
@@ -152,7 +113,70 @@ const documentViewerSlice = createSlice({
         state.error = action.error.message;
       })
 
-      // ✅ CHANGED: Fetch children and store by parent ID for nested support
+      // Upload File
+      .addCase(upload_File.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(upload_File.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Store file metadata (tempFileId, originalName, categoryId, securityLevel, aclRules)
+        if (action.payload) {
+          state.completeJsonData.filesMetaData.push({
+            tempFileId: action.payload.tempFileId,
+            originalName: action.payload.originalName,
+            categoryId: action.payload.categoryId,
+            securityLevel: null,
+            aclRules: [],
+          });
+          console.log(
+            "📁 Files Metadata:",
+            current(state.completeJsonData.filesMetaData)
+          );
+        }
+      })
+      .addCase(upload_File.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      // Delete File
+      .addCase(delete_File.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(delete_File.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Remove the file from filesMetaData array
+        if (action.payload && action.payload.tempFileId) {
+          state.completeJsonData.filesMetaData =
+            state.completeJsonData.filesMetaData.filter(
+              (file) => file.tempFileId !== action.payload.tempFileId
+            );
+          console.log(
+            "📁 Files Metadata:",
+            current(state.completeJsonData.filesMetaData)
+          );
+        }
+      })
+      .addCase(delete_File.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+
+      // Create Document
+      .addCase(createDocument.pending, (state) => {
+        state.documentCreationStatus = "loading";
+        state.documentCreationError = null;
+      })
+      .addCase(createDocument.fulfilled, (state) => {
+        state.documentCreationStatus = "succeeded";
+        state.documentCreationError = null;
+      })
+      .addCase(createDocument.rejected, (state, action) => {
+        state.documentCreationStatus = "failed";
+        state.documentCreationError = action.payload || action.error.message;
+      })
+
+      // Fetch children and store by parent ID for nested support
       .addCase(fetchCategoryChilds.pending, (state, action) => {
         state.childCategoriesLoading = true;
         state.loadingChildrenFor = action.meta.arg;
@@ -180,8 +204,8 @@ export const {
   clearCurrentChildren,
   clearAllChildren,
   setDocumentData,
-  addFilesToCategory,
-  removeFilesFromCategory,
   clearAllFiles,
+  setFileSecurityLevel,
+  setFileAclRules,
 } = documentViewerSlice.actions;
 export default documentViewerSlice.reducer;

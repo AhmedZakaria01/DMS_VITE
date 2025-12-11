@@ -3,7 +3,7 @@
  * It manages the authentication state (user, status, and error), and handles login, register, and logout actions.
  */
 import { createSlice } from "@reduxjs/toolkit";
-import { login, register } from "./authThunks";
+import { login } from "./authThunks";
 import { getRolesFromToken } from "../Users/jwtUtils";
 import { decryptToken } from "../../services/apiServices";
 import { setLocalStorage } from "../../../storageManager";
@@ -113,19 +113,6 @@ const authSlice = createSlice({
         }
       })
       .addCase(login.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-
-      // REGISTER
-      .addCase(register.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        // state.user = action.payload;
-      })
-      .addCase(register.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });

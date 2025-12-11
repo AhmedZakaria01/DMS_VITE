@@ -9,6 +9,9 @@ import {
   createNewCategory,
   fetchParentCategories,
   getChildCategories,
+  upload_Single_File,
+  delete_Single_File,
+  createNewDocument,
 } from "../../services/apiServices";
 
 // Create New Category Thunk
@@ -23,6 +26,44 @@ export const createCategory = createAsyncThunk(
         error.response?.data?.message ||
           error.message ||
           "Failed to create category"
+      );
+    }
+  }
+);
+export const upload_File = createAsyncThunk(
+  "Document/uploadFile",
+  async ({ file, categoryId }) => {
+    try {
+      const response = await upload_Single_File(file);
+      // Return response with categoryId included
+      return {
+        ...response,
+        categoryId,
+      };
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to upload file"
+      );
+    }
+  }
+);
+export const delete_File = createAsyncThunk(
+  "Document/deleteFile",
+  async (tempFileId) => {
+    try {
+      const response = await delete_Single_File(tempFileId);
+      // Return the tempFileId so we can remove it from state
+      return {
+        ...response,
+        tempFileId,
+      };
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to delete file"
       );
     }
   }
@@ -55,6 +96,23 @@ export const fetchCategoryChilds = createAsyncThunk(
       return childCategories;
     } catch (error) {
       throw new Error(error);
+    }
+  }
+);
+
+// Create Document Thunk
+export const createDocument = createAsyncThunk(
+  "Document/createDocument",
+  async (documentData, { rejectWithValue }) => {
+    try {
+      const response = await createNewDocument(documentData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create document"
+      );
     }
   }
 );

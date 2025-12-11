@@ -31,9 +31,8 @@ import FileCategoryForm from "./features/Category/FileCategory/FileCategoryForm"
 import CreateCategory from "./features/Category/FileCategory/CreateCategory";
 import CreateDocument from "./features/Document/component/CreateDocument";
 import UserSearchForm from "./features/Search/UserSearchForm";
-import CreateDocumentOnly from "./features/Document/component/CreateDocumentOnly";
 import Annotations from "./Annotations/Annotations";
- // import ScreenPermissions from "./features/Permissions/screenPermissions";
+// import ScreenPermissions from "./features/Permissions/screenPermissions";
 // import UpdatePermissions from "./features/Permissions/UpdatePermissions";
 
 function App() {
@@ -64,7 +63,7 @@ function App() {
           <Route path="/updateDocType/:docTypeId" element={<UpdateDocType />} />
           <Route path="/createDocumentType/:repoId" element={<DocTypeForm />} />
           <Route path="/FileCategoryForm" element={<FileCategoryForm />} />
-          <Route path="/documentCategoryTable" element={<CreateDocument />} />
+          {/* <Route path="/documentCategoryTable" element={<CreateDocument />} /> */}
           <Route path="/search" element={<UserSearchForm />} />
 
           <Route path="/CreateCategory" element={<CreateCategory />} />
@@ -99,7 +98,7 @@ function App() {
             path="/repoContents/:repoId/folderContent/*"
             element={<FolderContents />}
           />
-          <Route path="CreateDocumentOnly" element={<CreateDocumentOnly />} />
+          <Route path="/createDocument" element={<CreateDocument />} />
 
           <Route path="/createRepo" element={<RepoForm />} />
           <Route

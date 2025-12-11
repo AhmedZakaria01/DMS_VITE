@@ -547,7 +547,6 @@
 
 // export default DocumentForm;
 
-
 /* eslint-disable react/prop-types */
 // fill Data from backend or when user want to update the document data
 import { useState, useEffect } from "react";
@@ -578,6 +577,7 @@ function DocumentForm({ onDocumentTypeChange }) {
   const [selectedDocumentTypeId, setSelectedDocumentTypeId] = useState(null);
   const [currentMetadata, setCurrentMetadata] = useState([]);
   const [jsonData, setJsonData] = useState({});
+  const [documentSecurityLevel, setDocumentSecurityLevel] = useState(null);
 
   // Permissions state
   const [openPermissions, setOpenPermissions] = useState(false);
@@ -651,14 +651,16 @@ function DocumentForm({ onDocumentTypeChange }) {
               const field = {
                 key: attr.attributeName,
                 label: attr.attributeName,
+                attributeId: attr.id, // Store the attribute ID for backend submission
                 type: mapAttributeTypeToInputType(attr.attributeType),
-                required: attr.attributeValue !== null,
+                required: attr.isRequired === true, // Use isRequired from API
                 defaultValue: attr.attributeValue || "",
-                attributeSize: attr.attributeSize || null,
+                attributeSize: attr.attributeSize || null, // Use attributeSize for maxLength
               };
 
-              if (field.type === "dropdown") {
-                field.options = [];
+              // Add dropdown options from valuesOfMemoType
+              if (field.type === "dropdown" && attr.valuesOfMemoType && Array.isArray(attr.valuesOfMemoType)) {
+                field.options = attr.valuesOfMemoType;
               }
 
               return field;
@@ -672,8 +674,11 @@ function DocumentForm({ onDocumentTypeChange }) {
           transformedMetadata.forEach((field) => {
             if (field.defaultValue) {
               initialData[field.key] = field.defaultValue;
-            } else if (field.type === "dropdown" && field.options?.length > 0) {
-              initialData[field.key] = field.options[0];
+            } else if (field.type === "checkbox") {
+              initialData[field.key] = false;
+            } else if (field.type === "dropdown") {
+              // Don't auto-select for dropdowns - let user choose
+              initialData[field.key] = "";
             } else {
               initialData[field.key] = "";
             }
@@ -699,14 +704,12 @@ function DocumentForm({ onDocumentTypeChange }) {
   const mapAttributeTypeToInputType = (attributeType) => {
     const typeMap = {
       string: "text",
-      text: "text",
-      number: "number",
+      int: "number",
       integer: "number",
-      date: "date",
-      datetime: "date",
       boolean: "checkbox",
-      dropdown: "dropdown",
-      select: "dropdown",
+      dropdownlist: "dropdown",
+      memo: "textarea",
+      date: "date",
     };
 
     return typeMap[attributeType?.toLowerCase()] || "text";
@@ -766,35 +769,73 @@ function DocumentForm({ onDocumentTypeChange }) {
             })
           : [];
 
+      // Transform jsonData object to attributes array format
+      // Only include attributes that have non-empty values
+      const attributes = currentMetadata
+        .map((field) => {
+          const fieldValue = jsonData[field.key];
+
+          return {
+            attributeId: field.attributeId,
+            value: fieldValue,
+          };
+        })
+        .filter((attr) => {
+          // Exclude attributes with empty string, null, or undefined values
+          // But keep false (for unchecked checkboxes) and 0 (for number inputs)
+          return attr.value !== "" && attr.value !== null && attr.value !== undefined;
+        });
+
       const completeJsonData = {
+        repoId: currentRepoId,
         documentTypeId: selectedDocumentTypeId,
-        documentType: selectedDocumentType,
-        metadata: jsonData,
+        title: "",
+        securityLevel: documentSecurityLevel === null ? 0 : documentSecurityLevel,
+        attributes: attributes,
         aclRules: transformedAclRules,
       };
       dispatch(setDocumentData(completeJsonData));
-      
 
       console.log("=== JSON Data (Ready for Backend) ===");
-      console.log(JSON.stringify(completeJsonData, null, 2));
+      console.log(JSON.stringify(completeJsonData));
     }
-  }, [jsonData, selectedDocumentType, selectedDocumentTypeId, permissionsData ,dispatch]);
+  }, [
+    jsonData,
+    selectedDocumentType,
+    selectedDocumentTypeId,
+    permissionsData,
+    currentMetadata,
+    currentRepoId,
+    documentSecurityLevel,
+    dispatch,
+  ]);
 
   // Render input field based on metadata type
   const renderField = (field) => {
     switch (field.type) {
-      case "text":
+      case "text": {
+        const currentLength = (jsonData[field.key] || "").length;
+        const maxLength = field.attributeSize;
+
         return (
-          <input
-            type="text"
-            value={jsonData[field.key] || ""}
-            onChange={(e) => handleFieldChange(field.key, e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            placeholder={t("enterFieldPlaceholder", { field: field.label })}
-            required={field.required}
-            maxLength={field.attributeSize || undefined}
-          />
+          <div>
+            <input
+              type="text"
+              value={jsonData[field.key] || ""}
+              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder={t("enterFieldPlaceholder", { field: field.label })}
+              required={field.required}
+              maxLength={maxLength || undefined}
+            />
+            {maxLength && (
+              <div className="mt-1 text-xs text-gray-500 text-right">
+                {currentLength} / {maxLength} characters
+              </div>
+            )}
+          </div>
         );
+      }
 
       case "number":
         return (
@@ -850,6 +891,30 @@ function DocumentForm({ onDocumentTypeChange }) {
           </div>
         );
 
+      case "textarea": {
+        const currentLength = (jsonData[field.key] || "").length;
+        const maxLength = field.attributeSize;
+
+        return (
+          <div>
+            <textarea
+              value={jsonData[field.key] || ""}
+              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-h-[120px] resize-y"
+              placeholder={t("enterFieldPlaceholder", { field: field.label })}
+              required={field.required}
+              maxLength={maxLength || undefined}
+              rows={4}
+            />
+            {maxLength && (
+              <div className="mt-1 text-xs text-gray-500 text-right">
+                {currentLength} / {maxLength} characters
+              </div>
+            )}
+          </div>
+        );
+      }
+
       default:
         return null;
     }
@@ -903,6 +968,38 @@ function DocumentForm({ onDocumentTypeChange }) {
             </div>
           </div>
 
+          {/* Document Security Level Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t("Document Security Level")}
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="99"
+              value={
+                documentSecurityLevel === null ? "" : documentSecurityLevel
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "") {
+                  setDocumentSecurityLevel(null);
+                } else {
+                  const numValue = parseInt(value, 10);
+                  if (numValue >= 0 && numValue <= 99) {
+                    setDocumentSecurityLevel(numValue);
+                  }
+                }
+              }}
+              placeholder="0-99"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("securityLevelHint") ||
+                "Enter a value between 0-99 (optional)"}
+            </p>
+          </div>
+
           {/* Info box when no document type selected */}
           {!selectedDocumentType && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
@@ -911,8 +1008,6 @@ function DocumentForm({ onDocumentTypeChange }) {
               </p>
             </div>
           )}
-
-        
         </div>
       </div>
 
@@ -937,6 +1032,11 @@ function DocumentForm({ onDocumentTypeChange }) {
                   {field.label}
                   {field.required && (
                     <span className="text-red-500 ml-1">*</span>
+                  )}
+                  {field.attributeSize && (field.type === "text" || field.type === "textarea") && (
+                    <span className="text-xs text-gray-500 ml-2">
+                      (Max {field.attributeSize} characters)
+                    </span>
                   )}
                 </label>
                 {renderField(field)}

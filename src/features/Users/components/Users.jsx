@@ -220,7 +220,7 @@ function Users() {
   // Check for Create User permission
   const canCreateUser = usePermission("screens.users.create");
   const canEditUser = usePermission("screens.users.edit");
-  const canDeleteUser = usePermission("screens.users.delete"); 
+  const canDeleteUser = usePermission("screens.users.delete");
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -232,10 +232,8 @@ function Users() {
 
   // Fetch users only if status is idle (no data yet)
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchUsers());
-    }
-  }, [dispatch, status]);
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
   // Simplified refresh - just dispatch again
   const refreshUsersData = useCallback(() => {
@@ -273,7 +271,7 @@ function Users() {
       const hasAnyActionPermission = canEditUser || canDeleteUser;
       if (!hasAnyActionPermission) {
         // Return null if no permissions
-        return null; 
+        return null;
       }
 
       return (
@@ -290,7 +288,7 @@ function Users() {
               <Edit2 className="w-4 h-4" />
             </button>
           )}
-          
+
           {canDeleteUser && (
             <button
               onClick={(e) => {
@@ -341,13 +339,16 @@ function Users() {
   }, [ActionButtons, t, canEditUser, canDeleteUser]);
 
   // Double Click - Conditionally handle based on permissions
-  const handleRowDoubleClick = useCallback((row) => {
-    // Only allow double click action if user has edit permission
-    if (canEditUser) {
-      console.log("User selected! User ID:", row.original.id);
-      console.log("Full user data:", row.original);
-    }
-  }, [canEditUser]);
+  const handleRowDoubleClick = useCallback(
+    (row) => {
+      // Only allow double click action if user has edit permission
+      if (canEditUser) {
+        console.log("User selected! User ID:", row.original.id);
+        console.log("Full user data:", row.original);
+      }
+    },
+    [canEditUser]
+  );
 
   // Handle Create User
   const handleCreateClick = useCallback(() => {
@@ -358,7 +359,9 @@ function Users() {
     <div className="p-6">
       <div className="flex justify-between">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("users")}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t("users")}
+          </h1>
           <p className="text-gray-600">{t("usersDescription")}</p>
         </div>
         <div>
@@ -377,7 +380,9 @@ function Users() {
       {/* Show error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{t("error")}: {error}</p>
+          <p className="text-red-600">
+            {t("error")}: {error}
+          </p>
         </div>
       )}
 

@@ -205,11 +205,11 @@ import usePermission from "../../auth/usePermission";
 function Roles() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  
+
   // Check for Create Role permission
   const canCreateRole = usePermission("screens.roles.create");
   const canEditRole = usePermission("screens.roles.edit");
-  const canDeleteRole = usePermission("screens.roles.delete"); 
+  const canDeleteRole = usePermission("screens.roles.delete");
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -221,10 +221,8 @@ function Roles() {
 
   // Fetch users only if status is idle (no data yet)
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(fetchRoles());
-    }
-  }, [dispatch, status]);
+    dispatch(fetchRoles());
+  }, [dispatch]);
 
   // Simplified refresh - just dispatch again
   const refreshRoleData = useCallback(() => {
@@ -324,15 +322,18 @@ function Roles() {
   }, [ActionButtons, t, canEditRole, canDeleteRole]);
 
   // Double Click - You might want to conditionally handle this based on permissions too
-  const handleRowDoubleClick = useCallback((row) => {
-    // Only allow double click action if user has edit permission
-    if (canEditRole) {
-      console.log("Role selected! Role ID:", row.original.id);
-      console.log("Full role data:", row.original);
-      // You could also automatically open edit modal on double click
-      // handleUpdateRole(row.original);
-    }
-  }, [canEditRole]);
+  const handleRowDoubleClick = useCallback(
+    (row) => {
+      // Only allow double click action if user has edit permission
+      if (canEditRole) {
+        console.log("Role selected! Role ID:", row.original.id);
+        console.log("Full role data:", row.original);
+        // You could also automatically open edit modal on double click
+        // handleUpdateRole(row.original);
+      }
+    },
+    [canEditRole]
+  );
 
   // Handle Create Role
   const handleCreateClick = useCallback(() => {
@@ -343,7 +344,9 @@ function Roles() {
     <section className="p-6">
       <div className="flex justify-between items-">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("rolesTitle")}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t("rolesTitle")}
+          </h1>
           <p className="text-gray-600">{t("rolesDescription")}</p>
         </div>
 
@@ -359,8 +362,6 @@ function Roles() {
           )}
         </div>
       </div>
-
- 
 
       {/* Table */}
       <div>

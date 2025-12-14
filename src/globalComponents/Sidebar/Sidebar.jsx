@@ -23,28 +23,42 @@ export default function Sidebar({
   const canViewRole = usePermission("screens.roles.view");
   const canViewUser = usePermission("screens.users.view");
   const canViewSearch = usePermission("screens.search.use");
- const canViewSettings = usePermission("screens.settings.view")
+  const canViewSettings = usePermission("screens.settings.view");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("Dashboard");
 
+  // Icon mapping for each navigation item with colors
+  const iconMap = {
+    home: { emoji: "🏠", color: "text-blue-500" },
+    users: { emoji: "👤", color: "text-purple-500" },
+    roles: { emoji: "👥", color: "text-indigo-500" },
+    auditTrail: { emoji: "📈", color: "text-green-500" },
+    search: { emoji: "🔍", color: "text-amber-500" },
+    fileCategory: { emoji: "📁", color: "text-orange-500" },
+  };
+
   // Fixed navigation array with proper conditional rendering
   const navigation = [
-    { name: t("home"), link: "/", icon: "🏠" },
+    { name: t("home"), link: "/", iconKey: "home" },
     // Admin only items
     // ...(hasAdminRole(userRoles) ? [
-    ...(canViewUser ? [{ name: t("users"), link: "/users", icon: "🙍‍♂️" }] : []),
-    ...(canViewRole ? [{ name: t("roles"), link: "/roles", icon: "👥" }] : []),
+    ...(canViewUser
+      ? [{ name: t("users"), link: "/users", iconKey: "users" }]
+      : []),
+    ...(canViewRole
+      ? [{ name: t("roles"), link: "/roles", iconKey: "roles" }]
+      : []),
     // ] : []),
     // Conditionally include audit trail based on permission
     ...(canViewAudit
-      ? [{ name: t("auditTrail"), link: "/audit", icon: "📈" }]
+      ? [{ name: t("auditTrail"), link: "/audit", iconKey: "auditTrail" }]
       : []),
     ...(canViewSearch
       ? [
           {
             name: t("search"),
             link: "/search",
-            icon: "🔍",
+            iconKey: "search",
           },
         ]
       : []),
@@ -54,7 +68,7 @@ export default function Sidebar({
           {
             name: t("fileCategory"),
             link: "/category",
-            icon: "📁",
+            iconKey: "fileCategory",
           },
         ]
       : []),
@@ -64,7 +78,7 @@ export default function Sidebar({
     //   link: "/docTypeForm",
     //   icon: "📋",
     // },
-  //  ...(canViewSettings ?[{ name: t("settings"), link: "/settings", icon: "⚙️" }]:[]) ,
+    //  ...(canViewSettings ?[{ name: t("settings"), link: "/settings", icon: "⚙️" }]:[]) ,
   ];
 
   const handleNavClick = () => {
@@ -119,22 +133,22 @@ export default function Sidebar({
                   >
                     <button
                       type="button"
-                      className="-m-2.5 p-2.5"
+                      className="-m-2.5 p-2.5 rounded-lg hover:bg-white/10 transition-all duration-200"
                       onClick={() => setSidebarOpen(false)}
                     >
                       <span className="sr-only">{t("close_sidebar")}</span>
-                      <div className="h-6 w-6 text-white">✕</div>
+                      <span className="text-2xl text-white">✕</span>
                     </button>
                   </div>
                 </Transition.Child>
                 {/* Mobile sidebar content - positioned below navbar */}
-                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 px-6 pb-4 shadow-xl ">
-                  <div className="flex h-16 shrink-0 items-center">
-                    <div className="h-8 w-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-                      <span className="text-white font-bold">A</span>
+                <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/30 backdrop-blur-xl px-6 pb-4 shadow-2xl border-r border-white/20">
+                  <div className="flex h-16 shrink-0 items-center pt-2">
+                    <div className="h-10 w-10 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white/50">
+                      <span className="text-white font-bold text-lg">D</span>
                     </div>
                     <span
-                      className={`text-xl font-semibold text-gray-900 ${
+                      className={`text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent ${
                         isRTL ? "mr-3" : "ml-3"
                       }`}
                     >
@@ -144,25 +158,37 @@ export default function Sidebar({
                   <nav className="flex flex-1 flex-col">
                     <ul className="flex flex-1 flex-col gap-y-7">
                       <li>
-                        <ul className="-mx-2 space-y-1">
-                          {navigation.map((item) => (
-                            <li key={item.name}>
-                              <Link
-                                to={item.link}
-                                onClick={handleNavClick}
-                                className={`w-full group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-colors duration-200 ${
-                                  isRTL ? "" : ""
-                                } ${
-                                  activeNavItem === item.name
-                                    ? "bg-gray-50 text-indigo-600"
-                                    : "text-gray-700 hover:text-indigo-600 hover:bg-gray-50"
-                                }`}
-                              >
-                                <span className="text-lg">{item.icon}</span>
-                                {item.name}
-                              </Link>
-                            </li>
-                          ))}
+                        <ul className="-mx-2 space-y-2">
+                          {navigation.map((item) => {
+                            const { emoji, bgColor } = iconMap[item.iconKey];
+                            const isActive = activeNavItem === item.name;
+                            return (
+                              <li key={item.name}>
+                                <Link
+                                  to={item.link}
+                                  onClick={handleNavClick}
+                                  className={`w-full group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold transition-all duration-300 ${
+                                    isRTL ? "" : ""
+                                  } ${
+                                    isActive
+                                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/50 scale-105"
+                                      : "text-gray-700 hover:text-indigo-600 hover:bg-white/80 hover:shadow-md hover:scale-105"
+                                  }`}
+                                >
+                                  <div
+                                    className={`p-1.5 rounded-lg ${
+                                      isActive ? "bg-white/20" : bgColor
+                                    } transition-all duration-300`}
+                                  >
+                                    <span className="text-xl">{emoji}</span>
+                                  </div>
+                                  <span className="self-center">
+                                    {item.name}
+                                  </span>
+                                </Link>
+                              </li>
+                            );
+                          })}
                         </ul>
                       </li>
                     </ul>
@@ -176,61 +202,88 @@ export default function Sidebar({
 
       {/* Desktop sidebar - RTL/LTR positioning */}
       <div
-        className={`hidden lg:fixed lg:top-20 lg:bottom-0 lg:z-40 lg:flex lg:flex-col transition-all duration-300 ${
+        className={`hidden lg:fixed lg:top-20 lg:bottom-0 lg:z-40 lg:flex lg:flex-col transition-all duration-300 ease-in-out ${
           isRTL ? "lg:right-0" : "lg:left-0"
-        } ${desktopSidebarExpanded ? "lg:w-72" : "lg:w-16"}`}
+        } ${desktopSidebarExpanded ? "lg:w-72" : "lg:w-20"}`}
       >
         <div
-          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-slate-100 via-blue-50 to-slate-200 px-3 pb-4 ${
+          className={`flex grow flex-col gap-y-5 overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-100/50 backdrop-blur-xl px-3 pb-4 shadow-xl border border-gray-200/50 ${
             isRTL ? "border-l" : "border-r"
           }`}
         >
-          {/* <div
-          className={`flex grow flex-col gap-y-5 overflow-hidden border-gray-200 bg-gradient-to-b from-indigo-50 via-slate-200 to-indigo-400 px-3 pb-4 ${
-            isRTL ? "border-l" : "border-r"
-          }`}
-        > */}
-          {/* Brand/Logo section */}
-          {/* <div className="flex h-12 shrink-0 items-center justify-center mt-4">
-            <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold">DMS</span>
-            </div>
-          </div> */}
           {/* Toggle button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-4">
             <button
               onClick={() => setDesktopSidebarExpanded(!desktopSidebarExpanded)}
               className="p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors duration-200"
+              title={desktopSidebarExpanded ? t("collapse") : t("expand")}
             >
-              <div className="h-5 w-5 font-bold">☰</div>
+              <span className="text-xl font-bold">☰</span>
             </button>
           </div>
 
           <nav className="flex flex-1 flex-col">
-            <ul className="flex flex-1 flex-col gap-y-7">
+            <ul className="flex flex-1 flex-col gap-y-2">
               <li>
-                <ul className="space-y-1">
-                  {navigation.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        to={item.link}
-                        onClick={handleNavClick}
-                        className={`w-full group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold transition-all duration-200 ${
-                          isRTL ? "text-right" : ""
-                        } ${
-                          activeNavItem === item.name
-                            ? "bg-gradient-to-r from-indigo-300 to-purple-200 text-black shadow-lg"
-                            : "text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-slate-400 hover:to-slate-500 hover:shadow-md"
-                        } ${!desktopSidebarExpanded ? "justify-center" : ""}`}
-                        title={!desktopSidebarExpanded ? item.name : ""}
-                      >
-                        <span className="text-lg shrink-0">{item.icon}</span>
-                        {desktopSidebarExpanded && (
-                          <span className="whitespace-nowrap">{item.name}</span>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
+                <ul className="space-y-2">
+                  {navigation.map((item) => {
+                    const { emoji, bgColor } = iconMap[item.iconKey];
+                    const isActive = activeNavItem === item.name;
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          to={item.link}
+                          onClick={handleNavClick}
+                          className={`relative group flex items-center gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold transition-all duration-300 ${
+                            isRTL ? "text-right" : ""
+                          } ${
+                            isActive
+                              ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/50"
+                              : "text-gray-700 hover:text-indigo-600 hover:bg-white hover:shadow-md hover:scale-105"
+                          } ${!desktopSidebarExpanded ? "justify-center" : ""}`}
+                          title={!desktopSidebarExpanded ? item.name : ""}
+                        >
+                          {/* Active indicator bar */}
+                          {isActive && (
+                            <span
+                              className={`absolute top-0 bottom-0 w-1 bg-white rounded-r-full ${
+                                isRTL ? "right-0" : "left-0"
+                              }`}
+                            />
+                          )}
+                          <div
+                            className={`p-1.5 rounded-lg ${
+                              isActive ? "bg-white/20" : bgColor
+                            } transition-all duration-300 group-hover:scale-110`}
+                          >
+                            <span className="text-xl">{emoji}</span>
+                          </div>
+                          {desktopSidebarExpanded && (
+                            <span className="whitespace-nowrap overflow-hidden transition-all duration-300">
+                              {item.name}
+                            </span>
+                          )}
+                          {/* Tooltip for collapsed state */}
+                          {!desktopSidebarExpanded && (
+                            <div
+                              className={`absolute ${
+                                isRTL ? "right-full mr-2" : "left-full ml-2"
+                              } px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-xl`}
+                            >
+                              {item.name}
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 ${
+                                  isRTL
+                                    ? "left-full border-l-gray-900 border-l-4 border-y-transparent border-y-4 border-r-0"
+                                    : "right-full border-r-gray-900 border-r-4 border-y-transparent border-y-4 border-l-0"
+                                }`}
+                              />
+                            </div>
+                          )}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             </ul>
@@ -246,11 +299,11 @@ export default function Sidebar({
       >
         <button
           type="button"
-          className="p-2 rounded-md bg-gradient-to-r from-white to-gray-50 shadow-lg text-gray-700 hover:from-indigo-500 hover:to-purple-600 hover:text-white transition-all duration-200"
+          className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg text-white hover:from-indigo-600 hover:to-purple-700 hover:shadow-xl hover:scale-110 transition-all duration-300 active:scale-95"
           onClick={() => setSidebarOpen(true)}
         >
           <span className="sr-only">{t("open_sidebar")}</span>
-          <div className="h-5 w-5 font-bold">☰</div>
+          <span className="text-xl">☰</span>
         </button>
       </div>
     </>

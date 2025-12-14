@@ -1,15 +1,15 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const currentLanguage = i18n.language;
+  // Normalize language to handle cases like 'en-US' or undefined
+  const currentLanguage = i18n.language?.startsWith("ar") ? "ar" : "en";
 
   const toggleLanguage = () => {
-    const newLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+    const newLanguage = currentLanguage === "ar" ? "en" : "ar";
     i18n.changeLanguage(newLanguage);
     // Apply RTL/LTR direction dynamically
-    document.body.dir = newLanguage === 'ar' ? 'rtl' : 'ltr';
+    document.body.dir = newLanguage === "ar" ? "rtl" : "ltr";
     document.documentElement.lang = newLanguage;
   };
 
@@ -17,9 +17,9 @@ const LanguageSwitcher = () => {
     <button
       onClick={toggleLanguage}
       className={`flex items-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 text-white border border-white/20 hover:border-white/30 ${
-        currentLanguage === 'ar' ? "flex-row-reverse gap-2" : "gap-2"
+        currentLanguage === "ar" ? "flex-row-reverse gap-2" : "gap-2"
       }`}
-      title={`Switch to ${currentLanguage === 'en' ? 'Arabic' : 'English'}`}
+      title={`Switch to ${currentLanguage === "en" ? "Arabic" : "English"}`}
     >
       <svg
         className="w-4 h-4"
@@ -35,7 +35,7 @@ const LanguageSwitcher = () => {
         />
       </svg>
       <span className="text-sm font-medium">
-        {currentLanguage === 'en' ? 'عربي' : 'English'}
+        {currentLanguage === "ar" ? "English" : "عربي"}
       </span>
     </button>
   );

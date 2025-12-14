@@ -375,12 +375,12 @@ function CreateCategory() {
               <button
                 type="button"
                 onClick={handlePermissions}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-medium"
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
               >
                 <Shield className="w-4 h-4" />
                 {t("configurePermissions") || "Configure Permissions"}
                 {permissionsData.aclRules.length > 0 && (
-                  <span className="bg-orange-800 text-white px-2 py-1 rounded-full text-xs">
+                  <span className="bg-white/20 text-white px-2 py-1 rounded-full text-xs font-semibold">
                     {permissionsData.aclRules.length}
                   </span>
                 )}

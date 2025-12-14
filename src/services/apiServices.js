@@ -503,6 +503,16 @@ export async function updateNewUser(userData) {
   }
 }
 
+// Get Specific User by ID ( use it to access roles and permissions for specific user )
+export async function GetSpecificUser(userId) {
+  try {
+    const response = await api.get(`Users/GetUserById/GetUserById/${userId}`);
+    return response;
+  } catch (err) {
+    console.error("Failed to fetch specific user", err);
+    throw err;
+  }
+}
 //! Roles
 // Fetch Roles
 export async function getRoles() {

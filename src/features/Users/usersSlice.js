@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createUser, fetchUsers, updateUser } from "./usersThunks";
+import { createUser, fetchUsers, fetchSpecificUser, updateUser } from "./usersThunks";
 
 const usersSlice = createSlice({
   name: "users",
   initialState: {
     users: [],
+    specificUser: null,
     status: "idle",
     error: null,
     lastFetched: null,
@@ -12,10 +13,13 @@ const usersSlice = createSlice({
     createError: null,
     updateStatus: "idle", 
     updateError: null,
+    specificUserStatus: "idle", 
+    specificUserError: null,
   },
   reducers: {
     resetUsersState: (state) => {
       state.users = [];
+      state.specificUser = null;
       state.status = "idle";
       state.error = null;
       state.lastFetched = null;
@@ -23,6 +27,8 @@ const usersSlice = createSlice({
       state.createError = null;
       state.updateStatus = "idle";
       state.updateError = null;
+      state.specificUserStatus = "idle";
+      state.specificUserError = null;
     },
     resetCreateStatus: (state) => {
       state.createStatus = "idle";
@@ -32,10 +38,15 @@ const usersSlice = createSlice({
       state.updateStatus = "idle";
       state.updateError = null;
     },
+    resetSpecificUser: (state) => {
+      state.specificUser = null;
+      state.specificUserStatus = "idle";
+      state.specificUserError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch users
+      // Fetch all users
       .addCase(fetchUsers.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -50,6 +61,22 @@ const usersSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      
+      // Fetch specific user
+      .addCase(fetchSpecificUser.pending, (state) => {
+        state.specificUserStatus = "loading";
+        state.specificUserError = null;
+      })
+      .addCase(fetchSpecificUser.fulfilled, (state, action) => {
+        state.specificUserStatus = "succeeded";
+        state.specificUser = action.payload;
+        state.specificUserError = null;
+      })
+      .addCase(fetchSpecificUser.rejected, (state, action) => {
+        state.specificUserStatus = "failed";
+        state.specificUserError = action.error.message;
+      })
+      
       // Create user
       .addCase(createUser.pending, (state) => {
         state.createStatus = "loading";
@@ -88,5 +115,10 @@ const usersSlice = createSlice({
   },
 });
 
-export const { resetUsersState, resetCreateStatus, resetUpdateStatus } = usersSlice.actions;
+export const { 
+  resetUsersState, 
+  resetCreateStatus, 
+  resetUpdateStatus,
+  resetSpecificUser 
+} = usersSlice.actions;
 export default usersSlice.reducer;

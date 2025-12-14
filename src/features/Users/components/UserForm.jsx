@@ -839,11 +839,10 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  RotateCcw,
   Eye,
   EyeOff,
 } from "lucide-react";
-import { createUser } from "../usersThunks";
+import { createUser, updateUser } from "../usersThunks";
 import { fetchRoles } from "../../Roles/RolesThunks";
 import { fetchScreensPermissions } from "../../Permissions/permissionsThunks";
 import { useTranslation } from "react-i18next";
@@ -862,7 +861,7 @@ const UserForm = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { t } = useTranslation();
   
-  // Alert states - consistent with RepoForm
+  // Alert states
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -901,8 +900,10 @@ const UserForm = ({
         lastName: initialData.lastName || "",
         userName: initialData.userName || "",
         email: initialData.email || "",
-        password: "",
-        confirmPassword: "",
+          // No password fields for edit mode
+        ...(!isEditMode && { password: "", confirmPassword: "" }),
+        // password: "",
+        // confirmPassword: "",
       };
     }
     return {
@@ -931,7 +932,12 @@ const UserForm = ({
 
   // Get roles from Redux store
   const { roles } = useSelector((state) => state.rolesReducer);
-  
+  console.log('====================================');
+  console.log('marwaroles',roles);
+  console.log('====================================');
+  console.log('marwapermissions',screenPermissions)
+  console.log('====================================');
+  console.log('====================================');
   useEffect(() => {
     dispatch(fetchRoles());
   }, [dispatch]);
@@ -956,18 +962,26 @@ const UserForm = ({
       setValue("lastName", initialData.lastName || "");
       setValue("userName", initialData.userName || "");
       setValue("email", initialData.email || "");
-      setValue("password", "");
-      setValue("confirmPassword", "");
-
-      // Set selected roles and permissionIds from initial data
+      // setValue("password", "");
+      // setValue("confirmPassword", "");
+      // Set selected roles from initial data
       if (initialData.roles) {
-        setSelectedRoles(Array.isArray(initialData.roles) ? initialData.roles : []);
+        // Extract roleIds from roles array if it contains role objects
+        const roleIds = initialData.roles.map(role => 
+          typeof role === 'object' ? role.roleId || role.id : role
+        );
+        setSelectedRoles(roleIds);
       } else if (initialData.roleIds) {
-        // Fallback for backward compatibility
         setSelectedRoles(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
       }
       
-      if (initialData.permissionIds) {
+      // Set selected permissions from initial data
+      if (initialData.permissions) {
+        const permissionIds = initialData.permissions.map(permission =>
+          typeof permission === 'object' ? permission.id || permission.permissionId : permission
+        );
+        setSelectedPermissionIds(permissionIds);
+      } else if (initialData.permissionIds) {
         setSelectedPermissionIds(Array.isArray(initialData.permissionIds) ? initialData.permissionIds : []);
       }
 
@@ -1002,7 +1016,7 @@ const UserForm = ({
     };
   }, []);
 
-  // Handle success alert close - FIXED: consistent with RepoForm approach
+  // Handle success alert close
   const handleSuccessAlertClose = () => {
     if (autoCloseTimeoutRef.current) {
       clearTimeout(autoCloseTimeoutRef.current);
@@ -1011,7 +1025,7 @@ const UserForm = ({
     handleAutoClose();
   };
 
-  // Handle error alert close - FIXED: consistent with RepoForm approach
+  // Handle error alert close
   const handleErrorAlertClose = () => {
     setShowErrorAlert(false);
   };
@@ -1030,7 +1044,7 @@ const UserForm = ({
     }
   };
 
-  // Show success alert - FIXED: consistent naming and approach
+  // Show success alert
   const triggerSuccess = (message) => {
     setSuccessMessage(message);
     setShowSuccessAlert(true);
@@ -1044,17 +1058,16 @@ const UserForm = ({
     }, 3000);
   };
 
-  // Show error alert - FIXED: consistent with RepoForm approach
+  // Show error alert
   const triggerError = (message) => {
     setErrorMessage(message);
     setShowErrorAlert(true);
-    // Auto close after 6 seconds like RepoForm
     setTimeout(() => {
       setShowErrorAlert(false);
     }, 6000);
   };
 
-  // Handle role selection - using roleId instead of roleName
+  // Handle role selection
   const handleRoleToggle = (roleId) => {
     let updatedRoles;
     if (selectedRoles.includes(roleId)) {
@@ -1120,36 +1133,42 @@ const UserForm = ({
         clearTimeout(autoCloseTimeoutRef.current);
       }
 
-      // Prepare data for submission in the desired format
+      // Prepare data for submission
       const submitData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        userName: data.userName,
-        email: data.email,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        userName: data.userName.trim(),
+        email: data.email.trim().toLowerCase(),
+        // password: data.password,
+        // confirmPassword: data.confirmPassword,
         roleIds: selectedRoles,
         permissionIds: selectedPermissionIds,
       };
       // console.log('marwa submitData',submitData);
-      // In edit mode, include the ID and handle password
+      // Add password only if provided and we're in create mode
+      if (!isEditMode && data.password && data.password.trim() !== "") {
+        submitData.password = data.password;
+        submitData.confirmPassword = data.confirmPassword;
+      }
+
+      // In edit mode, include the user ID
       if (isEditMode && initialData) {
-        submitData.id = initialData.id;
-        // If password is empty in edit mode, don't include it
-        if (!submitData.password || submitData.password.trim() === "") {
-          delete submitData.password;
-          delete submitData.confirmPassword;
-        }
+        submitData.id = initialData.id || initialData.userId;
       }
 
       console.log(`${isEditMode ? "UPDATE" : "CREATE"} User Data:`, JSON.stringify(submitData, null, 2));
 
-      // Dispatch the createUser action with the properly formatted data
-      const result = await dispatch(createUser(submitData)).unwrap();
+      // Dispatch the appropriate action
+      let result;
+      if (isEditMode) {
+        result = await dispatch(updateUser(submitData)).unwrap();
+      } else {
+        result = await dispatch(createUser(submitData)).unwrap();
+      }
 
       console.log(`User ${isEditMode ? "updated" : "created"} successfully!`, result);
 
-      // Show success alert immediately after successful API call
+      // Show success alert
       triggerSuccess(`User ${isEditMode ? 'updated' : 'created'} successfully`);
       
       // Reset submitting state
@@ -1180,17 +1199,25 @@ const UserForm = ({
       setValue("lastName", initialData.lastName || "");
       setValue("userName", initialData.userName || "");
       setValue("email", initialData.email || "");
-      setValue("password", "");
-      setValue("confirmPassword", "");
-
-      // Reset selected roles and permissionIds
+      // setValue("password", "");
+      // setValue("confirmPassword", "");
+      // Reset selected roles
       if (initialData.roles) {
-        setSelectedRoles(Array.isArray(initialData.roles) ? initialData.roles : []);
+        const roleIds = initialData.roles.map(role => 
+          typeof role === 'object' ? role.roleId || role.id : role
+        );
+        setSelectedRoles(roleIds);
       } else if (initialData.roleIds) {
         setSelectedRoles(Array.isArray(initialData.roleIds) ? initialData.roleIds : []);
       }
       
-      if (initialData.permissionIds) {
+      // Reset selected permissions
+      if (initialData.permissions) {
+        const permissionIds = initialData.permissions.map(permission =>
+          typeof permission === 'object' ? permission.id || permission.permissionId : permission
+        );
+        setSelectedPermissionIds(permissionIds);
+      } else if (initialData.permissionIds) {
         setSelectedPermissionIds(Array.isArray(initialData.permissionIds) ? initialData.permissionIds : []);
       }
     } else {
@@ -1222,7 +1249,7 @@ const UserForm = ({
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Success Alert - FIXED: consistent with RepoForm */}
+      {/* Success Alert */}
       {showSuccessAlert && (
         <SuccessAlert
           show={showSuccessAlert}
@@ -1234,7 +1261,7 @@ const UserForm = ({
         />
       )}
 
-      {/* Error Alert - FIXED: consistent with RepoForm */}
+      {/* Error Alert */}
       {showErrorAlert && (
         <ErrorAlert
           show={showErrorAlert}
@@ -1327,6 +1354,7 @@ const UserForm = ({
                 <input
                   {...register("userName")}
                   type="text"
+                  disabled={isEditMode}
                   autoComplete="off"
                   className={`w-full px-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                     errors.userName
@@ -1356,6 +1384,7 @@ const UserForm = ({
                     {...register("email")}
                     type="email"
                     autoComplete="off"
+                    disabled={isEditMode}
                     className={`w-full pl-10 pr-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                       errors.email
                         ? "border-red-300 bg-red-50"
@@ -1372,110 +1401,92 @@ const UserForm = ({
                 )}
               </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("password")}
-                  {!isEditMode && <span className="text-red-500">*</span>}
-                  {isEditMode && (
-                    <span className="text-gray-500 text-xs ml-2">
-                      {t("leaveEmptyKeepPassword")}
-                    </span>
-                  )}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    {...register("password")}
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
-                      errors.password
-                        ? "border-red-300 bg-red-50"
-                        : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
-                    }`}
-                    placeholder={
-                      isEditMode
-                        ? t("passwordPlaceholderEdit")
-                        : t("passwordPlaceholderCreate")
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+              {/* Password Field - ONLY SHOW IN CREATE MODE */}
+              {!isEditMode && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t("password")} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        {...register("password")}
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
+                          errors.password
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
+                        }`}
+                        placeholder={t("passwordPlaceholderCreate")}
+                      />
+                      <button
+                        type="button"
+                        onClick={togglePasswordVisibility}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p className="mt-1 text-red-600 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        {errors.password.message}
+                      </p>
                     )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.password.message}
-                  </p>
-                )}
-                {!isEditMode && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    {t("passwordRequirements")}
-                  </p>
-                )}
-              </div>
+                    <p className="mt-1 text-xs text-gray-500">
+                      {t("passwordRequirements")}
+                    </p>
+                  </div>
 
-              {/* Confirm Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t("confirmPassword")}{" "}
-                  {!isEditMode && <span className="text-red-500">*</span>}
-                  {isEditMode && (
-                    <span className="text-gray-500 text-xs ml-2">
-                      {t("confirmPasswordPlaceholderEdit")}
-                    </span>
-                  )}
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    {...register("confirmPassword")}
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
-                      errors.confirmPassword
-                        ? "border-red-300 bg-red-50"
-                        : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
-                    }`}
-                    placeholder={
-                      isEditMode
-                        ? t("confirmPasswordPlaceholderEdit")
-                        : t("confirmPasswordPlaceholderCreate")
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleConfirmPasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  {/* Confirm Password Field - ONLY SHOW IN CREATE MODE */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t("confirmPassword")} <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        {...register("confirmPassword")}
+                        type={showConfirmPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
+                          errors.confirmPassword
+                            ? "border-red-300 bg-red-50"
+                            : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
+                        }`}
+                        placeholder={t("confirmPasswordPlaceholderCreate")}
+                      />
+                      <button
+                        type="button"
+                        onClick={toggleConfirmPasswordVisibility}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="mt-1 text-red-600 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        {errors.confirmPassword.message}
+                      </p>
                     )}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
 
               {/* Roles - Multi Select */}
               <div>
@@ -1696,8 +1707,9 @@ const UserForm = ({
 };
 
 // Dynamic validation schema based on mode
-const getValidationSchema = (isEditMode, t) =>
-  z.object({
+const getValidationSchema = (isEditMode, t) => {
+  // Base schema with common fields
+  const baseSchema = z.object({
     firstName: z
       .string()
       .min(1, t("firstNameRequired"))
@@ -1733,23 +1745,29 @@ const getValidationSchema = (isEditMode, t) =>
       .min(1, t("emailRequired"))
       .email(t("emailInvalid"))
       .toLowerCase(),
-    password: isEditMode
-      ? z.string().optional().or(z.literal("")) 
-      : z
-          .string()
-          .min(1, t("passwordRequired"))
-          .min(8, t("passwordMinLength"))
-          .max(100, t("passwordMaxLength"))
-          .regex(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-            t("passwordRequirements")
-          ),
-    confirmPassword: isEditMode
-      ? z.string().optional().or(z.literal("")) 
-      : z.string().min(1, t("confirmPasswordRequired")),
-  }).refine((data) => data.password === data.confirmPassword, {
-    message: t("passwordsNotMatch"),
-    path: ["confirmPassword"],
   });
+
+  // Add password fields only for create mode
+  if (!isEditMode) {
+    return baseSchema.extend({
+      password: z
+        .string()
+        .min(1, t("passwordRequired"))
+        .min(8, t("passwordMinLength"))
+        .max(100, t("passwordMaxLength"))
+        .regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+          t("passwordRequirements")
+        ),
+      confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+    }).refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsNotMatch"),
+      path: ["confirmPassword"],
+    });
+  }
+
+  // Return base schema only for edit mode (no password fields)
+  return baseSchema;
+};
 
 export default React.memo(UserForm);

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createUser, fetchUsers } from "./usersThunks";
+import { createUser, fetchUsers, updateUser } from "./usersThunks";
 
 const usersSlice = createSlice({
   name: "users",
@@ -8,8 +8,10 @@ const usersSlice = createSlice({
     status: "idle",
     error: null,
     lastFetched: null,
-    createStatus: "idle", // Separate status for create operation
+    createStatus: "idle",
     createError: null,
+    updateStatus: "idle", 
+    updateError: null,
   },
   reducers: {
     resetUsersState: (state) => {
@@ -19,10 +21,16 @@ const usersSlice = createSlice({
       state.lastFetched = null;
       state.createStatus = "idle";
       state.createError = null;
+      state.updateStatus = "idle";
+      state.updateError = null;
     },
     resetCreateStatus: (state) => {
       state.createStatus = "idle";
       state.createError = null;
+    },
+    resetUpdateStatus: (state) => {
+      state.updateStatus = "idle";
+      state.updateError = null;
     },
   },
   extraReducers: (builder) => {
@@ -50,14 +58,35 @@ const usersSlice = createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.createStatus = "succeeded";
         state.createError = null;
-        // state.users.push(action.payload); // Optionally add the new user to the users array
+        // Optionally update users list
+        // state.users.push(action.payload);
       })
       .addCase(createUser.rejected, (state, action) => {
         state.createStatus = "failed";
         state.createError = action.payload || action.error.message;
+      })
+      // Update user
+      .addCase(updateUser.pending, (state) => {
+        state.updateStatus = "loading";
+        state.updateError = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.updateStatus = "succeeded";
+        state.updateError = null;
+        // Update the user in the users array
+        const index = state.users.findIndex(user => 
+          user.id === action.payload.id || user.userId === action.payload.id
+        );
+        if (index !== -1) {
+          state.users[index] = { ...state.users[index], ...action.payload };
+        }
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.updateStatus = "failed";
+        state.updateError = action.payload || action.error.message;
       });
   },
 });
 
-export const { resetUsersState, resetCreateStatus } = usersSlice.actions;
+export const { resetUsersState, resetCreateStatus, resetUpdateStatus } = usersSlice.actions;
 export default usersSlice.reducer;

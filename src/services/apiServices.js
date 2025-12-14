@@ -481,6 +481,7 @@ export async function getAllUsers() {
   }
 }
 
+
 // Create User
 export async function createNewUser(userData) {
   try {
@@ -488,6 +489,16 @@ export async function createNewUser(userData) {
     return response;
   } catch (err) {
     console.error("Failed to Create User", err);
+    throw err;
+  }
+}
+// Update User
+export async function updateNewUser(userData) {
+  try {
+    const response = await api.put(`Users/UpdateUser/UpdateUser/${userData.id}`, userData);
+    return response;
+  } catch (err) {
+    console.error("Failed to Update User", err);
     throw err;
   }
 }

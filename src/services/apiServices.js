@@ -481,7 +481,6 @@ export async function getAllUsers() {
   }
 }
 
-
 // Create User
 export async function createNewUser(userData) {
   try {
@@ -495,7 +494,10 @@ export async function createNewUser(userData) {
 // Update User
 export async function updateNewUser(userData) {
   try {
-    const response = await api.put(`Users/UpdateUser/UpdateUser/${userData.id}`, userData);
+    const response = await api.put(
+      `Users/UpdateUser/UpdateUser/${userData.id}`,
+      userData
+    );
     return response;
   } catch (err) {
     console.error("Failed to Update User", err);
@@ -571,6 +573,33 @@ export async function getScreensPermissions() {
     return response;
   } catch (err) {
     console.error("Failed to Fetch Screen Permissions", err);
+    throw err;
+  }
+}
+
+//! Scan
+// fetch Scanners
+export async function getScanners() {
+  try {
+    const response = await axios.get("http://localhost:5000/scan/scanners");
+    console.log(response);
+
+    return response;
+  } catch (err) {
+    console.error("Failed to Fetch Scanners", err);
+    throw err;
+  }
+}
+
+// Scan
+export async function scan(scanData) {
+  try {
+    const response = await axios.post("http://localhost:5000/scan/scan", scanData);
+    console.log(response);
+
+    return response;
+  } catch (err) {
+    console.error("Failed to scan ", err);
     throw err;
   }
 }

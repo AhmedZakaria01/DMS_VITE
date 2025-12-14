@@ -26,6 +26,7 @@ import {
   delete_File,
   createDocument,
 } from "../documentViewerThunk";
+import { getScanners, scan } from "../../../services/apiServices";
 import {
   clearAllFiles,
   setFileSecurityLevel,
@@ -60,13 +61,8 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
   // Get filesMetaData from completeJsonData
   const filesMetaData = completeJsonData.filesMetaData;
 
-  const staticScanners = [
-    { id: 1, name: "HP ScanJet Pro 3000" },
-    { id: 2, name: "Canon imageFORMULA DR-C225" },
-    { id: 3, name: "Epson WorkForce ES-500W" },
-    { id: 4, name: "Fujitsu ScanSnap iX1600" },
-    { id: 5, name: "Brother ADS-2700W" },
-  ];
+  // Scanners state
+  const [scanners, setScanners] = useState([]);
   // Handle permissions button click for a specific file
   const handlePermissions = (categoryId, fileName) => {
     // Find the file in filesMetaData
@@ -244,6 +240,25 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     setCurrentPage(1);
   }, [documentTypeId]);
 
+  // ✅ Fetch scanners on component mount
+  useEffect(() => {
+    const fetchScanners = async () => {
+      try {
+        const response = await getScanners();
+        if (response.data) {
+          setScanners(response.data);
+          console.log("Scanners fetched successfully:", response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch scanners:", error);
+        // Set empty array on error
+        setScanners([]);
+      }
+    };
+
+    fetchScanners();
+  }, []);
+
   // ✅ Update when props change or Redux state changes
   useEffect(() => {
     if (currentDocTypeId) {
@@ -334,9 +349,47 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
   };
 
   // Handle scanner selection
-  const handleScannerChange = (selectedScannerId) => {
-    const scanId = selectedScannerId ? parseInt(selectedScannerId) : null;
-    setScannerId(scanId);
+  const handleScannerChange = (selectedScanner) => {
+    const scannerName = selectedScanner || null;
+    setScannerId(scannerName);
+  };
+
+  // Handle scan operation
+  const handleScan = async (categoryId, categoryName) => {
+    if (!scannerId) {
+      alert(t("selectScannerFirst") || "Please select a scanner first");
+      return;
+    }
+
+    try {
+      // Get the project root from environment variable
+      const projectRoot = import.meta.env.VITE_PROJECT_ROOT || "D:\\NAMAA\\DMS\\DMS_VITE";
+
+      // Construct the full output path: <project_root>\public\Scanner\Session_01
+      const outputFolder = `${projectRoot}\\public\\Scanner`;
+
+      const scanData = {
+        scannerName: scannerId,
+        outputFolder: outputFolder,
+        outputType: "PDF",
+        scanSubFolderName: "Session_01",
+      };
+
+      console.log("Initiating scan with data:", scanData);
+      const response = await scan(scanData);
+      console.log("Scan completed successfully:", response);
+
+      alert(
+        t("scanSuccess") ||
+          `Scan completed successfully for ${categoryName}! Files saved to Scanner folder.`
+      );
+    } catch (error) {
+      console.error("Scan failed:", error);
+      alert(
+        t("scanFailed") ||
+          `Scan failed: ${error.message || "Unknown error occurred"}`
+      );
+    }
   };
 
   // ✅  Pagination handlers
@@ -1382,7 +1435,7 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  alert(t("scanInitiated") || "Scan initiated!");
+                  handleScan(id, item.name);
                 }}
                 disabled={!documentTypeId || isUploading || !scannerId}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -1737,18 +1790,24 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
                     onChange={(e) => handleScannerChange(e.target.value)}
                     className="px-1 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px] text-sm"
                   >
-                    <option value="" className="text-sm">
+                    <option value="" disabled className="text-sm">
                       {t("selectScanner") || "Select Scanner"}
                     </option>
-                    {staticScanners.map((scanner) => (
-                      <option
-                        key={scanner.id}
-                        value={scanner.id}
-                        className="text-sm"
-                      >
-                        {scanner.name}
+                    {scanners.length > 0 ? (
+                      scanners.map((scanner, index) => (
+                        <option
+                          key={index}
+                          value={scanner}
+                          className="text-sm"
+                        >
+                          {scanner}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled className="text-sm text-gray-400">
+                        {t("noScannersAvailable") || "No scanners available"}
                       </option>
-                    ))}
+                    )}
                   </select>
                 </div>
               </div>

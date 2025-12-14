@@ -30,4 +30,5 @@ const folderContents = createSlice({
   },
 });
 
+export const { clearFolderContents } = folderContents.actions;
 export default folderContents.reducer;

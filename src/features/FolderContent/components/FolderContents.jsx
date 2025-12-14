@@ -4,6 +4,7 @@ import React, { useMemo, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Plus, Folder, FileText } from "lucide-react";
 import { fetchFolderContents } from "../folderContentsThunks";
+import { clearFolderContents } from "../folderContentsSlice";
 import { useTranslation } from "react-i18next";
 
 function FolderContents() {
@@ -53,6 +54,8 @@ function FolderContents() {
   // Fetch folder contents whenever currentFolderId changes
   useEffect(() => {
     if (repoId && currentFolderId) {
+      // Clear old data first to prevent showing stale data
+      dispatch(clearFolderContents());
       dispatch(fetchFolderContents({ repoId, folderId: currentFolderId }));
     }
   }, [dispatch, repoId, currentFolderId]);

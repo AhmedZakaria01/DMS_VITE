@@ -30,4 +30,5 @@ const repoContentSlice = createSlice({
   },
 });
 
+export const { clearRepoContents } = repoContentSlice.actions;
 export default repoContentSlice.reducer;

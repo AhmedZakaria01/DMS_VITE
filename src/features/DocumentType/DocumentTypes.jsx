@@ -6,6 +6,7 @@ import { Plus, Edit, Shield, Trash2, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
 import { fetchDocTypesByRepo } from "./DocTypeThunks";
+import { clearDocTypes } from "./docTypeSlice";
 
 function DocumentTypes() {
   const { t, i18n } = useTranslation();
@@ -27,13 +28,11 @@ function DocumentTypes() {
     document.body.dir = i18n.language === "ar" ? "rtl" : "ltr";
   }, [i18n.language]);
 
-  //   useEffect(() => {
-  //     dispatch(clearDocumentTypes());
-  //   }, [dispatch, user?.id, repoId]); // Clear when user changes or repo changes
-
   // Fetch Document Types for this repository
   useEffect(() => {
     if (repoId) {
+      // Clear old data first to prevent showing stale data
+      dispatch(clearDocTypes());
       dispatch(fetchDocTypesByRepo(repoId));
     }
   }, [dispatch, repoId]);

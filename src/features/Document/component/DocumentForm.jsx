@@ -567,7 +567,7 @@ function DocumentForm({ onDocumentTypeChange }) {
   const { t } = useTranslation();
   const { repoId } = useParams();
   const dispatch = useDispatch();
-  const currentRepoId = repoId || 1;
+  const currentRepoId = repoId || 19;
 
   // Redux selectors
   const { docTypes } = useSelector((state) => state.docTypeReducer);
@@ -777,13 +777,14 @@ function DocumentForm({ onDocumentTypeChange }) {
 
           return {
             attributeId: field.attributeId,
-            value: fieldValue,
+            // Convert all values to strings for JSON compatibility
+            value: String(fieldValue),
           };
         })
         .filter((attr) => {
           // Exclude attributes with empty string, null, or undefined values
           // But keep false (for unchecked checkboxes) and 0 (for number inputs)
-          return attr.value !== "" && attr.value !== null && attr.value !== undefined;
+          return attr.value !== "" && attr.value !== "null" && attr.value !== "undefined";
         });
 
       const completeJsonData = {

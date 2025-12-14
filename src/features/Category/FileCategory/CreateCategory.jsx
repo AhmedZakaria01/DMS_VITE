@@ -375,7 +375,7 @@ function CreateCategory() {
               <button
                 type="button"
                 onClick={handlePermissions}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md"
               >
                 <Shield className="w-4 h-4" />
                 {t("configurePermissions") || "Configure Permissions"}

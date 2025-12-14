@@ -4,6 +4,7 @@ import React, { useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Folder, FileText } from "lucide-react";
 import { fetchRepoContents } from "../repoContentThunks";
+import { clearRepoContents } from "../repoContentSlice";
 import { useTranslation } from "react-i18next";
 
 import usePermission from "../../auth/usePermission";
@@ -24,10 +25,13 @@ function RepoContents() {
 
   useEffect(() => {
     if (repoId) {
+      // Clear old data first to prevent showing stale data
+      dispatch(clearRepoContents());
       dispatch(fetchRepoContents(repoId));
       console.log("dispatched in Repo Content with:", { repoId });
     }
   }, [dispatch, repoId]);
+
 
   // ✅ Store repoId in localStorage when it becomes available
   useEffect(() => {

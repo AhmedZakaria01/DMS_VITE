@@ -35,6 +35,10 @@ const docTypeSlice = createSlice({
     clearDocTypeError: (state) => {
       state.error = null;
     },
+    // Clear all document types
+    clearDocTypes: (state) => {
+      state.docTypes = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -152,7 +156,7 @@ const docTypeSlice = createSlice({
   },
 });
 
-export const { resetDocTypeState, clearCurrentDocType, clearDocTypeError } =
+export const { resetDocTypeState, clearCurrentDocType, clearDocTypeError, clearDocTypes } =
   docTypeSlice.actions;
 
 export default docTypeSlice.reducer;

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAllUsers, createNewUser, updateNewUser } from "../../services/apiServices";
+import { getAllUsers, createNewUser, updateNewUser, GetSpecificUser } from "../../services/apiServices";
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const response = await getAllUsers();
@@ -14,11 +14,17 @@ export const createUser = createAsyncThunk(
     return response.data.response;
   }
 );
-
 export const updateUser = createAsyncThunk(
   "users/updateUser",
   async (userData) => {
     const response = await updateNewUser(userData);
+    return response.data.response;
+  }
+);
+export const fetchSpecificUser = createAsyncThunk(
+  "users/fetchSpecificUser",
+  async (userId) => {
+    const response = await GetSpecificUser(userId);
     return response.data.response;
   }
 );

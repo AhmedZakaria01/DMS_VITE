@@ -7,7 +7,7 @@ import {
 // Get all Roles
 export const fetchRoles = createAsyncThunk("users/fetchRoles", async () => {
   const response = await getRoles();
-  console.log(response.data.response);
+  // console.log(response.data.response);
   return response.data.response;
 });
 // Create New Roles

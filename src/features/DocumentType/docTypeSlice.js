@@ -38,6 +38,7 @@ const docTypeSlice = createSlice({
     // Clear all document types
     clearDocTypes: (state) => {
       state.docTypes = [];
+      state.loading = true; // Set loading to true when clearing to show loading state
     },
   },
   extraReducers: (builder) => {

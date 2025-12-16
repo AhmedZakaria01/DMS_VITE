@@ -11,6 +11,7 @@ const folderContents = createSlice({
   reducers: {
     clearFolderContents: (state) => {
       state.folderContents = [];
+      state.status = "loading"; // Set to loading to show loading state
     },
   },
   extraReducers: (builder) => {

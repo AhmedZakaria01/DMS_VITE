@@ -275,16 +275,17 @@ function Users() {
       }
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2">
           {canEditUser && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleUpdateUser(userData);
               }}
-              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+              className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
               title={t("editUser")}
             >
+              <p>{t("edit")}</p>
               <Edit2 className="w-4 h-4" />
             </button>
           )}
@@ -295,9 +296,10 @@ function Users() {
                 e.stopPropagation();
                 handleDeleteUser(userData);
               }}
-              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+              className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
               title={t("deleteUser")}
             >
+              <p>{t("delete")}</p>
               <Trash2 className="w-4 h-4" />
             </button>
           )}

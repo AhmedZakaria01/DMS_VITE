@@ -525,13 +525,45 @@ export async function createNewRole(roleData) {
 }
 
 // Update Role
-export async function updateRole(roleData) {
-  try {
-    const { id, ...updateData } = roleData;
-    const response = await api.put(`/Roles/${id}`, updateData);
+export async function updateSpaecificRole(roleData) {
+  try {    
+    const { roleId, roleName, permissionIds } = roleData;
+    
+    if (!roleId) {
+      throw new Error("Role ID is required for updating");
+    }
+    // Remove roleId from the data object as it's in the URL
+    const requestData = {
+      roleName: roleName || "new", 
+      permissionIds: permissionIds || []
+    };
+    
+    console.log("Updating role with data:", {
+      roleId,
+      endpoint: `/Roles/UpdateRolePermissions/${roleId}`,
+      data: requestData
+    });
+    
+    const response = await api.put(`/Roles/UpdateRolePermissions/${roleId}`, requestData);
     return response;
   } catch (err) {
-    console.error("Failed to Update Role", err);
+    console.error("Failed to Update Role:", err);
+    throw err;
+  }
+}
+
+
+// Fetch Permissions by RoleId
+export async function getPermissionRole(roleId) {
+  try {
+    if (!roleId) {
+      throw new Error("Role ID is required");
+    }
+    
+    const response = await api.get(`/Roles/GetRolePermissionsById/${roleId}`);
+    return response;
+  } catch (err) {
+    console.error(`Failed to fetch permissions for role ${roleId}:`, err);
     throw err;
   }
 }

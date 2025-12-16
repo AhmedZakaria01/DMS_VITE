@@ -715,7 +715,7 @@ const CreateFolder = () => {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-3 flex justify-center items-center">
           <FolderPlus className="w-7 h-7 mr-2 text-blue-600" />
-          {t("title")}
+          {t("Create Folder")}
         </h2>
         <p className="text-gray-600 text-lg">{t("description")}</p>
       </div>

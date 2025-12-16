@@ -15,7 +15,7 @@ function FolderContents() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { repoId } = useParams();
+  const { repoId, folderId } = useParams();
   const location = useLocation();
 
   // Extract the folder path from the wildcard route
@@ -24,16 +24,15 @@ function FolderContents() {
   )[1];
 
   // Get current folder ID (the last segment of the path)
-  const currentFolderId = folderPath ? folderPath.split("/").pop() : null;
+  // Use folderId from params as fallback if folderPath extraction fails
+  const currentFolderId = folderPath ? folderPath.split("/").pop() : folderId;
 
   // Get folder navigation history and repository name from location state
   const folderHistory = location.state?.folderHistory || [];
   const repoName =
     location.state?.repoName || sessionStorage.getItem("currentRepoName");
 
-  // Debug log to see what we're working with
-  console.log("FolderContents - repoName:", repoName);
-  console.log("FolderContents - location.state:", location.state);
+
 
   // Combine folders and documents into one array
   const folders_documents = useMemo(() => {
@@ -51,12 +50,14 @@ function FolderContents() {
     return combined;
   }, [folderContents]);
 
+  console.log(currentFolderId);
+
   // Fetch folder contents whenever currentFolderId changes
   useEffect(() => {
     if (repoId && currentFolderId) {
       // Clear old data first to prevent showing stale data
       dispatch(clearFolderContents());
-      dispatch(fetchFolderContents({ repoId, folderId: currentFolderId }));
+      dispatch(fetchFolderContents({currentFolderId }));
     }
   }, [dispatch, repoId, currentFolderId]);
 
@@ -144,11 +145,12 @@ function FolderContents() {
         </div>
         <div>
           <button
-            onClick={() => navigate("/createRepo")}
+            onClick={() => navigate(`/repoContents/${repoId}/folderContent/80`)}
+            // onClick={() => navigate("/createDocument")}
             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
           >
             <Plus className="w-5 h-5" />
-            {t("createRepository")}
+            {t("Create Document")}
           </button>
         </div>
       </div>

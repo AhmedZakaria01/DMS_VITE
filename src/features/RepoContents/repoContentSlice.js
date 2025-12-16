@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchRepoContents } from "./repoContentThunks";
+import { getRepoContents } from "./repoContentThunks";
 
 const repoContentSlice = createSlice({
   name: "Repo Contents",
@@ -16,14 +16,24 @@ const repoContentSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch User Repos
-      .addCase(fetchRepoContents.pending, (state) => {
+      .addCase(getRepoContents.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchRepoContents.fulfilled, (state, action) => {
+      .addCase(getRepoContents.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.repoContents = action.payload?.response || [];
+        console.log(action.payload);
+
+        // Combine folders and documents into a single array
+        const folders = action.payload.response?.folders || [];
+        const documents = action.payload.response?.documents || [];
+
+        // Merge both arrays and add a type field to distinguish them
+        state.repoContents = [
+          ...folders.map(folder => ({ ...folder, type: 'Folder' })),
+          ...documents.map(document => ({ ...document, type: 'Document' }))
+        ];
       })
-      .addCase(fetchRepoContents.rejected, (state, action) => {
+      .addCase(getRepoContents.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       });

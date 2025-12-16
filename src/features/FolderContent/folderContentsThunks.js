@@ -5,8 +5,15 @@ import { createFolder, getFolderContents } from "../../services/apiServices";
 // Fetch User Repositories
 export const fetchFolderContents = createAsyncThunk(
   "repo/fetchRepoContent",
-  async ({ repoId, folderId }) => {
-    const response = await getFolderContents(repoId, folderId);
+  async ({ currentFolderId }) => {
+    console.log(
+      "fetchFolderContents thunk - repoId:",
+      "currentFolderId:",
+      currentFolderId
+    );
+
+    const response = await getFolderContents(currentFolderId);
+    console.log(response);
     return response.data;
   }
 );

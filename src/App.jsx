@@ -95,7 +95,7 @@ function App() {
             element={<UsersRolesPermissionsTable />}
           />
           <Route
-            path="/repoContents/:repoId/folderContent/*"
+            path="/repoContents/:repoId/folderContent/:folderId"
             element={<FolderContents />}
           />
           <Route path="/createDocument" element={<CreateDocument />} />

@@ -6,12 +6,14 @@ import { Plus, Folder, FileText } from "lucide-react";
 import { fetchFolderContents } from "../folderContentsThunks";
 import { clearFolderContents } from "../folderContentsSlice";
 import { useTranslation } from "react-i18next";
+import usePermission from "../../auth/usePermission";
 
 function FolderContents() {
   const { t } = useTranslation();
   const { folderContents, status, error } = useSelector(
     (state) => state.folderContentsReducer
   );
+  const canCreateDocument = usePermission("document.create");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,8 +33,6 @@ function FolderContents() {
   const folderHistory = location.state?.folderHistory || [];
   const repoName =
     location.state?.repoName || sessionStorage.getItem("currentRepoName");
-
-
 
   // Combine folders and documents into one array
   const folders_documents = useMemo(() => {
@@ -57,7 +57,7 @@ function FolderContents() {
     if (repoId && currentFolderId) {
       // Clear old data first to prevent showing stale data
       dispatch(clearFolderContents());
-      dispatch(fetchFolderContents({currentFolderId }));
+      dispatch(fetchFolderContents({ currentFolderId }));
     }
   }, [dispatch, repoId, currentFolderId]);
 
@@ -144,14 +144,17 @@ function FolderContents() {
           <p className="text-gray-600">{t("folderContentsDescription")}</p>
         </div>
         <div>
-          <button
-            onClick={() => navigate(`/repoContents/${repoId}/folderContent/80`)}
-            // onClick={() => navigate("/createDocument")}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
-          >
-            <Plus className="w-5 h-5" />
-            {t("Create Document")}
-          </button>
+          {!canCreateDocument && (
+            <button
+              onClick={() => navigate(`/createDocument`)}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
+              aria-label={t("createDocument")}
+              title={t("createDocument")}
+            >
+              <Plus className="w-5 h-5" />
+              {t("Create Document ")}
+            </button>
+          )}
         </div>
       </div>
 

@@ -128,7 +128,7 @@ function RepoContents() {
               title={t("createDocument")}
             >
               <Plus className="w-5 h-5" />
-              {t("Create Document")}
+              {t("Create Document ")}
             </button>
           )}
         </div>

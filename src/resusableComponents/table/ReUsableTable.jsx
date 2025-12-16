@@ -297,11 +297,11 @@ const ReUsableTable = ({
             <button
               type="button"
               onClick={handleTablePopup}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-4 py-2 font-semibold shadow hover:from-blue-700 hover:to-cyan-600 transition-all duration-200"
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 text-white px-3 py-1.5 text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
               title="View selected items"
             >
               <svg
-                className="w-5 h-5 text-white"
+                className="w-4 h-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -392,7 +392,7 @@ const ReUsableTable = ({
                 <td colSpan={columns.length} className="empty-state">
                   <div className="empty-icon">📭</div>
                   <p>{t("noDataAvailable")}</p>
-                  <small> {t("Tryagain")}  </small>
+                  <small> {t("Tryagain")} </small>
                 </td>
               </tr>
             ) : (
@@ -444,10 +444,10 @@ const ReUsableTable = ({
         </table>
       </div>
       {/* Add this after the table wrapper and before pagination */}
-      <div className="table-info flex justify-between items-center py-2 px-4 bg-gray-50 rounded text-sm text-gray-600">
+      <div className="table-info ">
         <span>
-          Showing {table.getRowModel().rows.length} of {""}
-          {table.getFilteredRowModel().rows.length} entries
+          Showing <strong>{table.getRowModel().rows.length}</strong> of{" "}
+          <strong>{table.getFilteredRowModel().rows.length}</strong> entries
         </span>
       </div>
       {/* Pagination controls */}

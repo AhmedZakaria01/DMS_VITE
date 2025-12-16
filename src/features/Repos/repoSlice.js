@@ -12,7 +12,7 @@ const repoSlice = createSlice({
   reducers: {
     clearRepos: (state) => {
       state.repos = [];
-      state.status = "idle";
+      state.status = "loading"; // Set to loading instead of idle to show loading state
       state.error = null;
     },
   },

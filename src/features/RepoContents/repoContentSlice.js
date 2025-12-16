@@ -11,6 +11,7 @@ const repoContentSlice = createSlice({
   reducers: {
     clearRepoContents: (state) => {
       state.repoContents = [];
+      state.status = "loading"; // Set to loading to show loading state
     },
   },
   extraReducers: (builder) => {

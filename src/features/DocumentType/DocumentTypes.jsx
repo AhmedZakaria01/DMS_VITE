@@ -2,23 +2,31 @@
 import { useDispatch, useSelector } from "react-redux";
 import React, { useMemo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Plus, Edit, Shield, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Shield, Trash2, ArrowLeft, FileType } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
 import { fetchDocTypesByRepo } from "./DocTypeThunks";
 import { clearDocTypes } from "./docTypeSlice";
+import usePermission from "../auth/usePermission";
 
 function DocumentTypes() {
   const { t, i18n } = useTranslation();
   const { repoId } = useParams(); // Get repository ID from URL params
   const [isUpdateDetails, setIsUpdateDetails] = useState(false);
   const [selectedDocumentType, setSelectedDocumentType] = useState(null);
-  const { docTypes, status, error } = useSelector(
+  const { docTypes, loading, error } = useSelector(
     (state) => state.docTypeReducer
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isAdmin } = useSelector((state) => state.authReducer);
+
+  // Check for permissions
+  const canEditDocType = usePermission("screens.documentTypes.edit");
+  const canDeleteDocType = usePermission("screens.documentTypes.delete");
+  const canManagePermissions = usePermission(
+    "screens.documentTypes.permissions"
+  );
 
   // Get repository name from sessionStorage or location state
   const repoName = sessionStorage.getItem("currentRepoName") || "Repository";
@@ -64,58 +72,80 @@ function DocumentTypes() {
   };
 
   // Action Buttons Component
-  const ActionButtons = ({ documentType }) => (
-    <div className="flex gap-2">
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleUpdateDetails(documentType);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-        title={t("update")}
-      >
-        <p>{t("update")}</p>
-        <Edit className="w-4 h-4" />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleUpdatePermissions(documentType);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
-        title={t("managePermissions")}
-      >
-        <p>{t("managePermissions")}</p>
-        <Shield className="w-4 h-4" />
-      </button>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          handleDelete(documentType);
-        }}
-        className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
-        title={t("delete")}
-      >
-        <p>{t("delete")}</p>
-        <Trash2 className="w-4 h-4" />
-      </button>
-    </div>
-  );
+  const ActionButtons = ({ documentType }) => {
+    // Check if user has any action permissions
+    const hasAnyActionPermission =
+      canEditDocType || canManagePermissions || canDeleteDocType;
+    if (!hasAnyActionPermission) {
+      return null;
+    }
+
+    return (
+      <div className="flex gap-2">
+        {canEditDocType && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUpdateDetails(documentType);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            title={t("update")}
+          >
+            <p>{t("update")}</p>
+            <Edit className="w-4 h-4" />
+          </button>
+        )}
+
+        {canManagePermissions && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUpdatePermissions(documentType);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
+            title={t("managePermissions")}
+          >
+            <p>{t("managePermissions")}</p>
+            <Shield className="w-4 h-4" />
+          </button>
+        )}
+
+        {canDeleteDocType && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(documentType);
+            }}
+            className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+            title={t("delete")}
+          >
+            <p>{t("delete")}</p>
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  };
 
   // Define table columns using TanStack Table format
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const baseColumns = [
       {
         id: "name",
         accessorKey: "name",
         header: t("documentTypeName"),
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <FileType className="w-5 h-5 text-purple-500" />
+            <span className="font-medium">{row.original.name}</span>
+          </div>
+        ),
       },
-      {
-        id: "description",
-        accessorKey: "description",
-        header: t("description"),
-      },
-      {
+    ];
+
+    // Only add actions column if user has any action permissions
+    if (canEditDocType || canManagePermissions || canDeleteDocType) {
+      baseColumns.push({
         id: "actions",
         accessorKey: "actions",
         header: t("actions"),
@@ -123,10 +153,11 @@ function DocumentTypes() {
         enableSorting: false,
         enableColumnFilter: false,
         cell: ({ row }) => <ActionButtons documentType={row.original} />,
-      },
-    ],
-    [t]
-  );
+      });
+    }
+
+    return baseColumns;
+  }, [t, canEditDocType, canManagePermissions, canDeleteDocType]);
 
   const handleRowDoubleClick = (row) => {
     console.log("Full row data:", row.original);
@@ -175,7 +206,6 @@ function DocumentTypes() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {t("documentTypes")}
           </h1>
-
         </div>
         <div>
           <button
@@ -193,7 +223,7 @@ function DocumentTypes() {
           columns={columns}
           data={docTypes || []}
           title={t("documentTypesManagement")}
-          isLoading={status === "loading"}
+          isLoading={loading}
           onRowDoubleClick={handleRowDoubleClick}
           showGlobalFilter={true}
           pageSizeOptions={[5, 10, 20, 50]}

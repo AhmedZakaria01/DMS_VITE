@@ -30,7 +30,7 @@ export default function Sidebar({
   // Icon mapping for each navigation item with colors
   const iconMap = {
     home: { emoji: "🏠", color: "text-blue-500" },
-    users: { emoji: "👤", color: "text-purple-500" },
+    users: { emoji: "🙍‍♂️", color: "text-purple-500" },
     roles: { emoji: "👥", color: "text-indigo-500" },
     auditTrail: { emoji: "📈", color: "text-green-500" },
     search: { emoji: "🔍", color: "text-amber-500" },

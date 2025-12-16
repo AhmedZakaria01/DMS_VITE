@@ -1,23 +1,12 @@
 // redux/thunks/repoThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getRepoContents } from "../../services/apiServices";
+import { fetchRepoContents } from "../../services/apiServices";
 
 // Fetch User Repositories
-export const fetchRepoContents = createAsyncThunk(
+export const getRepoContents = createAsyncThunk(
   "repo/fetchRepoContent",
   async (userId) => {
-    const response = await getRepoContents(userId);
-    // console.log(response);
-    
-    return response.data;
+    const response = await fetchRepoContents(userId);
+    return response;
   }
 );
-
-// Create New Repository
-// export const createNewRepo = createAsyncThunk(
-//   "repo/createNewRepository",
-//   async (repoData) => {
-//     const response = await createNewRepository(repoData);
-//     return response.data;
-//   }
-// );

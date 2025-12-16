@@ -324,20 +324,6 @@ export async function getRepositoryById(id) {
   }
 }
 
-// Fetch Repo Contents
-export async function getRepoContents(id) {
-  try {
-    const response = await api
-      .get
-      //! Replace With Repo Contents API
-      // `Repository/GetRepositoryDetailsById?id=${id}`
-      ();
-    return response;
-  } catch (err) {
-    console.err("Failed to Fetch Repos Contents", err);
-  }
-}
-
 // Get User Repos
 export async function getUserRepos(userId) {
   try {
@@ -366,12 +352,12 @@ export async function createFolder(data) {
 }
 
 // Fetch Folder Contents
-export async function getFolderContents(repoId, folderId) {
+export async function getFolderContents(folderId) {
   try {
     const response = await api.get(
-      `Folder/GetFolderInfoById?RepositoryId=${repoId}&folderId=${folderId}`
+      `Folder/GetFolderContentsById?id=${folderId}`
     );
-    console.log(repoId, folderId);
+    console.log(folderId);
     return response;
   } catch (err) {
     console.error("Failed to Fetch Folder Contents", err);
@@ -591,15 +577,34 @@ export async function getScanners() {
   }
 }
 
-// Scan
+//! Scan
+// Scan Document
 export async function scan(scanData) {
   try {
-    const response = await axios.post("http://localhost:5000/scan/scan", scanData);
+    const response = await axios.post(
+      "http://localhost:5000/scan/scan",
+      scanData
+    );
     console.log(response);
 
     return response;
   } catch (err) {
     console.error("Failed to scan ", err);
+    throw err;
+  }
+}
+
+//! Folders & Documents
+// Move Items (Folders/Documents)
+export async function fetchRepoContents(repoid) {
+  try {
+    const response = await api.get(
+      `Repository/GetRepositoryContentById?id=${repoid}`
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to Fetch Folders and Documents", err);
     throw err;
   }
 }

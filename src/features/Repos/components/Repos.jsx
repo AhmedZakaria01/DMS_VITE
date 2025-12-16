@@ -152,14 +152,14 @@
 //           <p className="text-gray-600">{t("reposDescription")}</p>
 //         </div>
 //         <div>
-  
+
 //          <button
 //             onClick={() => navigate("/createRepo")}
 //             className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
 //           >
 //             <Plus className="w-5 h-5" />
 //             {t("createRepository")}
-//           </button> 
+//           </button>
 //         </div>
 //       </div>
 
@@ -188,7 +188,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useEffect, useState, useCallback } from "react";
-import { fetchAllRepos, fetchUserRepos } from "../repoThunks";
+import { fetchAllRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
 import { Plus, Edit, Shield, Trash2 } from "lucide-react";
 // import Popup from "../../../globalComponents/Popup";
@@ -206,7 +206,11 @@ function Repos() {
   const canCreateRepo = usePermission("screens.repositories.create");
   const canEditRepo = usePermission("screens.repositories.edit");
   const canDeleteRepo = usePermission("screens.repositories.delete");
-  const canManagePermissions = usePermission("screens.repositories.permissions"); 
+  const canManagePermissions = usePermission(
+    "screens.repositories.permissions"
+  );
+
+   
 
   const [isUpdateDetails, setIsUpdateDetails] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState(null);
@@ -230,81 +234,102 @@ function Repos() {
   }, [dispatch]);
 
   // Action button handlers
-  const handleUpdateDetails = useCallback((repo) => {
-    console.log("Update details for:", repo.name);
-    setSelectedRepo(repo.id);
-    navigate(`/repos/${repo.id}/update-details`);
-    setIsUpdateDetails(true);
-  }, [navigate]);
+  const handleUpdateDetails = useCallback(
+    (repo) => {
+      console.log("Update details for:", repo.name);
+      setSelectedRepo(repo.id);
+      navigate(`/repos/${repo.id}/update-details`);
+      setIsUpdateDetails(true);
+    },
+    [navigate]
+  );
 
-  const handleUpdatePermissions = useCallback((repo) => {
-    console.log("Update permissions for:", repo.name);
-    navigate(`/repos/${repo.id}/permissions`);
-  }, [navigate]);
+  const handleUpdatePermissions = useCallback(
+    (repo) => {
+      console.log("Update permissions for:", repo.name);
+      navigate(`/repos/${repo.id}/permissions`);
+    },
+    [navigate]
+  );
 
-  const handleDelete = useCallback((repo) => {
-    console.log("Delete repo:", repo.name);
-    if (window.confirm(t("system.confirmDelete", { name: repo.name }))) {
-      // Dispatch delete action here
-      // dispatch(deleteRepo(repo.id));
-    }
-  }, [t]);
+  const handleDelete = useCallback(
+    (repo) => {
+      console.log("Delete repo:", repo.name);
+      if (window.confirm(t("system.confirmDelete", { name: repo.name }))) {
+        // Dispatch delete action here
+        // dispatch(deleteRepo(repo.id));
+      }
+    },
+    [t]
+  );
 
   // Action Buttons Component with permission checks
-  const ActionButtons = useCallback(({ repo }) => {
-    // Check if user has any action permissions
-    const hasAnyActionPermission = canEditRepo || canManagePermissions || canDeleteRepo;
-    
-    if (!hasAnyActionPermission) {
-      return null;
-    }
+  const ActionButtons = useCallback(
+    ({ repo }) => {
+      // Check if user has any action permissions
+      const hasAnyActionPermission =
+        canEditRepo || canManagePermissions || canDeleteRepo;
 
-    return (
-      <div className="flex gap-2">
-        {canEditRepo && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUpdateDetails(repo);
-            }}
-            className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-            title={t("update")}
-          >
-            <p>{t("update")}</p>
-            <Edit className="w-4 h-4" />
-          </button>
-        )}
-        
-        {canManagePermissions && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUpdatePermissions(repo);
-            }}
-            className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
-            title={t("managePermissions")}
-          >
-            <p>{t("managePermissions")}</p>
-            <Shield className="w-4 h-4" />
-          </button>
-        )}
-        
-        {canDeleteRepo && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(repo);
-            }}
-            className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
-            title={t("delete")}
-          >
-            <p>{t("delete")}</p>
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-    );
-  }, [canEditRepo, canManagePermissions, canDeleteRepo, handleUpdateDetails, handleUpdatePermissions, handleDelete, t]);
+      if (!hasAnyActionPermission) {
+        return null;
+      }
+
+      return (
+        <div className="flex gap-2">
+          {canEditRepo && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpdateDetails(repo);
+              }}
+              className="p-2 flex justify-center items-center gap-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+              title={t("update")}
+            >
+              <p>{t("update")}</p>
+              <Edit className="w-4 h-4" />
+            </button>
+          )}
+
+          {canManagePermissions && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUpdatePermissions(repo);
+              }}
+              className="p-2 flex justify-center items-center gap-3 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors duration-200"
+              title={t("managePermissions")}
+            >
+              <p>{t("managePermissions")}</p>
+              <Shield className="w-4 h-4" />
+            </button>
+          )}
+
+          {canDeleteRepo && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(repo);
+              }}
+              className="p-2 flex justify-center items-center gap-3 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+              title={t("delete")}
+            >
+              <p>{t("delete")}</p>
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      );
+    },
+    [
+      canEditRepo,
+      canManagePermissions,
+      canDeleteRepo,
+      handleUpdateDetails,
+      handleUpdatePermissions,
+      handleDelete,
+      t,
+    ]
+  );
 
   // Conditionally show actions column only if user has any actions permissions
   const columns = useMemo(() => {
@@ -334,24 +359,27 @@ function Repos() {
 
   const { isAdmin } = useSelector((state) => state.authReducer);
 
-  const handleRowDoubleClick = useCallback((row) => {
-    console.log("Full row data:", row.original);
+  const handleRowDoubleClick = useCallback(
+    (row) => {
+      console.log("Full row data:", row.original);
 
-    // Store repository name in sessionStorage
-    sessionStorage.setItem("currentRepoName", row.original.name);
+      // Store repository name in sessionStorage
+      sessionStorage.setItem("currentRepoName", row.original.name);
 
-    if (isAdmin) {
-      // Navigate to Document Type for Admins
-      navigate(`/documentTypes/${row.original.id}`, {
-        state: { repoName: row.original.name },
-      });
-    } else {
-      // Navigate to Create Folder for non-Admins
-      navigate(`/repoContents/${row.original.id}/createFolder`, {
-        state: { repoName: row.original.name },
-      });
-    }
-  }, [navigate, isAdmin]);
+      if (isAdmin) {
+        // Navigate to Document Type for Admins
+        navigate(`/documentTypes/${row.original.id}`, {
+          state: { repoName: row.original.name },
+        });
+      } else {
+        // Navigate to Create Folder for non-Admins
+        navigate(`/repoContents/${row.original.id} `, {
+          state: { repoName: row.original.name },
+        });
+      }
+    },
+    [navigate, isAdmin]
+  );
 
   return (
     <section className="p-6">

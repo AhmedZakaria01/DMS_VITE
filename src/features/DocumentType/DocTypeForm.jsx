@@ -22,6 +22,8 @@ import {
 import Popup from "../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../Permissions/UsersRolesPermissionsTable";
 import { createDocTypeWithAttribute } from "./DocTypeThunks";
+import SuccessAlert from "../../globalComponents/Alerts/SuccessAlert";
+import ErrorAlert from "../../globalComponents/Alerts/ErrorAlert";
 
 // Index field types configuration
 const indexFieldsTypes = [
@@ -357,6 +359,40 @@ const DocTypeForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openPermissions, setOpenPermissions] = useState(false);
   const [permissionsData, setPermissionsData] = useState({});
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorAlertMessage, setErrorAlertMessage] = useState("");
+
+  // Handle success messages from Redux
+  useEffect(() => {
+    if (success && message) {
+      setSuccessMessage(message);
+      setShowSuccessAlert(true);
+
+      // Auto-hide after 3 seconds
+      const timer = setTimeout(() => {
+        setShowSuccessAlert(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [success, message]);
+
+  // Handle error messages from Redux
+  useEffect(() => {
+    if (error) {
+      setErrorAlertMessage(error);
+      setShowErrorAlert(true);
+
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => {
+        setShowErrorAlert(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const resetFieldForm = () => {
     setCurrentField({
@@ -623,10 +659,6 @@ const DocTypeForm = () => {
               </div>
             </div>
           </div>
-
-          {/* Success/Error Messages */}
-          {error && <Alert message={error} type="error" />}
-          {success && message && <Alert message={message} type="success" />}
 
           {/* Scrollable Content Area */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -1072,6 +1104,22 @@ const DocTypeForm = () => {
           </form>
         </div>
       </div>
+
+      {/* Success Alert */}
+      <SuccessAlert
+        show={showSuccessAlert}
+        onClose={() => setShowSuccessAlert(false)}
+        title={t("success") || "Success!"}
+        message={successMessage}
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        show={showErrorAlert}
+        onClose={() => setShowErrorAlert(false)}
+        title={t("error") || "Error!"}
+        message={errorAlertMessage}
+      />
     </>
   );
 };

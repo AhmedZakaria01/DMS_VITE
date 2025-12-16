@@ -1177,7 +1177,7 @@ function RoleForm({
           show={showSuccessAlert}
           onClose={handleSuccessAlertClose}
           title={t("success")}
-          message={`Role ${isEditMode ? "updated" : "created"} successfully`}
+          message={isEditMode ? t("roleUpdatedSuccess") : t("roleCreatedSuccess")}
           autoHide={true}
           duration={3000}
         />

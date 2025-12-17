@@ -197,7 +197,13 @@ import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import Popup from "../../../globalComponents/Popup";
-import { Plus, Edit2, Trash2, ShieldCheck } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  ShieldCheck,
+  PaintRollerIcon,
+} from "lucide-react";
 import RoleForm from "./RoleForm";
 import { fetchRoles } from "../RolesThunks";
 import usePermission from "../../auth/usePermission";
@@ -364,7 +370,7 @@ function Roles() {
               onClick={handleCreateClick}
               className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium  py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm"
             >
-              <Plus className="w-5 h-5" />
+              <ShieldCheck className="w-5 h-5" />
               {t("createNewRole")}
             </button>
           )}

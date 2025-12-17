@@ -163,7 +163,6 @@
 
 //       // Extract permission IDs from permissionsToSet
 //       const permissionIds = [];
-      
 //       // Set the permissions from the selected source
 //       if (permissionsToSet.length > 0) {
 //         permissionsToSet.forEach((permission) => {
@@ -178,7 +177,7 @@
 //       } else {
 //         console.log("No existing permissions found for this role");
 //       }
-      
+
 //       // Store existing permission IDs for reference
 //       setExistingPermissionsIds(permissionIds);
 //     }
@@ -521,8 +520,7 @@
 //               <div className="mb-4">
 //                 <div className="flex items-center justify-between mb-2">
 //                   <label className="block text-sm font-medium text-gray-700">
-//                      {t("selectedPermissionsCount")} ({selectedPermissions.length}) 
-                 
+//                      {t("selectedPermissionsCount")} ({selectedPermissions.length})
 //                   </label>
 //                   <div className="flex gap-2">
 //                     <button
@@ -556,7 +554,7 @@
 //                       <span
 //                         key={permission.id}
 //                         className={`inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full group ${
-//                           isExisting 
+//                           isExisting
 //                             ? "bg-green-100 text-green-800 border border-green-300"
 //                             : "bg-blue-100 text-blue-800"
 //                         }`}
@@ -578,7 +576,7 @@
 //                       </span>
 //                     );
 //                   })}
-//                 </div> 
+//                 </div>
 //               </div>
 //             )}
 
@@ -646,7 +644,7 @@
 //                         {filteredPermissions.map((permission) => {
 //                           const isChecked = getValues(`permission_${permission.id}`);
 //                           const isExisting = isExistingPermission(permission.id);
-                          
+
 //                           return (
 //                             <div
 //                               key={permission.id}
@@ -670,7 +668,7 @@
 //                                   </span>
 //                                   {isExisting && isEditMode && (
 //                                     <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-//                                       Existing
+//                                       <Existing>
 //                                     </span>
 //                                   )}
 //                                 </div>
@@ -767,6 +765,7 @@ import {
 } from "../RolesThunks";
 import { clearPermissionRoles } from "../RolesSlice";
 import SuccessAlert from "../../../globalComponents/Alerts/SuccessAlert";
+import ErrorAlert from "../../../globalComponents/Alerts/ErrorAlert";
 
 function RoleForm({
   mode = "create",
@@ -782,9 +781,9 @@ function RoleForm({
     (state) => state.permissionsReducer
   );
 
-  console.log('====================================');
-  console.log('screenPermissions all', screenPermissions);
-  console.log('====================================');
+  console.log("====================================");
+  console.log("screenPermissions all", screenPermissions);
+  console.log("====================================");
   // Get roles state including permissionRoles
   const {
     permissionRoles = [],
@@ -797,6 +796,8 @@ function RoleForm({
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [permissionSearchTerm, setPermissionSearchTerm] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoadingRolePermissions, setIsLoadingRolePermissions] = useState(false);
   const [isPermissionDropdownOpen, setIsPermissionDropdownOpen] = useState(false);
   const [existingPermissionsIds, setExistingPermissionsIds] = useState([]);
@@ -908,7 +909,6 @@ function RoleForm({
 
       // Extract permission IDs from permissionsToSet
       const permissionIds = [];
-      
       // Set the permissions from the selected source
       if (permissionsToSet.length > 0) {
         permissionsToSet.forEach((permission) => {
@@ -917,13 +917,12 @@ function RoleForm({
           if (permissionId) {
             setValue(`permission_${permissionId}`, true);
             permissionIds.push(permissionId);
-            console.log(`Setting permission_${permissionId} to true for ${permission.displayName || 'unknown'}`);
+            console.log(`Setting permission_${permissionId} to true for ${permission.displayName || "unknown"}`);
           }
         });
       } else {
         console.log("No existing permissions found for this role");
       }
-      
       // Store existing permission IDs for reference
       setExistingPermissionsIds(permissionIds);
     }
@@ -947,6 +946,7 @@ function RoleForm({
       console.log(`Role ${isEditMode ? "updated" : "created"} successfully`);
       setIsSubmitting(false);
       setShowSuccessAlert(true);
+      setShowErrorAlert(false); // Hide any existing error
 
       // Auto close after 3 seconds
       autoCloseTimeoutRef.current = setTimeout(() => {
@@ -960,8 +960,10 @@ function RoleForm({
         rolesError
       );
       setIsSubmitting(false);
+      setShowErrorAlert(true);
+      setErrorMessage(rolesError || t("operationFailed"));
     }
-  }, [rolesStatus, rolesError, isSubmitting, isEditMode]);
+  }, [rolesStatus, rolesError, isSubmitting, isEditMode, t]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -975,7 +977,10 @@ function RoleForm({
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (permissionDropdownRef.current && !permissionDropdownRef.current.contains(event.target)) {
+      if (
+        permissionDropdownRef.current &&
+        !permissionDropdownRef.current.contains(event.target)
+      ) {
         setIsPermissionDropdownOpen(false);
         setPermissionSearchTerm("");
       }
@@ -1001,10 +1006,18 @@ function RoleForm({
     }
   };
 
+  const handleErrorAlertClose = () => {
+    setShowErrorAlert(false);
+    setErrorMessage("");
+  };
+
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
       setShowSuccessAlert(false);
+      setShowErrorAlert(false);
+      setErrorMessage("");
+
       if (autoCloseTimeoutRef.current) {
         clearTimeout(autoCloseTimeoutRef.current);
       }
@@ -1016,14 +1029,24 @@ function RoleForm({
         .map(([key]) => key.replace("permission_", ""));
 
       const roleName = data.roleName.trim();
-      
       if (!roleName) {
-        throw new Error("Role name is required");
+        setShowErrorAlert(true);
+        setErrorMessage(t("roleNameRequired"));
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate at least one permission is selected
+      if (permissionIds.length === 0) {
+        setShowErrorAlert(true);
+        setErrorMessage(t("atLeastOnePermissionRequired"));
+        setIsSubmitting(false);
+        return;
       }
 
       // FIXED: Include roleName in formattedData
       const formattedData = {
-        roleName: roleName, // This was commented out before
+        roleName: roleName,
         permissionIds,
       };
 
@@ -1052,6 +1075,8 @@ function RoleForm({
         error
       );
       setIsSubmitting(false);
+      setShowErrorAlert(true);
+      setErrorMessage(error.message || t("operationFailed"));
     }
   };
 
@@ -1079,6 +1104,8 @@ function RoleForm({
     setIsPermissionDropdownOpen(false);
     setPermissionSearchTerm("");
     setShowSuccessAlert(false);
+    setShowErrorAlert(false);
+    setErrorMessage("");
   };
 
   const handleCancel = () => {
@@ -1092,6 +1119,8 @@ function RoleForm({
     setIsPermissionDropdownOpen(false);
     setPermissionSearchTerm("");
     setShowSuccessAlert(false);
+    setShowErrorAlert(false);
+    setErrorMessage("");
     dispatch(clearPermissionRoles());
     if (onCancel) {
       onCancel();
@@ -1153,9 +1182,7 @@ function RoleForm({
     }
   };
 
-  const isLoading =
-    permissionsStatus === "loading" ||
-    isLoadingRolePermissions;
+  const isLoading = permissionsStatus === "loading" || isLoadingRolePermissions;
 
   // Function to check if a permission is an existing permission for the role (in edit mode)
   const isExistingPermission = (permissionId) => {
@@ -1165,7 +1192,9 @@ function RoleForm({
 
   // Get permission label by id
   const getPermissionLabel = (id) => {
-    const permission = screenPermissions.find((permission) => permission.id === id);
+    const permission = screenPermissions.find(
+      (permission) => permission.id === id
+    );
     return permission ? permission.displayName : id;
   };
 
@@ -1177,9 +1206,21 @@ function RoleForm({
           show={showSuccessAlert}
           onClose={handleSuccessAlertClose}
           title={t("success")}
-          message={isEditMode ? t("roleUpdatedSuccess") : t("roleCreatedSuccess")}
+          message={
+            isEditMode ? t("roleUpdatedSuccess") : t("roleCreatedSuccess")
+          }
           autoHide={true}
           duration={3000}
+        />
+      )}
+
+      {/* Error Alert */}
+      {showErrorAlert && (
+        <ErrorAlert
+          show={showErrorAlert}
+          onClose={handleErrorAlertClose}
+          title={t("error")}
+          message={errorMessage}
         />
       )}
 
@@ -1233,10 +1274,18 @@ function RoleForm({
                       message: t("roleNameMaxLength"),
                     },
                   })}
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.roleName
+                  // className={`w-full px-4 py-3 border rounded-lg shadow-sm bg-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  //   errors.roleName
+                  //     ? "border-red-300 bg-red-50"
+                  //     : "border-gray-300 hover:border-gray-400"
+                  // }`}
+                  disabled={isEditMode}
+                  className={`w-full px-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
+                    errors.userName
                       ? "border-red-300 bg-red-50"
-                      : "border-gray-300 hover:border-gray-400"
+                      : isEditMode
+                      ? "border-gray-300 bg-gray-100 cursor-not-allowed"
+                      : "border-gray-300 hover:border-gray-400 focus:border-blue-500"
                   }`}
                 />
                 {errors.roleName && (
@@ -1258,23 +1307,13 @@ function RoleForm({
               {t("screenAccessPermissions")}
             </h3>
 
-            {/* Show error if role creation fails */}
-            {rolesError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-600 flex items-center">
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  {rolesError}
-                </p>
-              </div>
-            )}
-
             {/* Selected Permissions Display */}
             {selectedPermissions.length > 0 && (
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-gray-700">
-                     {t("selectedPermissionsCount")} ({selectedPermissions.length}) 
-                 
+                    {t("selectedPermissionsCount")} (
+                    {selectedPermissions.length})
                   </label>
                   <div className="flex gap-2">
                     <button
@@ -1301,21 +1340,24 @@ function RoleForm({
                     </button>
                   </div>
                 </div>
-               <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-white min-h-[3rem]">
+                {/* <div className="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg bg-white min-h-[3rem]">
                   {selectedPermissions.map((permission) => {
                     const isExisting = isExistingPermission(permission.id);
                     return (
                       <span
                         key={permission.id}
                         className={`inline-flex items-center gap-1 px-3 py-1 text-sm font-medium rounded-full group ${
-                          isExisting 
+                          isExisting
                             ? "bg-green-100 text-green-800 border border-green-300"
                             : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {permission.displayName}
                         {isExisting && (
-                          <span className="text-xs ml-1 text-green-600" title="Existing permission">
+                          <span
+                            className="text-xs ml-1 text-green-600"
+                            title="Existing permission"
+                          >
                             (E)
                           </span>
                         )}
@@ -1330,7 +1372,7 @@ function RoleForm({
                       </span>
                     );
                   })}
-                </div> 
+                </div> */}
               </div>
             )}
 
@@ -1388,26 +1430,35 @@ function RoleForm({
                                 ? t("deselectAllInView")
                                 : t("selectAllInView")}
                             </button>
-                            {permissionSearchTerm && filteredPermissions.length > 0 && (
-                              <span className="text-gray-500">
-                                {filteredPermissions.length} {t("resultsFound")}
-                              </span>
-                            )}
+                            {permissionSearchTerm &&
+                              filteredPermissions.length > 0 && (
+                                <span className="text-gray-500">
+                                  {filteredPermissions.length}
+                                  {t("resultsFound")}
+                                </span>
+                              )}
                           </div>
                         </div>
                         {filteredPermissions.map((permission) => {
-                          const isChecked = getValues(`permission_${permission.id}`);
-                          const isExisting = isExistingPermission(permission.id);
-                          
+                          const isChecked = getValues(
+                            `permission_${permission.id}`
+                          );
+                          const isExisting = isExistingPermission(
+                            permission.id
+                          );
+
                           return (
                             <div
                               key={permission.id}
                               className={`flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer ${
-                                isChecked
-                                  ? "bg-blue-50"
-                                  : ""
+                                isChecked ? "bg-blue-50" : ""
                               }`}
-                              onClick={() => handlePermissionChange(permission.id, !isChecked)}
+                              onClick={() =>
+                                handlePermissionChange(
+                                  permission.id,
+                                  !isChecked
+                                )
+                              }
                             >
                               <div className="flex items-center">
                                 <input
@@ -1436,7 +1487,8 @@ function RoleForm({
                       </>
                     ) : (
                       <div className="px-4 py-2 text-sm text-gray-500">
-                        {t("noPermissionsFound")} &quot;{permissionSearchTerm}&quot;
+                        {t("noPermissionsFound")} &quot;{permissionSearchTerm}
+                        &quot;
                       </div>
                     )}
                   </div>
@@ -1444,7 +1496,8 @@ function RoleForm({
               </div>
 
               <p className="mt-1 text-xs text-gray-500">
-                {t("permissionsSelectionHint")} {selectedPermissions.length} / {screenPermissions.length}
+                {t("permissionsSelectionHint")} {selectedPermissions.length} /{" "}
+                {screenPermissions.length}
               </p>
             </div>
           </div>
@@ -1453,7 +1506,11 @@ function RoleForm({
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
             <button
               type="submit"
-              disabled={isSubmitting || rolesStatus === "loading" || screenPermissions.length === 0 || selectedPermissions.length === 0}
+              disabled={
+                isSubmitting ||
+                rolesStatus === "loading" ||
+                screenPermissions.length === 0
+              }
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
             >
               {isSubmitting || rolesStatus === "loading" ? (

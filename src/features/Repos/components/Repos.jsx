@@ -78,17 +78,9 @@ function Repos() {
   // Action Buttons Component with permission checks
   const ActionButtons = useCallback(
     ({ repo }) => {
-      // Check if user has any action permissions
-      const hasAnyActionPermission =
-        canEditRepo || canManagePermissions || canDeleteRepo;
-
-      if (!hasAnyActionPermission) {
-        return null;
-      }
-
       return (
         <div className="flex gap-2">
-          {canEditRepo && (
+          {repo.canEdit && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -102,7 +94,7 @@ function Repos() {
             </button>
           )}
 
-          {canManagePermissions && (
+          {repo.canManagePermissions && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -116,7 +108,7 @@ function Repos() {
             </button>
           )}
 
-          {canDeleteRepo && (
+          {repo.canDelete && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -132,15 +124,7 @@ function Repos() {
         </div>
       );
     },
-    [
-      canEditRepo,
-      canManagePermissions,
-      canDeleteRepo,
-      handleUpdateDetails,
-      handleUpdatePermissions,
-      handleDelete,
-      t,
-    ]
+    [handleUpdateDetails, handleUpdatePermissions, handleDelete, t]
   );
 
   // Conditionally show actions column only if user has any actions permissions
@@ -160,20 +144,19 @@ function Repos() {
     ];
 
     // Only add actions column if user has any action permissions
-    if (canEditRepo || canManagePermissions || canDeleteRepo) {
-      baseColumns.push({
-        id: "actions",
-        accessorKey: "actions",
-        header: t("actions"),
-        size: 140,
-        enableSorting: false,
-        enableColumnFilter: false,
-        cell: ({ row }) => <ActionButtons repo={row.original} />,
-      });
-    }
+
+    baseColumns.push({
+      id: "actions",
+      accessorKey: "actions",
+      header: t("actions"),
+      size: 140,
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: ({ row }) => <ActionButtons repo={row.original} />,
+    });
 
     return baseColumns;
-  }, [t, canEditRepo, canManagePermissions, canDeleteRepo, ActionButtons]);
+  }, []);
 
   const { isAdmin } = useSelector((state) => state.authReducer);
 

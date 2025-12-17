@@ -47,6 +47,7 @@ function RepoContents() {
   }, [repoId]);
 
   // Combine folders and documents into one array
+  console.log("repoContents data:", repoContents);
 
   // Fetch User Repos
   useEffect(() => {
@@ -104,21 +105,11 @@ function RepoContents() {
   // Action Buttons Component
   const ActionButtons = useCallback(
     ({ item }) => {
-      // Check if user has permissions based on item type
-      const canEdit = item.type === "Folder" ? canEditFolder : canEditDocument;
-      const canDelete =
-        item.type === "Folder" ? canDeleteFolder : canDeleteDocument;
-      const canManagePermissions =
-        item.type === "Folder" ? canManageFolderPermissions : canManageDocumentPermissions;
-
-      const hasAnyActionPermission = canEdit || canDelete || canManagePermissions;
-      if (!hasAnyActionPermission) {
-        return null;
-      }
+      console.log(item);
 
       return (
         <div className="flex gap-2">
-          {canEdit && (
+          {item.canEdit && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -132,7 +123,7 @@ function RepoContents() {
             </button>
           )}
 
-          {canManagePermissions && (
+          {item.canManagePermissions && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -146,7 +137,7 @@ function RepoContents() {
             </button>
           )}
 
-          {canDelete && (
+          {item.canDelete && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -162,18 +153,7 @@ function RepoContents() {
         </div>
       );
     },
-    [
-      canEditFolder,
-      canDeleteFolder,
-      canEditDocument,
-      canDeleteDocument,
-      canManageFolderPermissions,
-      canManageDocumentPermissions,
-      handleEdit,
-      handleDelete,
-      handleManagePermissions,
-      t,
-    ]
+    [handleEdit, handleDelete, handleManagePermissions, t]
   );
 
   // Define table columns
@@ -212,27 +192,40 @@ function RepoContents() {
       },
     ];
 
-    // Only add actions column if user has any action permissions
-    if (canEditFolder || canDeleteFolder || canEditDocument || canDeleteDocument || canManageFolderPermissions || canManageDocumentPermissions) {
-      baseColumns.push({
-        id: "actions",
-        accessorKey: "actions",
-        header: t("actions"),
-        size: 120,
-        enableSorting: false,
-        enableColumnFilter: false,
-        cell: ({ row }) => <ActionButtons item={row.original} />,
-      });
-    }
+    baseColumns.push({
+      id: "actions",
+      accessorKey: "actions",
+      header: t("actions"),
+      size: 120,
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: ({ row }) => <ActionButtons item={row.original} />,
+    });
 
     return baseColumns;
-  }, [t, canEditFolder, canDeleteFolder, canEditDocument, canDeleteDocument, canManageFolderPermissions, canManageDocumentPermissions]);
+  }, []);
 
   const handleRowDoubleClick = (row) => {
     console.log("Full row data:", row.original);
 
     if (row.original.type === "Folder") {
-      navigate(`/repoContents/${repoId}/folderContent/${row.original.id}`);
+      const folderPath = `/repoContents/${repoId}/folderContent/${row.original.id}`;
+
+      // Create folder history with just this one folder
+      const folderHistory = [
+        {
+          id: row.original.id,
+          name: row.original.name,
+          path: folderPath,
+        },
+      ];
+
+      navigate(folderPath, {
+        state: {
+          folderHistory: folderHistory,
+          repoName: sessionStorage.getItem("currentRepoName"),
+        },
+      });
     } else {
       console.log("Opening document:", row.original.name);
       navigate("/documentViewer");

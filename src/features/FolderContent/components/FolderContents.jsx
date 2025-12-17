@@ -17,12 +17,6 @@ function FolderContents() {
   // Check for permissions
   const canCreateFolder = usePermission("folder.create");
   const canCreateDocument = usePermission("document.create");
-  const canEditFolder = usePermission("folder.edit");
-  const canDeleteFolder = usePermission("folder.delete");
-  const canManageFolderPermissions = usePermission("folder.permissions");
-  const canEditDocument = usePermission("document.edit");
-  const canDeleteDocument = usePermission("document.delete");
-  const canManageDocumentPermissions = usePermission("document.permissions");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -119,24 +113,11 @@ function FolderContents() {
   // Action Buttons Component
   const ActionButtons = useCallback(
     ({ item }) => {
-      // Check if user has permissions based on item type
-      const canEdit = item.type === "folder" ? canEditFolder : canEditDocument;
-      const canDelete =
-        item.type === "folder" ? canDeleteFolder : canDeleteDocument;
-      const canManagePermissions =
-        item.type === "folder"
-          ? canManageFolderPermissions
-          : canManageDocumentPermissions;
-
-      const hasAnyActionPermission =
-        canEdit || canDelete || canManagePermissions;
-      if (!hasAnyActionPermission) {
-        return null;
-      }
+      console.log(item);
 
       return (
         <div className="flex gap-2">
-          {canEdit && (
+          {item.canEdit && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -150,7 +131,7 @@ function FolderContents() {
             </button>
           )}
 
-          {canManagePermissions && (
+          {item.canManagePermissions && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -164,7 +145,7 @@ function FolderContents() {
             </button>
           )}
 
-          {canDelete && (
+          {item.canDelete && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -180,18 +161,7 @@ function FolderContents() {
         </div>
       );
     },
-    [
-      canEditFolder,
-      canDeleteFolder,
-      canEditDocument,
-      canDeleteDocument,
-      canManageFolderPermissions,
-      canManageDocumentPermissions,
-      handleEdit,
-      handleDelete,
-      handleManagePermissions,
-      t,
-    ]
+    [handleEdit, handleDelete, handleManagePermissions, t]
   );
 
   // Define table columns
@@ -230,28 +200,19 @@ function FolderContents() {
       },
     ];
 
-    // Only add actions column if user has any action permissions
-    if (
-      canEditFolder ||
-      canDeleteFolder ||
-      canEditDocument ||
-      canDeleteDocument ||
-      canManageFolderPermissions ||
-      canManageDocumentPermissions
-    ) {
-      baseColumns.push({
-        id: "actions",
-        accessorKey: "actions",
-        header: t("actions"),
-        size: 120,
-        enableSorting: false,
-        enableColumnFilter: false,
-        cell: ({ row }) => <ActionButtons item={row.original} />,
-      });
-    }
+    baseColumns.push({
+      id: "actions",
+      accessorKey: "actions",
+      header: t("actions"),
+      size: 120,
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: ({ row }) => <ActionButtons item={row.original} />,
+    });
 
     return baseColumns;
-  }, [t, canEditFolder, canDeleteFolder, canEditDocument, canDeleteDocument, canManageFolderPermissions, canManageDocumentPermissions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleRowDoubleClick = (row) => {
     console.log("Full row data:", row.original);
@@ -298,7 +259,7 @@ function FolderContents() {
           <p className="text-gray-600">{t("folderContentsDescription")}</p>
         </div>
         <div className="flex items-center gap-3">
-          {canCreateFolder && (
+          {!canCreateFolder && (
             <button
               onClick={() => navigate(`/repoContents/${repoId}/createFolder`)}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
@@ -310,7 +271,7 @@ function FolderContents() {
             </button>
           )}
 
-          {canCreateDocument && (
+          {!canCreateDocument && (
             <button
               onClick={() => navigate(`/createDocument`)}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 whitespace-nowrap"

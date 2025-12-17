@@ -207,7 +207,7 @@ import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import UserForm from "./UserForm";
 import Popup from "../../../globalComponents/Popup";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { getAllUsers } from "../../../services/apiServices";
 import { fetchUsers } from "../usersThunks";
@@ -316,6 +316,12 @@ function Users() {
         accessorKey: "userName",
         header: t("userName"),
         size: 150,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <User className="w-5 h-5 text-blue-500" />
+            <span className="font-medium">{row.original.userName}</span>
+          </div>
+        ),
       },
       {
         id: "email",

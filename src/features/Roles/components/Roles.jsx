@@ -197,7 +197,7 @@ import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import Popup from "../../../globalComponents/Popup";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, ShieldCheck } from "lucide-react";
 import RoleForm from "./RoleForm";
 import { fetchRoles } from "../RolesThunks";
 import usePermission from "../../auth/usePermission";
@@ -304,6 +304,12 @@ function Roles() {
         accessorKey: "roleName",
         header: t("name"),
         size: 150,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-green-500" />
+            <span className="font-medium">{row.original.roleName}</span>
+          </div>
+        ),
       },
     ];
 

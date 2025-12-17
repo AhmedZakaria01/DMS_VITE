@@ -113,7 +113,7 @@ function FolderContents() {
   // Action Buttons Component
   const ActionButtons = useCallback(
     ({ item }) => {
-      console.log(item);
+      // console.log(item);
 
       return (
         <div className="flex gap-2">

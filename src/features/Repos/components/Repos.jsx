@@ -4,7 +4,14 @@ import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { fetchAllRepos } from "../repoThunks";
 import { useNavigate } from "react-router-dom";
-import { Plus, Edit, Shield, Trash2, Warehouse } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Shield,
+  Trash2,
+  Warehouse,
+  WarehouseIcon,
+} from "lucide-react";
 // import Popup from "../../../globalComponents/Popup";
 // import UserForm from "../../Users/components/UserForm";
 // import RepoForm from "./RepoForm";
@@ -191,13 +198,13 @@ function Repos() {
           </h1>
           <p className="text-gray-600">{t("reposDescription")}</p>
         </div>
-        <div>
+        <div className="flex items-center gap-3">
           {canCreateRepo && (
             <button
               onClick={() => navigate("/createRepo")}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
             >
-              <Plus className="w-5 h-5" />
+              <WarehouseIcon className="w-5 h-5 mx-3" />
               {t("createRepository")}
             </button>
           )}

@@ -401,18 +401,24 @@ const UserForm = ({
 
       // Show success alert
       triggerSuccess(`User ${isEditMode ? 'updated' : 'created'} successfully`);
-      
+      // Failed to cr eate user. Please try again.
+
+
       // Reset submitting state
       setIsSubmitting(false);
 
     } catch (error) {
-      console.error(
-        `Failed to ${isEditMode ? "update" : "create"} user:`,
+      console.log(
+        // `Failed to ${isEditMode ? "update" : "create"} user:`,
         error
       );
       
       // FIXED: Use ErrorAlert component instead of native alert
-      const errorMsg = error?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
+      const errorMsg = errors?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
+      // const errorMsg = errors[0]?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
+      console.log('====================================');
+      console.log(errorMsg);
+      console.log('====================================');
       triggerError(errorMsg);
       setIsSubmitting(false);
     }

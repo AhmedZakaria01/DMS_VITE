@@ -41,6 +41,11 @@ const UserForm = ({
   const [successMessage, setSuccessMessage] = useState("");
   const autoCloseTimeoutRef = useRef(null);
 
+  // State for input hints
+  const [showFirstNameHint, setShowFirstNameHint] = useState(false);
+  const [showLastNameHint, setShowLastNameHint] = useState(false);
+  const [showUserNameHint, setShowUserNameHint] = useState(false);
+
   const { screenPermissions = [] } = useSelector(
     (state) => state.permissionsReducer
   );
@@ -200,7 +205,6 @@ const UserForm = ({
       // setValue("password", "");
       // setValue("confirmPassword", "");
       // Set selected roles from initial data
-      // Try to get roles from initialData.userRoles
       if (initialData.userRoles) {
         const roleIds = initialData.userRoles.map(role => 
           typeof role === 'object' ? role.roleId || role.id : role
@@ -208,7 +212,7 @@ const UserForm = ({
         setSelectedRoles(roleIds);
       }
 
-      // Try to get permissions from initialData.userPermissions
+      // Set selected permissions from initial data
       if (initialData.userPermissions) {
         const permissionIds = initialData.userPermissions.map(permission =>
           typeof permission === 'object' ? permission.id || permission.permissionId : permission
@@ -245,6 +249,33 @@ const UserForm = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Handle input to prevent starting with space
+  const handleInputNoLeadingSpace = (fieldName, e, setHintFunction) => {
+    const value = e.target.value;
+    
+    // Check if user tries to start with space
+    if (value.startsWith(' ') && value.length === 1) {
+      // Show hint message
+      if (setHintFunction) setHintFunction(true);
+      
+      // Prevent the space
+      e.target.value = '';
+      setValue(fieldName, '', { shouldValidate: true });
+      return;
+    }
+    
+    // Remove starting space if user pastes text with leading space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+      setValue(fieldName, e.target.value, { shouldValidate: true });
+    }
+    
+    // Hide hint if user starts typing valid text
+    if (value.length > 0 && !value.startsWith(' ') && setHintFunction) {
+      setHintFunction(false);
+    }
+  };
 
   // Handle success alert close
   const handleSuccessAlertClose = () => {
@@ -401,21 +432,15 @@ const UserForm = ({
 
       // Show success alert
       triggerSuccess(`User ${isEditMode ? 'updated' : 'created'} successfully`);
-      // Failed to cr eate user. Please try again.
-
 
       // Reset submitting state
       setIsSubmitting(false);
 
     } catch (error) {
-      console.log(
-        // `Failed to ${isEditMode ? "update" : "create"} user:`,
-        error
-      );
+      console.log("Failed to create/update user:", error);
       
       // FIXED: Use ErrorAlert component instead of native alert
-      const errorMsg = errors?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
-      // const errorMsg = errors[0]?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
+      const errorMsg = error?.message || `Failed to ${isEditMode ? "update" : "create"} user. Please try again.`;
       console.log('====================================');
       console.log(errorMsg);
       console.log('====================================');
@@ -464,6 +489,7 @@ const UserForm = ({
         setSelectedRoles(roleIds);
       }
       
+      // Reset selected permissions
       if (initialData.userPermissions) {
         const permissionIds = initialData.userPermissions.map(permission =>
           typeof permission === 'object' ? permission.id || permission.permissionId : permission
@@ -476,6 +502,12 @@ const UserForm = ({
       setSelectedRoles([]);
       setSelectedPermissionIds([]);
     }
+    
+    // Reset hints
+    setShowFirstNameHint(false);
+    setShowLastNameHint(false);
+    setShowUserNameHint(false);
+    
     setRoleSearchTerm("");
     setPermissionSearchTerm("");
     setIsRoleDropdownOpen(false);
@@ -505,9 +537,6 @@ const UserForm = ({
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             {t("updateUser")}
           </h2>
-          <p className="text-lg text-gray-600">
-            {t("updateUserDescription")}
-          </p>
         </div>
         <div className="bg-gray-50 rounded-xl p-6 flex items-center justify-center h-64">
           <div className="text-center">
@@ -569,7 +598,7 @@ const UserForm = ({
 
       {/* Form Container */}
       <div className="bg-gray-50 rounded-xl p-6">
-        <div className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Account Information Section */}
           <div>
             <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -589,6 +618,16 @@ const UserForm = ({
                   {...register("firstName")}
                   type="text"
                   autoComplete="off"
+                  onInput={(e) => handleInputNoLeadingSpace("firstName", e, setShowFirstNameHint)}
+                  onBlur={(e) => {
+  
+                    const trimmedValue = e.target.value.trim();
+                    if (e.target.value !== trimmedValue) {
+                      setValue("firstName", trimmedValue, { shouldValidate: true });
+                    }
+                    setShowFirstNameHint(false);
+                  }}
+                  onFocus={() => setShowFirstNameHint(false)}
                   className={`w-full px-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                     errors.firstName
                       ? "border-red-300 bg-red-50"
@@ -596,6 +635,12 @@ const UserForm = ({
                   }`}
                   placeholder={t("firstNamePlaceholder")}
                 />
+                {showFirstNameHint && (
+                  <div className="mt-1 flex items-center text-amber-600 text-xs">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <span>{t("cannotStartWithSpace")}</span>
+                  </div>
+                )}
                 {errors.firstName && (
                   <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
@@ -613,6 +658,15 @@ const UserForm = ({
                   {...register("lastName")}
                   type="text"
                   autoComplete="off"
+                  onInput={(e) => handleInputNoLeadingSpace("lastName", e, setShowLastNameHint)}
+                  onBlur={(e) => {
+                    const trimmedValue = e.target.value.trim();
+                    if (e.target.value !== trimmedValue) {
+                      setValue("lastName", trimmedValue, { shouldValidate: true });
+                    }
+                    setShowLastNameHint(false);
+                  }}
+                  onFocus={() => setShowLastNameHint(false)}
                   className={`w-full px-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                     errors.lastName
                       ? "border-red-300 bg-red-50"
@@ -620,6 +674,12 @@ const UserForm = ({
                   }`}
                   placeholder={t("lastNamePlaceholder")}
                 />
+                {showLastNameHint && (
+                  <div className="mt-1 flex items-center text-amber-600 text-xs">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <span>{t("cannotStartWithSpace")}</span>
+                  </div>
+                )}
                 {errors.lastName && (
                   <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
@@ -638,6 +698,16 @@ const UserForm = ({
                   type="text"
                   disabled={isEditMode}
                   autoComplete="off"
+                  onInput={(e) => handleInputNoLeadingSpace("userName", e, setShowUserNameHint)}
+                  onBlur={(e) => {
+  
+                    const trimmedValue = e.target.value.trim();
+                    if (e.target.value !== trimmedValue) {
+                      setValue("userName", trimmedValue, { shouldValidate: true });
+                    }
+                    setShowUserNameHint(false);
+                  }}
+                  onFocus={() => setShowUserNameHint(false)}
                   className={`w-full px-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                     errors.userName
                       ? "border-red-300 bg-red-50"
@@ -647,6 +717,12 @@ const UserForm = ({
                   }`}
                   placeholder={t("usernamePlaceholder")}
                 />
+                {showUserNameHint && (
+                  <div className="mt-1 flex items-center text-amber-600 text-xs">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    <span>{t("cannotStartWithSpace")}</span>
+                  </div>
+                )}
                 {errors.userName && (
                   <p className="mt-1 text-red-600 flex items-center">
                     <AlertCircle className="w-4 h-4 mr-1" />
@@ -669,6 +745,21 @@ const UserForm = ({
                     type="email"
                     autoComplete="off"
                     disabled={isEditMode}
+                    onInput={(e) => {
+                      // Prevent starting with space for email
+                      const value = e.target.value;
+                      if (value.startsWith(' ')) {
+                        e.target.value = value.trimStart();
+                        setValue("email", e.target.value, { shouldValidate: true });
+                      }
+                    }}
+                    onBlur={(e) => {
+    
+                      const trimmedValue = e.target.value.trim();
+                      if (e.target.value !== trimmedValue) {
+                        setValue("email", trimmedValue, { shouldValidate: true });
+                      }
+                    }}
                     className={`w-full pl-10 pr-4 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                       errors.email
                         ? "border-red-300 bg-red-50"
@@ -685,6 +776,7 @@ const UserForm = ({
                     {errors.email.message}
                   </p>
                 )}
+             
               </div>
 
               {/* Password Field - ONLY SHOW IN CREATE MODE */}
@@ -702,6 +794,21 @@ const UserForm = ({
                         {...register("password")}
                         type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
+                        onInput={(e) => {
+                          // Prevent starting with space for password
+                          const value = e.target.value;
+                          if (value.startsWith(' ')) {
+                            e.target.value = value.trimStart();
+                            setValue("password", e.target.value, { shouldValidate: true });
+                          }
+                        }}
+                        onBlur={(e) => {
+        
+                          const trimmedValue = e.target.value.trim();
+                          if (e.target.value !== trimmedValue) {
+                            setValue("password", trimmedValue, { shouldValidate: true });
+                          }
+                        }}
                         className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                           errors.password
                             ? "border-red-300 bg-red-50"
@@ -727,9 +834,6 @@ const UserForm = ({
                         {errors.password.message}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-gray-500">
-                      {t("passwordRequirements")}
-                    </p>
                   </div>
 
                   {/* Confirm Password Field - ONLY SHOW IN CREATE MODE */}
@@ -745,6 +849,21 @@ const UserForm = ({
                         {...register("confirmPassword")}
                         type={showConfirmPassword ? "text" : "password"}
                         autoComplete="new-password"
+                        onInput={(e) => {
+                          // Prevent starting with space for confirm password
+                          const value = e.target.value;
+                          if (value.startsWith(' ')) {
+                            e.target.value = value.trimStart();
+                            setValue("confirmPassword", e.target.value, { shouldValidate: true });
+                          }
+                        }}
+                        onBlur={(e) => {
+        
+                          const trimmedValue = e.target.value.trim();
+                          if (e.target.value !== trimmedValue) {
+                            setValue("confirmPassword", trimmedValue, { shouldValidate: true });
+                          }
+                        }}
                         className={`w-full pl-10 pr-12 py-3 border rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${
                           errors.confirmPassword
                             ? "border-red-300 bg-red-50"
@@ -817,6 +936,14 @@ const UserForm = ({
                     value={roleSearchTerm}
                     onChange={(e) => setRoleSearchTerm(e.target.value)}
                     onFocus={() => setIsRoleDropdownOpen(true)}
+                    onInput={(e) => {
+                      // Prevent starting with space for role search
+                      const value = e.target.value;
+                      if (value.startsWith(' ')) {
+                        e.target.value = value.trimStart();
+                        setRoleSearchTerm(e.target.value);
+                      }
+                    }}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
                     placeholder={t("rolesPlaceholder")}
                   />
@@ -908,6 +1035,14 @@ const UserForm = ({
                     value={permissionSearchTerm}
                     onChange={(e) => setPermissionSearchTerm(e.target.value)}
                     onFocus={() => setIsPermissionDropdownOpen(true)}
+                    onInput={(e) => {
+                      // Prevent starting with space for permission search
+                      const value = e.target.value;
+                      if (value.startsWith(' ')) {
+                        e.target.value = value.trimStart();
+                        setPermissionSearchTerm(e.target.value);
+                      }
+                    }}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:border-gray-400 focus:border-blue-500"
                     placeholder={t("permissionsPlaceholder")}
                   />
@@ -961,8 +1096,7 @@ const UserForm = ({
           {/* Form Actions */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
             <button
-              type="button"
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
               disabled={isSubmitting || !isValid || selectedRoles.length === 0}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
             >
@@ -973,7 +1107,6 @@ const UserForm = ({
                 </>
               ) : (
                 <>
-                  {/* <CheckCircle className="w-5 h-5 mr-2" /> */}
                   {isEditMode ? t("updateUser") : t("createUser")}
                 </>
               )}
@@ -985,7 +1118,6 @@ const UserForm = ({
               disabled={isSubmitting}
               className="flex-none bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center justify-center"
             >
-              {/* <RotateCcw className="w-4 h-4 mr-2" /> */}
               {t("reset")}
             </button>
 
@@ -998,13 +1130,13 @@ const UserForm = ({
               {t("cancel")}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
 };
 
-// Dynamic validation schema based on mode
+// Dynamic validation schema based on mode - UPDATED with space prevention
 const getValidationSchema = (isEditMode, t) => {
   // Base schema with common fields
   const baseSchema = z.object({
@@ -1017,6 +1149,7 @@ const getValidationSchema = (isEditMode, t) => {
         /^[a-zA-Z0-9_]+$/,
         t("onlyLettersNumbersUnderscore")
       )
+      .regex(/^\S.*$/, t("noLeadingSpace")) 
       .trim(),
     lastName: z
       .string()
@@ -1027,6 +1160,7 @@ const getValidationSchema = (isEditMode, t) => {
         /^[a-zA-Z0-9_]+$/,
         t("onlyLettersNumbersUnderscore")
       )
+      .regex(/^\S.*$/, t("noLeadingSpace")) 
       .trim(),
     userName: z
       .string()
@@ -1037,12 +1171,15 @@ const getValidationSchema = (isEditMode, t) => {
         /^[a-zA-Z0-9_]+$/,
         t("onlyLettersNumbersUnderscore")
       )
+      .regex(/^\S.*$/, t("noLeadingSpace")) 
       .trim(),
     email: z
       .string()
       .min(1, t("emailRequired"))
       .email(t("emailInvalid"))
-      .toLowerCase(),
+      .regex(/^\S.*$/, t("noLeadingSpace")) 
+      .toLowerCase()
+      .trim(),
   });
 
   // Add password fields only for create mode
@@ -1053,11 +1190,17 @@ const getValidationSchema = (isEditMode, t) => {
         .min(1, t("passwordRequired"))
         .min(8, t("passwordMinLength"))
         .max(100, t("passwordMaxLength"))
+        .regex(/^\S.*$/, t("noLeadingSpace")) 
         .regex(
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
           t("passwordRequirements")
-        ),
-      confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+        )
+        .trim(),
+      confirmPassword: z
+        .string()
+        .min(1, t("confirmPasswordRequired"))
+        .regex(/^\S.*$/, t("noLeadingSpace")) 
+        .trim(),
     }).refine((data) => data.password === data.confirmPassword, {
       message: t("passwordsNotMatch"),
       path: ["confirmPassword"],

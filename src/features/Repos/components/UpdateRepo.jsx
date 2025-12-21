@@ -17,6 +17,7 @@ import {
   Shield,
   Users,
   Loader,
+  AlertCircle,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -250,9 +251,6 @@ const IndexFieldsTable = ({
                     <p className="text-base font-medium mb-1">
                       {t("noIndexFields")}
                     </p>
-                    <p className="text-sm">
-                      {t("addIndexFieldHint")}
-                    </p>
                   </div>
                 </td>
               </tr>
@@ -270,16 +268,18 @@ function UpdateRepo({ id, setIsOpen }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // Form validation schema - MOVED INSIDE COMPONENT
+  // Form validation schema - UPDATED with space prevention
   const validationSchema = z.object({
     name: z
       .string()
       .min(1, t("nameRequired"))
-      .min(3, t("minThreeChars")),
+      .min(3, t("minThreeChars"))
+      .regex(/^\S.*$/, t("noLeadingSpace")), 
     description: z
       .string()
       .min(1, t("descriptionRequired"))
-      .min(3, t("minThreeChars")),
+      .min(3, t("minThreeChars"))
+      .regex(/^\S.*$/, t("noLeadingSpace")), 
     isEncrypted: z.boolean(),
     categoryOption: z.string().optional(),
   });
@@ -324,6 +324,12 @@ function UpdateRepo({ id, setIsOpen }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [repositoryData, setRepositoryData] = useState(null);
   const params = useParams();
+
+  // State for input hints
+  const [showNameHint, setShowNameHint] = useState(false);
+  const [showDescriptionHint, setShowDescriptionHint] = useState(false);
+  const [showAttributeNameHint, setShowAttributeNameHint] = useState(false);
+  const [showDropdownValueHint, setShowDropdownValueHint] = useState({});
 
   const repoId = params.repoId;
 
@@ -407,6 +413,95 @@ function UpdateRepo({ id, setIsOpen }) {
     }, 3000);
   };
 
+  // Handle input to prevent starting with space - MAIN FORM INPUTS
+  const handleInputNoLeadingSpace = (fieldName, e, setHintFunction) => {
+    const value = e.target.value;
+    
+    // Check if user tries to start with space
+    if (value.startsWith(' ') && value.length === 1) {
+      // Show hint message
+      if (setHintFunction) setHintFunction(true);
+      
+      // Prevent the space
+      e.target.value = '';
+      setValue(fieldName, '', { shouldValidate: true });
+      return;
+    }
+    
+    // Remove starting space if user pastes text with leading space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+      setValue(fieldName, e.target.value, { shouldValidate: true });
+    }
+    
+    // Hide hint if user starts typing valid text
+    if (value.length > 0 && !value.startsWith(' ') && setHintFunction) {
+      setHintFunction(false);
+    }
+  };
+
+  // Handle attribute name input to prevent starting with space
+  const handleAttributeNameInput = (e) => {
+    const value = e.target.value;
+    
+    // Check if user tries to start with space
+    if (value.startsWith(' ') && value.length === 1) {
+      // Show hint message
+      setShowAttributeNameHint(true);
+      
+      // Prevent the space
+      e.target.value = '';
+      setCurrentField((prev) => ({
+        ...prev,
+        attributeName: '',
+      }));
+      return;
+    }
+    
+    // Remove starting space if user pastes text with leading space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+    }
+    
+    setCurrentField((prev) => ({
+      ...prev,
+      attributeName: e.target.value,
+    }));
+    
+    // Hide hint if user starts typing valid text
+    if (value.length > 0 && !value.startsWith(' ')) {
+      setShowAttributeNameHint(false);
+    }
+  };
+
+  // Handle dropdown value input to prevent starting with space
+  const handleDropdownValueInput = (index, e) => {
+    const value = e.target.value;
+    
+    // Check if user tries to start with space
+    if (value.startsWith(' ') && value.length === 1) {
+      // Show hint message for this specific field
+      setShowDropdownValueHint(prev => ({ ...prev, [index]: true }));
+      
+      // Prevent the space
+      e.target.value = '';
+      updateValue(index, '');
+      return;
+    }
+    
+    // Remove starting space if user pastes text with leading space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+    }
+    
+    updateValue(index, e.target.value);
+    
+    // Hide hint if user starts typing valid text
+    if (value.length > 0 && !value.startsWith(' ')) {
+      setShowDropdownValueHint(prev => ({ ...prev, [index]: false }));
+    }
+  };
+
   // Add new dropdown/memo value to current field
   const addValue = () => {
     setCurrentField((prev) => ({
@@ -432,6 +527,12 @@ function UpdateRepo({ id, setIsOpen }) {
         ...prev,
         valuesOfMemoType: prev.valuesOfMemoType.filter((_, i) => i !== index),
       }));
+      // Remove hint for deleted field
+      setShowDropdownValueHint(prev => {
+        const newHints = { ...prev };
+        delete newHints[index];
+        return newHints;
+      });
     }
   };
 
@@ -446,6 +547,8 @@ function UpdateRepo({ id, setIsOpen }) {
       valuesOfMemoType: [""],
     });
     setEditingIndex(null);
+    setShowAttributeNameHint(false);
+    setShowDropdownValueHint({});
   };
 
   // Cancel add/edit field operation
@@ -459,13 +562,32 @@ function UpdateRepo({ id, setIsOpen }) {
       valuesOfMemoType: [""],
     });
     setEditingIndex(null);
+    setShowAttributeNameHint(false);
+    setShowDropdownValueHint({});
   };
 
-  // Validate and save index field
+  // Validate and save index field - UPDATED with space prevention
   const saveIndexField = () => {
     if (!currentField.attributeName.trim() || !currentField.attributeType) {
       triggerError(t("fillRequiredFields"));
       return;
+    }
+
+    // Check if attribute name starts with space
+    if (currentField.attributeName.startsWith(' ')) {
+      triggerError(t("noLeadingSpaceForAttribute"));
+      return;
+    }
+
+    // Check if any dropdown value starts with space
+    if (currentField.attributeType === "dropdown") {
+      const hasLeadingSpace = currentField.valuesOfMemoType.some(
+        (val) => val.startsWith(' ')
+      );
+      if (hasLeadingSpace) {
+        triggerError(t("noLeadingSpaceForDropdownValues"));
+        return;
+      }
     }
 
     const selectedType = ATTRIBUTE_TYPES.find(
@@ -523,6 +645,8 @@ function UpdateRepo({ id, setIsOpen }) {
     });
     setEditingIndex(index);
     setShowAddField(true);
+    setShowAttributeNameHint(false);
+    setShowDropdownValueHint({});
   };
 
   // Remove field with confirmation
@@ -532,11 +656,11 @@ function UpdateRepo({ id, setIsOpen }) {
     }
   };
 
-  // Submit form with backend-compatible data structure
+  // Submit form with backend-compatible data structure - UPDATED to trim values
   const onSubmit = async (data) => {
     const backendData = {
-      name: data.name,
-      description: data.description || undefined,
+      name: data.name.trim(),
+      description: data.description.trim() || undefined,
       isEncrypted: data.isEncrypted,
       categoryOption: data.categoryOption || undefined,
       newAttributes: attributes.map((field) => ({
@@ -558,6 +682,11 @@ function UpdateRepo({ id, setIsOpen }) {
       triggerSuccess();
       // Refresh repositories list
       dispatch(fetchAllRepos());
+      // Reset all hints
+      setShowNameHint(false);
+      setShowDescriptionHint(false);
+      setShowAttributeNameHint(false);
+      setShowDropdownValueHint({});
     } catch (error) {
       console.error("Failed to update repository:", error);
       const errorMsg =
@@ -633,6 +762,16 @@ function UpdateRepo({ id, setIsOpen }) {
                         <input
                           {...register("name")}
                           type="text"
+                          onInput={(e) => handleInputNoLeadingSpace("name", e, setShowNameHint)}
+                          onBlur={(e) => {
+
+                            const trimmedValue = e.target.value.trim();
+                            if (e.target.value !== trimmedValue) {
+                              setValue("name", trimmedValue, { shouldValidate: true });
+                            }
+                            setShowNameHint(false);
+                          }}
+                          onFocus={() => setShowNameHint(false)}
                           className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                             errors.name
                               ? "border-red-300 bg-red-50"
@@ -640,8 +779,15 @@ function UpdateRepo({ id, setIsOpen }) {
                           }`}
                           placeholder={t("repositoryNamePlaceholder")}
                         />
+                        {showNameHint && (
+                          <div className="mt-1 flex items-center text-amber-600 text-xs">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            <span>{t("cannotStartWithSpace")}</span>
+                          </div>
+                        )}
                         {errors.name && (
-                          <p className="text-red-600 text-sm mt-2">
+                          <p className="text-red-600 text-sm mt-2 flex items-center">
+                            <AlertCircle className="w-4 h-4 mr-1" />
                             {errors.name.message}
                           </p>
                         )}
@@ -674,11 +820,27 @@ function UpdateRepo({ id, setIsOpen }) {
                       <textarea
                         {...register("description")}
                         rows={4}
+                        onInput={(e) => handleInputNoLeadingSpace("description", e, setShowDescriptionHint)}
+                        onBlur={(e) => {
+                          const trimmedValue = e.target.value.trim();
+                          if (e.target.value !== trimmedValue) {
+                            setValue("description", trimmedValue, { shouldValidate: true });
+                          }
+                          setShowDescriptionHint(false);
+                        }}
+                        onFocus={() => setShowDescriptionHint(false)}
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
                         placeholder={t("descriptionPlaceholder")}
                       />
+                      {showDescriptionHint && (
+                        <div className="mt-1 flex items-center text-amber-600 text-xs">
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          <span>{t("cannotStartWithSpace")}</span>
+                        </div>
+                      )}
                       {errors.description && (
-                        <p className="text-red-600 text-sm mt-2">
+                        <p className="text-red-600 text-sm mt-2 flex items-center">
+                          <AlertCircle className="w-4 h-4 mr-1" />
                           {errors.description.message}
                         </p>
                       )}
@@ -765,12 +927,18 @@ function UpdateRepo({ id, setIsOpen }) {
                             <input
                               type="text"
                               value={currentField.attributeName}
-                              onChange={(e) =>
-                                setCurrentField((prev) => ({
-                                  ...prev,
-                                  attributeName: e.target.value,
-                                }))
-                              }
+                              onChange={handleAttributeNameInput}
+                              onBlur={(e) => {
+                                const trimmedValue = e.target.value.trim();
+                                if (e.target.value !== trimmedValue) {
+                                  setCurrentField((prev) => ({
+                                    ...prev,
+                                    attributeName: trimmedValue,
+                                  }));
+                                }
+                                setShowAttributeNameHint(false);
+                              }}
+                              onFocus={() => setShowAttributeNameHint(false)}
                               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                               placeholder={t("enterAttributeName")}
                             />
@@ -835,31 +1003,49 @@ function UpdateRepo({ id, setIsOpen }) {
                               <label className="block text-sm font-semibold text-gray-700">
                                 {t("dropdownValues")}
                               </label>
-                              <button
-                                type="button"
-                                onClick={addValue}
-                                className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                              >
-                                <Plus className="w-4 h-4" />
-                                {t("addValue")}
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500">
+                                  {t("inputHint")} {t("cannotStartWithSpace")}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={addValue}
+                                  className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {t("addValue")}
+                                </button>
+                              </div>
                             </div>
                             <div className="space-y-2 max-h-32 overflow-y-auto">
                               {currentField.valuesOfMemoType.map(
                                 (value, index) => (
                                   <div
                                     key={index}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 relative"
                                   >
                                     <input
                                       type="text"
                                       value={value}
-                                      onChange={(e) =>
-                                        updateValue(index, e.target.value)
-                                      }
+                                      onChange={(e) => handleDropdownValueInput(index, e)}
+                                      onBlur={(e) => {
+            
+                                        const trimmedValue = e.target.value.trim();
+                                        if (e.target.value !== trimmedValue) {
+                                          updateValue(index, trimmedValue);
+                                        }
+                                        setShowDropdownValueHint(prev => ({ ...prev, [index]: false }));
+                                      }}
+                                      onFocus={() => setShowDropdownValueHint(prev => ({ ...prev, [index]: false }))}
                                       className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                       placeholder={`${t("option")} ${index + 1}`}
                                     />
+                                    {showDropdownValueHint[index] && (
+                                      <div className="absolute -top-6 left-0 flex items-center text-amber-600 text-xs bg-amber-50 px-2 py-1 rounded">
+                                        <AlertCircle className="w-3 h-3 mr-1" />
+                                        <span>{t("cannotStartWithSpace")}</span>
+                                      </div>
+                                    )}
                                     {currentField.valuesOfMemoType.length >
                                       1 && (
                                       <button

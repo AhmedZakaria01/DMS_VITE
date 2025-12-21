@@ -519,6 +519,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Plus,
   Folder,
@@ -542,7 +543,10 @@ import Loading from "../../../globalComponents/Loading";
 const CategoryTable = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
   const canCreateCategory = usePermission("screens.categories.create");
+  const currentRepoId = params.repoId;
 
   // Redux selectors
   const {
@@ -789,6 +793,17 @@ const CategoryTable = () => {
         } else {
           dispatch(fetchCategoryChilds(parentCategoryId));
         }
+
+        // Show success message
+        alert(
+          t("categoryCreatedSuccess") ||
+            `Category "${categoryName.trim()}" created successfully!`
+        );
+
+        // Navigate to repoContents page after successful creation
+        if (currentRepoId) {
+          navigate(`/repoContents/${currentRepoId}`);
+        }
       } catch (error) {
         console.error("Error creating category:", error);
         setCreateError(error.message || "Failed to create category");
@@ -796,7 +811,16 @@ const CategoryTable = () => {
         setCreateLoading(false);
       }
     },
-    [newCategoryName, documentTypeId, securityLevel, aclRules, dispatch, t]
+    [
+      newCategoryName,
+      documentTypeId,
+      securityLevel,
+      aclRules,
+      dispatch,
+      t,
+      navigate,
+      currentRepoId,
+    ]
   );
 
   // Handle input change for category name

@@ -98,7 +98,6 @@ function App() {
             path="/repoContents/:repoId/folderContent/:folderId"
             element={<FolderContents />}
           />
-          <Route path="/createDocument" element={<CreateDocument />} />
 
           <Route path="/createRepo" element={<RepoForm />} />
           <Route
@@ -110,6 +109,10 @@ function App() {
           <Route
             path="/repoContents/:repoId/createFolder"
             element={<CreateFolder />}
+          />
+          <Route
+            path="/repoContents/:repoId/createDocument"
+            element={<CreateDocument />}
           />
         </Route>
 

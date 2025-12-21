@@ -169,104 +169,6 @@ function CreateCategory() {
     console.log(data.aclRules);
   };
 
-  // Function to handle category creation
-  const handleCategoryCreated = (newCategory) => {
-    console.log("New category created:", newCategory);
-
-    // Transform ACL Rules to match backend format
-    const transformedAclRules =
-      permissionsData.aclRules && permissionsData.aclRules.length > 0
-        ? permissionsData.aclRules.map((rule) => {
-            let permissionsArray = [];
-            if (Array.isArray(rule.permissions)) {
-              permissionsArray = rule.permissions
-                .filter((p) => p != null)
-                .map((p) => {
-                  if (typeof p === "object" && p.code) {
-                    return p.code;
-                  } else if (typeof p === "string" && p.trim() !== "") {
-                    return p.trim();
-                  }
-                  return null;
-                })
-                .filter((p) => p != null);
-            } else if (
-              typeof rule.permissions === "string" &&
-              rule.permissions.trim() !== ""
-            ) {
-              permissionsArray = [rule.permissions.trim()];
-            }
-
-            return {
-              principalId: String(rule.principalId || ""),
-              principalType: rule.principalType === "user" ? 1 : 2, // Convert to numeric: 1 = user, 2 = role
-              permissions: permissionsArray,
-              accessType: rule.accessType === 0 ? 0 : 1, // Keep numeric format: 0 = deny, 1 = allow
-            };
-          })
-        : [];
-
-    // Add the new category to our local state with permissions
-    const categoryToAdd = {
-      id: Date.now(), // Generate unique ID
-      name: newCategory.name,
-      documentTypeId: newCategory.documentTypeId,
-      parentId: newCategory.parentCategoryId || null,
-      aclRules: transformedAclRules,
-    };
-
-    if (categoryType === "child") {
-      // Add to child categories
-      const updatedChildren = [...categoryData, categoryToAdd];
-      setCategoryData(updatedChildren);
-
-      // Also update the mock data for persistence
-      const parentId = currentParentCategoryId;
-      if (parentId) {
-        mockChildCategories[parentId] = [
-          ...(mockChildCategories[parentId] || []),
-          categoryToAdd,
-        ];
-      }
-    } else {
-      // Add to parent categories
-      const updatedCategories = [...categoryData, categoryToAdd];
-      setCategoryData(updatedCategories);
-
-      // Also update the mock data for persistence
-      const docTypeId = currentDocTypeId;
-      if (docTypeId) {
-        mockCategoryData[docTypeId] = [
-          ...(mockCategoryData[docTypeId] || []),
-          categoryToAdd,
-        ];
-      }
-    }
-
-    // ✅ EXACT BACKEND FORMAT - Ready to send to API
-    const backendPayload = {
-      name: newCategory.name,
-      documentTypeId: newCategory.documentTypeId,
-      parentCategoryId: newCategory.parentCategoryId || 0,
-      aclRules: transformedAclRules,
-    };
-
-    console.log("=== EXACT BACKEND PAYLOAD (Ready to Send) ===");
-    console.log(JSON.stringify(backendPayload, null, 2));
-    console.log("=============================================");
-
-    // Show success message
-    alert(
-      t("categoryCreatedSuccessAlert", { categoryName: newCategory.name }) ||
-        `Category "${newCategory.name}" created successfully!`
-    );
-
-    // Reset permissions after category creation
-    setPermissionsData({
-      aclRules: [],
-    });
-  };
-
   const getPageTitle = () => {
     if (params.id) {
       return t("childCategories") || "Child Categories";
@@ -352,7 +254,6 @@ function CreateCategory() {
         <div className="lg:col-span-1">
           <FileCategoryForm
             onDocumentTypeSelect={handleDocumentTypeSelect}
-            onCategoryCreated={handleCategoryCreated}
             currentDocTypeId={currentDocTypeId}
             currentParentCategoryId={currentParentCategoryId}
           />
@@ -418,7 +319,7 @@ function CreateCategory() {
           setIsOpen={setOpenPermissions}
           component={
             <UsersRolesPermissionsTable
-              entityType="category"
+              entityType="categories"
               onDone={handlePermissionsDataChange}
               savedData={permissionsData}
             />

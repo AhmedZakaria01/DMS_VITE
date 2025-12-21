@@ -15,7 +15,7 @@ const schema = z.object({
   securityLevel: z.union([z.number().optional()]),
 });
 
-const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
+const FileCategoryForm = ({ currentParentCategoryId }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { repos } = useSelector((state) => state.repoReducer);
@@ -27,7 +27,6 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
 
   const {
     register,
-    handleSubmit,
     setValue,
     getValues,
     watch,
@@ -111,38 +110,6 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
     setShowDocTypeOptions(false);
   };
 
-  // Submit form
-  const onSubmit = (data) => {
-    if (!documentTypeId) {
-      console.error("No document type selected");
-      return;
-    }
-    if (!selectedRepo) {
-      console.error("No repository selected");
-      return;
-    }
-
-    // Prepare form data according to your backend requirements
-    const formData = {
-      name: data.name,
-      documentTypeId: documentTypeId,
-      parentCategoryId: currentParentCategoryId || 0,
-      securityLevel:
-        data.securityLevel === "" ? 0 : Number(data.securityLevel) || 0,
-      repositoryId: selectedRepo.id,
-    };
-
-    console.log("Form Data Submitted:", formData);
-
-    // Reset form
-    setSelectedRepo(null);
-    setSelectedDocType(null);
-    dispatch(setDocumentTypeId(null));
-    setValue("name", "");
-    setValue("Repo", "");
-    setValue("DocType", "");
-    setValue("securityLevel", "");
-  };
 
   return (
     <section className="p-6">
@@ -159,7 +126,7 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
       </div> */}
 
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
           {/* Repository Dropdown */}
           <div className="relative" ref={repoDropdownRef}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -295,7 +262,8 @@ const FileCategoryForm = ({ onCategoryCreated, currentParentCategoryId }) => {
               </p>
             )}
           </div>
-        </form>
+
+        </div>
       </div>
     </section>
   );

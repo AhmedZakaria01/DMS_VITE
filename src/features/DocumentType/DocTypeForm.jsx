@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Popup from "../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../Permissions/UsersRolesPermissionsTable";
-import { createDocTypeWithAttribute } from "./DocTypeThunks";
+import { createDocTypeWithAttribute } from "./docTypeThunks";
 import SuccessAlert from "../../globalComponents/Alerts/SuccessAlert";
 import ErrorAlert from "../../globalComponents/Alerts/ErrorAlert";
 
@@ -627,6 +627,7 @@ const DocTypeForm = () => {
         resetFieldForm();
         setIndexFields([]);
         setPermissionsData({});
+        // navigate(`/repoContents/${repoId}`);
         // Refresh document types list
         // dispatch(getDocTypesFromRepo(repoId));
       }

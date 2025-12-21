@@ -265,13 +265,20 @@ const IndexFieldsTable = ({
 function RepoForm() {
   const { t } = useTranslation();
 
-  // Form validation schema - FIXED validation keys
+  // Form validation schema - FIXED validation keys with space prevention
   const validationSchema = z.object({
-    name: z.string().min(1, t("nameRequired")).min(3, t("minThreeChars")),
+    name: z
+      .string()
+      .min(1, t("nameRequired"))
+      .min(3, t("minThreeChars"))
+      // Prevent starting with space
+      .regex(/^\S.*$/, t("noLeadingSpace")), 
     description: z
       .string()
       .min(1, t("descriptionRequired"))
-      .min(3, t("minThreeChars")),
+      .min(3, t("minThreeChars"))
+      // Prevent starting with space
+      .regex(/^\S.*$/, t("noLeadingSpace")), 
     isEncrypted: z.boolean(),
     categoryOption: z.string().optional(),
   });
@@ -292,6 +299,7 @@ function RepoForm() {
     handleSubmit,
     formState: { errors, isValid },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(validationSchema),
     mode: "onChange",
@@ -345,6 +353,44 @@ function RepoForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Handle input to prevent starting with space - MAIN FORM INPUTS
+  const handleInputNoLeadingSpace = (fieldName, e) => {
+    const value = e.target.value;
+    // Prevent input from starting with space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+      setValue(fieldName, e.target.value, { shouldValidate: true });
+    }
+  };
+
+  // Handle attribute name input to prevent starting with space
+  const handleAttributeNameInput = (e) => {
+    const value = e.target.value;
+    // Prevent input from starting with space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+      setCurrentField((prev) => ({
+        ...prev,
+        attributeName: e.target.value,
+      }));
+    } else {
+      setCurrentField((prev) => ({
+        ...prev,
+        attributeName: value,
+      }));
+    }
+  };
+
+  // Handle dropdown value input to prevent starting with space
+  const handleDropdownValueInput = (index, e) => {
+    const value = e.target.value;
+    // Prevent input from starting with space
+    if (value.startsWith(' ')) {
+      e.target.value = value.trimStart();
+    }
+    updateValue(index, e.target.value);
+  };
+
   // Add new dropdown/memo value to current field
   const addValue = () => {
     setCurrentField((prev) => ({
@@ -397,11 +443,28 @@ function RepoForm() {
     setEditingIndex(null);
   };
 
-  // Validate and save index field - FIXED validation keys
+  // Validate and save index field - FIXED validation keys with space prevention
   const saveIndexField = () => {
     if (!currentField.attributeName.trim() || !currentField.attributeType) {
       triggerError(t("fillRequiredFields"));
       return;
+    }
+
+    // Check if attribute name starts with space
+    if (currentField.attributeName.startsWith(' ')) {
+      triggerError(t("noLeadingSpaceForAttribute"));
+      return;
+    }
+
+    // Check if any dropdown value starts with space
+    if (currentField.attributeType === "dropdown") {
+      const hasLeadingSpace = currentField.valuesOfMemoType.some(
+        (val) => val.startsWith(' ')
+      );
+      if (hasLeadingSpace) {
+        triggerError(t("noLeadingSpaceForDropdownValues"));
+        return;
+      }
     }
 
     const selectedType = ATTRIBUTE_TYPES.find(
@@ -484,8 +547,8 @@ function RepoForm() {
   // Submit form with backend-compatible data structure - FIXED validation key
   const onSubmit = async (data) => {
     const backendData = {
-      name: data.name,
-      description: data.description || undefined,
+      name: data.name.trim(),
+      description: data.description.trim() || undefined,
       isEncrypted: data.isEncrypted,
       categoryOption: data.categoryOption || undefined,
       clearanceRules: permissionsData.clearanceRules || [],
@@ -579,6 +642,13 @@ function RepoForm() {
                       <input
                         {...register("name")}
                         type="text"
+                        onInput={(e) => handleInputNoLeadingSpace("name", e)}
+                        onBlur={(e) => {
+                          const trimmedValue = e.target.value.trim();
+                          if (e.target.value !== trimmedValue) {
+                            setValue("name", trimmedValue, { shouldValidate: true });
+                          }
+                        }}
                         className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                           errors.name
                             ? "border-red-300 bg-red-50"
@@ -622,6 +692,14 @@ function RepoForm() {
                     <textarea
                       {...register("description")}
                       rows={4}
+                      onInput={(e) => handleInputNoLeadingSpace("description", e)}
+                      onBlur={(e) => {
+                        // Trim on blur
+                        const trimmedValue = e.target.value.trim();
+                        if (e.target.value !== trimmedValue) {
+                          setValue("description", trimmedValue, { shouldValidate: true });
+                        }
+                      }}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
                       placeholder={t("descriptionPlaceholder")}
                     />
@@ -743,12 +821,16 @@ function RepoForm() {
                           <input
                             type="text"
                             value={currentField.attributeName}
-                            onChange={(e) =>
-                              setCurrentField((prev) => ({
-                                ...prev,
-                                attributeName: e.target.value,
-                              }))
-                            }
+                            onChange={handleAttributeNameInput}
+                            onBlur={(e) => {
+                                  const trimmedValue = e.target.value.trim();
+                              if (e.target.value !== trimmedValue) {
+                                setCurrentField((prev) => ({
+                                  ...prev,
+                                  attributeName: trimmedValue,
+                                }));
+                              }
+                            }}
                             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                             placeholder={t("enterAttributeName")}
                           />
@@ -832,9 +914,13 @@ function RepoForm() {
                                   <input
                                     type="text"
                                     value={value}
-                                    onChange={(e) =>
-                                      updateValue(index, e.target.value)
-                                    }
+                                    onChange={(e) => handleDropdownValueInput(index, e)}
+                                    onBlur={(e) => {
+                                                  const trimmedValue = e.target.value.trim();
+                                      if (e.target.value !== trimmedValue) {
+                                        updateValue(index, trimmedValue);
+                                      }
+                                    }}
                                     className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                     placeholder={`${t("option")} ${index + 1}`}
                                   />

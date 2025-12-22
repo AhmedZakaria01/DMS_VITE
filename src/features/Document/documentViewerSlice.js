@@ -36,12 +36,12 @@ const documentViewerSlice = createSlice({
     },
   },
   reducers: {
-    // ✅ Action to clear current children
+    // clear current children
     clearCurrentChildren: (state) => {
       state.currentChildren = [];
       state.currentChildrenParentId = null;
     },
-    // ✅ Action to clear all children cache
+    // clear all children cache
     clearAllChildren: (state) => {
       state.childrenByParentId = {};
       state.currentChildren = [];
@@ -57,7 +57,7 @@ const documentViewerSlice = createSlice({
       state.completeJsonData.aclRules = action.payload.aclRules;
     },
 
-    // ✅ Action to clear all files metadata
+    // clear all files metadata
     clearAllFiles: (state) => {
       state.completeJsonData.filesMetaData = [];
     },
@@ -119,6 +119,8 @@ const documentViewerSlice = createSlice({
       })
       .addCase(upload_File.fulfilled, (state, action) => {
         state.status = "succeeded";
+        console.log("upload File API CALLED");
+
         // Store file metadata (tempFileId, originalName, categoryId, securityLevel, aclRules)
         if (action.payload) {
           state.completeJsonData.filesMetaData.push({

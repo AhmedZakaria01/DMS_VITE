@@ -448,10 +448,6 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
       return <Image className="w-5 h-5 text-green-600" />;
     } else if (fileType === "application/pdf") {
       return <FileText className="w-5 h-5 text-red-600" />;
-    } else if (fileType.includes("document") || fileType.includes("word")) {
-      return <FileText className="w-5 h-5 text-blue-600" />;
-    } else if (fileType.includes("sheet") || fileType.includes("excel")) {
-      return <FileText className="w-5 h-5 text-green-600" />;
     } else {
       return <File className="w-5 h-5 text-gray-600" />;
     }
@@ -491,14 +487,28 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
         url: URL.createObjectURL(file),
       }));
 
-      // Add files to preview
-      setPreviewFiles((prev) => ({
-        ...prev,
-        [categoryId]: {
-          files: filesWithMetadata,
-          categoryName,
-        },
-      }));
+      // Add files to preview - APPEND to existing files instead of replacing
+      setPreviewFiles((prev) => {
+        const existingData = prev[categoryId];
+        const existingFiles = existingData ? existingData.files : [];
+
+        // Combine existing files with newly selected files
+        const combinedFiles = [...existingFiles, ...filesWithMetadata];
+
+        console.log(
+          `Adding ${filesWithMetadata.length} new files to category ${categoryId}`
+        );
+        console.log(`Previous file count: ${existingFiles.length}`);
+        console.log(`Total files after adding: ${combinedFiles.length}`);
+
+        return {
+          ...prev,
+          [categoryId]: {
+            files: combinedFiles,
+            categoryName,
+          },
+        };
+      });
 
       // Start uploading files automatically
       setUploadLoading((prev) => ({ ...prev, [categoryId]: true }));
@@ -561,11 +571,7 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
             `Failed to upload file ${i + 1}/${files.length}:`,
             error
           );
-          alert(
-            `${t("fileUploadFailed") || "File upload failed"}: ${file.name}\n${
-              error.message || error
-            }`
-          );
+
           setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
           setUploadProgress({ current: 0, total: 0 });
           return;
@@ -580,6 +586,178 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     };
 
     fileInput.click();
+  };
+
+  // Handle scan completion - upload scanned files to Redux
+  const handleScanComplete = async (categoryId, categoryName, filePaths) => {
+    console.log("🟢 ========================================");
+    console.log("🟢 handleScanComplete CALLED");
+    console.log("🟢 ========================================");
+    console.log(`🟢 Category ID: ${categoryId}`);
+    console.log(`🟢 Category Name: ${categoryName}`);
+    console.log("🟢 Scanned file paths:", filePaths);
+    console.log("🟢 Is Array?:", Array.isArray(filePaths));
+    console.log("🟢 Length:", filePaths?.length);
+
+    if (!Array.isArray(filePaths) || filePaths.length === 0) {
+      console.error("🔴 No scanned files to process. filePaths:", filePaths);
+      return;
+    }
+
+    // Start uploading scanned files
+    setUploadLoading((prev) => ({ ...prev, [categoryId]: true }));
+    setUploadProgress({ current: 0, total: filePaths.length });
+
+    console.log(`Uploading ${filePaths.length} scanned files for category ${categoryId}...`);
+
+    // Upload files sequentially
+    for (let i = 0; i < filePaths.length; i++) {
+      const filePath = filePaths[i];
+      const fileName = filePath.split(/[/\\]/).pop(); // Extract filename from path
+
+      // Check if this file has already been uploaded
+      const alreadyUploaded = filesMetaData.some(
+        (uploadedFile) =>
+          String(uploadedFile.categoryId) === String(categoryId) &&
+          uploadedFile.originalName === fileName
+      );
+
+      if (alreadyUploaded) {
+        console.log(`File ${fileName} already uploaded, skipping...`);
+        continue;
+      }
+
+      try {
+        setUploadProgress({ current: i + 1, total: filePaths.length });
+
+        // Extract the path starting from /public
+        // Example: "D:\\NAMAA\\DMS\\DMS_VITE\\public\\Scanner\\a\\a_013.pdf" -> "/public/Scanner/a/a_013.pdf"
+        const publicIndex = filePath.indexOf("\\public\\");
+        let relativePath = filePath;
+        if (publicIndex !== -1) {
+          relativePath = filePath.substring(publicIndex).replace(/\\/g, "/");
+        } else {
+          // Try forward slash version
+          const publicIndexForward = filePath.indexOf("/public/");
+          if (publicIndexForward !== -1) {
+            relativePath = filePath.substring(publicIndexForward);
+          }
+        }
+
+        console.log(`Reading scanned file from path: ${relativePath}`);
+
+        // Read the file from the public directory
+        const response = await fetch(relativePath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch file from ${relativePath}: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        console.log(`Blob fetched, size: ${blob.size}, type: ${blob.type}`);
+
+        // Create a File-like object from blob by adding necessary properties
+        // Blobs work with FormData just like File objects
+        const file = new Blob([blob], { type: blob.type || "application/pdf" });
+
+        // Add File-like properties to make it compatible with our preview
+        Object.defineProperty(file, 'name', {
+          value: fileName,
+          writable: false
+        });
+
+        Object.defineProperty(file, 'lastModified', {
+          value: Date.now(),
+          writable: false
+        });
+
+        Object.defineProperty(file, 'lastModifiedDate', {
+          value: new Date(),
+          writable: false
+        });
+
+        console.log(`✅ File-like blob created: name=${file.name}, size=${file.size}, type=${file.type}`);
+
+        // Add file to preview FIRST so user can see it immediately
+        const fileWithMetadata = {
+          file: file,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          lastModified: file.lastModified,
+          url: URL.createObjectURL(file),
+        };
+
+        setPreviewFiles((prev) => {
+          const existingData = prev[categoryId];
+          const existingFiles = existingData ? existingData.files : [];
+          const combinedFiles = [...existingFiles, fileWithMetadata];
+
+          console.log(`📁 Adding scanned file to preview: ${fileName}`);
+          console.log(`📁 Total files in preview for category ${categoryId}: ${combinedFiles.length}`);
+
+          return {
+            ...prev,
+            [categoryId]: {
+              files: combinedFiles,
+              categoryName,
+            },
+          };
+        });
+
+        // Now dispatch upload_File with file and categoryId
+        console.log("=".repeat(60));
+        console.log(`🔷 DISPATCHING upload_File for scanned file: ${file.name}`);
+        console.log(`🔷 Category ID: ${categoryId}`);
+        console.log(`🔷 File object:`, {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          isBlob: file instanceof Blob,
+          hasNameProperty: !!file.name,
+        });
+
+        const result = await dispatch(upload_File({ file, categoryId })).unwrap();
+
+        console.log(`✅ SUCCESS: Scanned file uploaded to backend`);
+        console.log(`✅ Backend Response:`, result);
+        console.log(`✅ tempFileId: ${result.tempFileId}`);
+        console.log(`✅ originalName: ${result.originalName}`);
+        console.log(`✅ size: ${result.size}`);
+        console.log("=".repeat(60));
+
+        // Log filesMetaData from Redux after upload
+        console.log("📊 Current filesMetaData in Redux:", filesMetaData);
+
+        // Transfer temporary security level to Redux if it exists
+        const fileKey = `${categoryId}_${fileName}`;
+        if (tempSecurityLevels[fileKey] !== undefined) {
+          dispatch(
+            setFileSecurityLevel({
+              tempFileId: result.tempFileId,
+              securityLevel: tempSecurityLevels[fileKey],
+            })
+          );
+          setTempSecurityLevels((prev) => {
+            const updated = { ...prev };
+            delete updated[fileKey];
+            return updated;
+          });
+          console.log(`Transferred security level ${tempSecurityLevels[fileKey]} for ${fileName}`);
+        }
+      } catch (error) {
+        console.error(`Failed to upload scanned file ${i + 1}/${filePaths.length}:`, error);
+        console.error("Error details:", error.message);
+        console.error("Error stack:", error.stack);
+
+        setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
+        setUploadProgress({ current: 0, total: 0 });
+        return;
+      }
+    }
+
+    setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
+    setUploadProgress({ current: 0, total: 0 });
+    console.log(`All ${filePaths.length} scanned files uploaded successfully to Redux`);
   };
 
   // Cancel file upload
@@ -1243,6 +1421,7 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
                 scannerId={scannerId}
                 documentTypeId={documentTypeId}
                 isUploading={isUploading}
+                onScanComplete={handleScanComplete}
               />
               {/* Upload Button */}
               <button

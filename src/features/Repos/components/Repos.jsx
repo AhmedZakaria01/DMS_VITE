@@ -174,7 +174,7 @@ function Repos() {
       // Store repository name in sessionStorage
       sessionStorage.setItem("currentRepoName", row.original.name);
 
-      if (isAdmin) {
+      if (!isAdmin) {
         // Navigate to Document Type for Admins
         navigate(`/documentTypes/${row.original.id}`, {
           state: { repoName: row.original.name },

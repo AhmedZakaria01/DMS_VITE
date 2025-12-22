@@ -33,14 +33,32 @@ export const createCategory = createAsyncThunk(
 export const upload_File = createAsyncThunk(
   "Document/uploadFile",
   async ({ file, categoryId }) => {
+    console.log("🔶 upload_File THUNK CALLED");
+    console.log("🔶 Received file:", {
+      name: file?.name,
+      type: file?.type,
+      size: file?.size,
+      isFile: file instanceof File,
+      isBlob: file instanceof Blob,
+    });
+    console.log("🔶 categoryId:", categoryId);
+
     try {
+      console.log("🔶 Calling upload_Single_File API...");
       const response = await upload_Single_File(file);
+      console.log("🔶 upload_Single_File API returned:", response);
+
       // Return response with categoryId included
-      return {
+      const result = {
         ...response,
         categoryId,
       };
+      console.log("🔶 upload_File THUNK SUCCESS, returning:", result);
+      return result;
     } catch (error) {
+      console.error("🔶 upload_File THUNK ERROR:", error);
+      console.error("🔶 Error message:", error.message);
+      console.error("🔶 Error response:", error.response?.data);
       throw new Error(
         error.response?.data?.message ||
           error.message ||

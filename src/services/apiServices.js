@@ -368,19 +368,40 @@ export async function getFolderContents(folderId) {
 //! Files
 // Upload Single File
 export async function upload_Single_File(file) {
+  console.log("🔸 upload_Single_File API CALLED");
+  console.log("🔸 File received:", {
+    name: file?.name,
+    type: file?.type,
+    size: file?.size,
+    isFile: file instanceof File,
+    isBlob: file instanceof Blob,
+  });
+
   try {
     const formData = new FormData();
+    console.log("🔸 Appending file to FormData...");
     formData.append("file", file);
 
+    // Check what FormData contains
+    console.log("🔸 FormData entries:");
+    for (let pair of formData.entries()) {
+      console.log("  -", pair[0], ":", pair[1], "| name:", pair[1].name);
+    }
+
+    console.log("🔸 Sending POST request to temp-files/upload...");
     const response = await api.post(`temp-files/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log(response);
+    console.log("🔸 API Response received:", response);
+    console.log("🔸 Response data:", response.data);
     return response.data;
   } catch (err) {
-    console.error("Failed to Upload File", err);
+    console.error("🔸 upload_Single_File API ERROR:", err);
+    console.error("🔸 Error message:", err.message);
+    console.error("🔸 Error response:", err.response?.data);
+    console.error("🔸 Error status:", err.response?.status);
     throw err;
   }
 } // Delete Single File
@@ -632,6 +653,32 @@ export async function scan(scanData) {
     return response;
   } catch (err) {
     console.error("Failed to scan ", err);
+    throw err;
+  }
+}
+
+// Fetch scanned file content
+export async function fetchScannedFile(filePath) {
+  try {
+    // Extract category and filename from path
+    // Example path: "D:\\NAMAA\\DMS\\DMS_VITE\\public\\Scanner\\a\\a_08.pdf"
+    const parts = filePath.split(/[/\\]/);
+    const filename = parts[parts.length - 1];
+    const category = parts[parts.length - 2];
+
+    console.log(`Fetching scanned file from scan server: category=${category}, filename=${filename}`);
+
+    const response = await axios.get(
+      `http://localhost:5000/scan/file/${category}/${filename}`,
+      {
+        responseType: 'blob'
+      }
+    );
+    console.log("Scanned file fetched successfully:", response);
+
+    return response.data; // Returns blob
+  } catch (err) {
+    console.error("Failed to fetch scanned file:", err);
     throw err;
   }
 }

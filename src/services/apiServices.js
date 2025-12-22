@@ -380,12 +380,14 @@ export async function upload_Single_File(file) {
   try {
     const formData = new FormData();
     console.log("🔸 Appending file to FormData...");
-    formData.append("file", file);
 
-    // Check what FormData contains
-    console.log("🔸 FormData entries:");
-    for (let pair of formData.entries()) {
-      console.log("  -", pair[0], ":", pair[1], "| name:", pair[1].name);
+    // If file has a name property, use it explicitly in FormData
+    // This handles Blob objects with custom name properties
+    if (file.name) {
+      formData.append("file", file, file.name);
+      console.log("🔸 Appending with explicit filename:", file.name);
+    } else {
+      formData.append("file", file);
     }
 
     console.log("🔸 Sending POST request to temp-files/upload...");
@@ -547,25 +549,28 @@ export async function createNewRole(roleData) {
 
 // Update Role
 export async function updateSpaecificRole(roleData) {
-  try {    
+  try {
     const { roleId, roleName, permissionIds } = roleData;
-    
+
     if (!roleId) {
       throw new Error("Role ID is required for updating");
     }
     // Remove roleId from the data object as it's in the URL
     const requestData = {
-      roleName: roleName || "new", 
-      permissionIds: permissionIds || []
+      roleName: roleName || "new",
+      permissionIds: permissionIds || [],
     };
-    
+
     console.log("Updating role with data:", {
       roleId,
       endpoint: `/Roles/UpdateRolePermissions/${roleId}`,
-      data: requestData
+      data: requestData,
     });
-    
-    const response = await api.put(`/Roles/UpdateRolePermissions/${roleId}`, requestData);
+
+    const response = await api.put(
+      `/Roles/UpdateRolePermissions/${roleId}`,
+      requestData
+    );
     return response;
   } catch (err) {
     console.error("Failed to Update Role:", err);
@@ -573,14 +578,13 @@ export async function updateSpaecificRole(roleData) {
   }
 }
 
-
 // Fetch Permissions by RoleId
 export async function getPermissionRole(roleId) {
   try {
     if (!roleId) {
       throw new Error("Role ID is required");
     }
-    
+
     const response = await api.get(`/Roles/GetRolePermissionsById/${roleId}`);
     return response;
   } catch (err) {
@@ -666,12 +670,14 @@ export async function fetchScannedFile(filePath) {
     const filename = parts[parts.length - 1];
     const category = parts[parts.length - 2];
 
-    console.log(`Fetching scanned file from scan server: category=${category}, filename=${filename}`);
+    console.log(
+      `Fetching scanned file from scan server: category=${category}, filename=${filename}`
+    );
 
     const response = await axios.get(
       `http://localhost:5000/scan/file/${category}/${filename}`,
       {
-        responseType: 'blob'
+        responseType: "blob",
       }
     );
     console.log("Scanned file fetched successfully:", response);

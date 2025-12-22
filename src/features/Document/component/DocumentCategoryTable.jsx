@@ -70,7 +70,7 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     );
 
     if (file) {
-      // Set current file and load existing permissions
+      // Set current file and load existing permissions from Redux
       setCurrentPermissionFile({
         categoryId,
         fileName,
@@ -79,13 +79,26 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
       setPermissionsData({
         aclRules: file.aclRules || [],
       });
-      setOpenPermissions(true);
     } else {
-      // File not uploaded yet, can't set permissions
-      console.warn(
-        "Cannot set permissions for file that hasn't been uploaded yet"
+      // File not uploaded yet, check for temporary ACL rules
+      const fileKey = `${categoryId}_${fileName}`;
+      const existingTempRules = tempAclRules[fileKey] || [];
+
+      console.log(
+        "File not uploaded yet, allowing permissions setup for when it uploads"
       );
+      setCurrentPermissionFile({
+        categoryId,
+        fileName,
+        tempFileId: null, // Will be set when file uploads
+      });
+      setPermissionsData({
+        aclRules: existingTempRules,
+      });
     }
+
+    // Always open the permissions dialog
+    setOpenPermissions(true);
   };
 
   // Handle permissions data from UsersRolesPermissionsTable
@@ -107,17 +120,30 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
         accessType: rule.accessType,
       }));
 
-      // Update the file's ACL rules in Redux
-      dispatch(
-        setFileAclRules({
-          tempFileId: currentPermissionFile.tempFileId,
-          aclRules: transformedAclRules,
-        })
-      );
-      console.log(
-        `Updated ACL rules for file ${currentPermissionFile.fileName}:`,
-        transformedAclRules
-      );
+      if (currentPermissionFile.tempFileId) {
+        // File is already uploaded, update Redux
+        dispatch(
+          setFileAclRules({
+            tempFileId: currentPermissionFile.tempFileId,
+            aclRules: transformedAclRules,
+          })
+        );
+        console.log(
+          `Updated ACL rules for uploaded file ${currentPermissionFile.fileName}:`,
+          transformedAclRules
+        );
+      } else {
+        // File not uploaded yet, store temporarily
+        const fileKey = `${currentPermissionFile.categoryId}_${currentPermissionFile.fileName}`;
+        setTempAclRules((prev) => ({
+          ...prev,
+          [fileKey]: transformedAclRules,
+        }));
+        console.log(
+          `Stored temporary ACL rules for ${currentPermissionFile.fileName}:`,
+          transformedAclRules
+        );
+      }
     }
     setPermissionsData(data);
     setOpenPermissions(false);
@@ -147,6 +173,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     total: 0,
   });
 
+  // Track which individual files are currently uploading (by categoryId_fileName)
+  const [uploadingFiles, setUploadingFiles] = useState(new Set());
+
   // Alert notification states
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -159,6 +188,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
 
   // Temporary security levels (before upload) - stored by categoryId_fileName
   const [tempSecurityLevels, setTempSecurityLevels] = useState({});
+
+  // Temporary storage for ACL rules before file upload - stored by categoryId_fileName
+  const [tempAclRules, setTempAclRules] = useState({});
 
   // ✅ Track which categories we've fetched children for (for UI purposes)
   const [fetchedChildrenFor, setFetchedChildrenFor] = useState(new Set());
@@ -608,7 +640,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
     setUploadLoading((prev) => ({ ...prev, [categoryId]: true }));
     setUploadProgress({ current: 0, total: filePaths.length });
 
-    console.log(`Uploading ${filePaths.length} scanned files for category ${categoryId}...`);
+    console.log(
+      `Uploading ${filePaths.length} scanned files for category ${categoryId}...`
+    );
 
     // Upload files sequentially
     for (let i = 0; i < filePaths.length; i++) {
@@ -630,6 +664,10 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
       try {
         setUploadProgress({ current: i + 1, total: filePaths.length });
 
+        // Mark this file as uploading
+        const uploadingFileKey = `${categoryId}_${fileName}`;
+        setUploadingFiles((prev) => new Set([...prev, uploadingFileKey]));
+
         // Extract the path starting from /public
         // Example: "D:\\NAMAA\\DMS\\DMS_VITE\\public\\Scanner\\a\\a_013.pdf" -> "/public/Scanner/a/a_013.pdf"
         const publicIndex = filePath.indexOf("\\public\\");
@@ -649,7 +687,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
         // Read the file from the public directory
         const response = await fetch(relativePath);
         if (!response.ok) {
-          throw new Error(`Failed to fetch file from ${relativePath}: ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch file from ${relativePath}: ${response.statusText}`
+          );
         }
 
         const blob = await response.blob();
@@ -660,22 +700,24 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
         const file = new Blob([blob], { type: blob.type || "application/pdf" });
 
         // Add File-like properties to make it compatible with our preview
-        Object.defineProperty(file, 'name', {
+        Object.defineProperty(file, "name", {
           value: fileName,
-          writable: false
+          writable: false,
         });
 
-        Object.defineProperty(file, 'lastModified', {
+        Object.defineProperty(file, "lastModified", {
           value: Date.now(),
-          writable: false
+          writable: false,
         });
 
-        Object.defineProperty(file, 'lastModifiedDate', {
+        Object.defineProperty(file, "lastModifiedDate", {
           value: new Date(),
-          writable: false
+          writable: false,
         });
 
-        console.log(`✅ File-like blob created: name=${file.name}, size=${file.size}, type=${file.type}`);
+        console.log(
+          `✅ File-like blob created: name=${file.name}, size=${file.size}, type=${file.type}`
+        );
 
         // Add file to preview FIRST so user can see it immediately
         const fileWithMetadata = {
@@ -693,7 +735,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
           const combinedFiles = [...existingFiles, fileWithMetadata];
 
           console.log(`📁 Adding scanned file to preview: ${fileName}`);
-          console.log(`📁 Total files in preview for category ${categoryId}: ${combinedFiles.length}`);
+          console.log(
+            `📁 Total files in preview for category ${categoryId}: ${combinedFiles.length}`
+          );
 
           return {
             ...prev,
@@ -706,7 +750,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
 
         // Now dispatch upload_File with file and categoryId
         console.log("=".repeat(60));
-        console.log(`🔷 DISPATCHING upload_File for scanned file: ${file.name}`);
+        console.log(
+          `🔷 DISPATCHING upload_File for scanned file: ${file.name}`
+        );
         console.log(`🔷 Category ID: ${categoryId}`);
         console.log(`🔷 File object:`, {
           name: file.name,
@@ -716,7 +762,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
           hasNameProperty: !!file.name,
         });
 
-        const result = await dispatch(upload_File({ file, categoryId })).unwrap();
+        const result = await dispatch(
+          upload_File({ file, categoryId })
+        ).unwrap();
 
         console.log(`✅ SUCCESS: Scanned file uploaded to backend`);
         console.log(`✅ Backend Response:`, result);
@@ -725,8 +773,26 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
         console.log(`✅ size: ${result.size}`);
         console.log("=".repeat(60));
 
+        // Wait a tiny bit for Redux to update
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // Log filesMetaData from Redux after upload
         console.log("📊 Current filesMetaData in Redux:", filesMetaData);
+
+        // Verify the file was added to Redux
+        const uploadedFileCheck = filesMetaData.find(
+          (file) =>
+            String(file.categoryId) === String(categoryId) &&
+            file.originalName === fileName
+        );
+        console.log("🔍 Uploaded file found in Redux:", uploadedFileCheck);
+
+        // Remove file from uploading set
+        setUploadingFiles((prev) => {
+          const updated = new Set(prev);
+          updated.delete(uploadingFileKey);
+          return updated;
+        });
 
         // Transfer temporary security level to Redux if it exists
         const fileKey = `${categoryId}_${fileName}`;
@@ -742,12 +808,44 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
             delete updated[fileKey];
             return updated;
           });
-          console.log(`Transferred security level ${tempSecurityLevels[fileKey]} for ${fileName}`);
+          console.log(
+            `Transferred security level ${tempSecurityLevels[fileKey]} for ${fileName}`
+          );
+        }
+
+        // Transfer temporary ACL rules to Redux if they exist
+        if (tempAclRules[fileKey]) {
+          dispatch(
+            setFileAclRules({
+              tempFileId: result.tempFileId,
+              aclRules: tempAclRules[fileKey],
+            })
+          );
+          setTempAclRules((prev) => {
+            const updated = { ...prev };
+            delete updated[fileKey];
+            return updated;
+          });
+          console.log(
+            `Transferred ACL rules for ${fileName}:`,
+            tempAclRules[fileKey]
+          );
         }
       } catch (error) {
-        console.error(`Failed to upload scanned file ${i + 1}/${filePaths.length}:`, error);
+        console.error(
+          `Failed to upload scanned file ${i + 1}/${filePaths.length}:`,
+          error
+        );
         console.error("Error details:", error.message);
         console.error("Error stack:", error.stack);
+
+        // Remove file from uploading set on error
+        const uploadingFileKey = `${categoryId}_${fileName}`;
+        setUploadingFiles((prev) => {
+          const updated = new Set(prev);
+          updated.delete(uploadingFileKey);
+          return updated;
+        });
 
         setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
         setUploadProgress({ current: 0, total: 0 });
@@ -757,7 +855,9 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
 
     setUploadLoading((prev) => ({ ...prev, [categoryId]: false }));
     setUploadProgress({ current: 0, total: 0 });
-    console.log(`All ${filePaths.length} scanned files uploaded successfully to Redux`);
+    console.log(
+      `All ${filePaths.length} scanned files uploaded successfully to Redux`
+    );
   };
 
   // Cancel file upload
@@ -1165,154 +1265,159 @@ const DocumentCategoryTable = ({ currentDocTypeId, docTypesList }) => {
                           <>
                             {/* Files List */}
                             <div className="p-3 space-y-2">
-                              {previewData.files.map((fileData, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
-                                >
-                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    {getFileIcon(fileData)}
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-gray-800 truncate">
-                                        {fileData.name}
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        {formatFileSize(fileData.size)}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    {/* Security Level Input - Always visible */}
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="99"
-                                      placeholder={
-                                        t("securityLevel") || "Security Level"
-                                      }
-                                      value={(() => {
-                                        // Check if file is uploaded
-                                        const uploadedFile = filesMetaData.find(
-                                          (file) =>
-                                            String(file.categoryId) ===
-                                              String(categoryId) &&
-                                            file.originalName === fileData.name
-                                        );
+                              {previewData.files.map((fileData, index) => {
+                                // Check if file is uploaded
+                                const uploadedFile = filesMetaData.find(
+                                  (file) =>
+                                    String(file.categoryId) ===
+                                      String(categoryId) &&
+                                    file.originalName === fileData.name
+                                );
 
-                                        // If uploaded, get from filesMetaData
-                                        if (
-                                          uploadedFile &&
-                                          uploadedFile.securityLevel !== null &&
-                                          uploadedFile.securityLevel !==
-                                            undefined
-                                        ) {
-                                          return uploadedFile.securityLevel;
-                                        }
+                                // Check if file is currently uploading
+                                const isUploading = uploadingFiles.has(
+                                  `${categoryId}_${fileData.name}`
+                                );
 
-                                        // Otherwise, get from temporary state
-                                        const fileKey = `${categoryId}_${fileData.name}`;
-                                        return (
-                                          tempSecurityLevels[fileKey] ?? ""
-                                        );
-                                      })()}
-                                      onChange={(e) =>
-                                        handleSecurityLevelChange(
-                                          categoryId,
-                                          fileData.name,
-                                          e.target.value
-                                        )
-                                      }
-                                      className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                      title={
-                                        t("securityLevel") ||
-                                        "Security Level (0-99)"
-                                      }
-                                    />
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        onClick={() =>
-                                          handleShowFilePreview(
-                                            categoryId,
-                                            fileData
-                                          )
-                                        }
-                                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                        title={
-                                          t("previewFile") || "Preview file"
-                                        }
-                                      >
-                                        <Eye className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() =>
-                                          handleRemoveFile(categoryId, index)
-                                        }
-                                        disabled={uploadLoading[categoryId]}
-                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                                        title={t("removeFile") || "Remove file"}
-                                      >
-                                        <X className="w-4 h-4" />
-                                      </button>
-                                    </div>
-
-                                    {/* /////////////////marwa///////////////// */}
-                                    {/* Permissions Button */}
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        handlePermissions(
-                                          categoryId,
-                                          fileData.name
-                                        )
-                                      }
-                                      className="w-full inline-flex items-center justify-center gap-1 px-1 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-small disabled:opacity-50 disabled:cursor-not-allowed"
-                                      disabled={(() => {
-                                        const uploadedFile = filesMetaData.find(
-                                          (file) =>
-                                            String(file.categoryId) ===
-                                              String(categoryId) &&
-                                            file.originalName === fileData.name
-                                        );
-                                        return !uploadedFile; // Disabled if not uploaded
-                                      })()}
-                                      title={(() => {
-                                        const uploadedFile = filesMetaData.find(
-                                          (file) =>
-                                            String(file.categoryId) ===
-                                              String(categoryId) &&
-                                            file.originalName === fileData.name
-                                        );
-                                        return uploadedFile
-                                          ? t("configurePermissions") ||
-                                              "Configure Permissions"
-                                          : t("uploadFileFirst") ||
-                                              "Upload file first to set permissions";
-                                      })()}
-                                    >
-                                      <Shield className="w-4 h-4" />
-                                      {(() => {
-                                        const uploadedFile = filesMetaData.find(
-                                          (file) =>
-                                            String(file.categoryId) ===
-                                              String(categoryId) &&
-                                            file.originalName === fileData.name
-                                        );
-                                        const aclRulesCount =
-                                          uploadedFile?.aclRules?.length || 0;
-                                        return (
-                                          aclRulesCount > 0 && (
-                                            <span className="bg-orange-800 text-white px-2 py-1 rounded-full text-xs">
-                                              {aclRulesCount}
+                                return (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between p-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group"
+                                  >
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                      {isUploading ? (
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                                      ) : (
+                                        getFileIcon(fileData)
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-gray-800 truncate">
+                                          {fileData.name}
+                                          {isUploading && (
+                                            <span className="ml-2 text-xs text-blue-600 font-normal">
+                                              ({t("uploading") || "Uploading"}
+                                              ...)
                                             </span>
-                                          )
-                                        );
-                                      })()}
-                                    </button>
+                                          )}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          {formatFileSize(fileData.size)}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      {/* Security Level Input - Always visible */}
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="99"
+                                        placeholder={
+                                          t("securityLevel") || "Security Level"
+                                        }
+                                        disabled={isUploading}
+                                        value={(() => {
+                                          // If uploaded, get from filesMetaData
+                                          if (
+                                            uploadedFile &&
+                                            uploadedFile.securityLevel !==
+                                              null &&
+                                            uploadedFile.securityLevel !==
+                                              undefined
+                                          ) {
+                                            return uploadedFile.securityLevel;
+                                          }
 
-                                    {/* /////////////////marwa///////////////// */}
+                                          // Otherwise, get from temporary state
+                                          const fileKey = `${categoryId}_${fileData.name}`;
+                                          return (
+                                            tempSecurityLevels[fileKey] ?? ""
+                                          );
+                                        })()}
+                                        onChange={(e) =>
+                                          handleSecurityLevelChange(
+                                            categoryId,
+                                            fileData.name,
+                                            e.target.value
+                                          )
+                                        }
+                                        className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        title={
+                                          t("securityLevel") ||
+                                          "Security Level (0-99)"
+                                        }
+                                      />
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() =>
+                                            handleShowFilePreview(
+                                              categoryId,
+                                              fileData
+                                            )
+                                          }
+                                          disabled={isUploading}
+                                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
+                                          title={
+                                            t("previewFile") || "Preview file"
+                                          }
+                                        >
+                                          <Eye className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                          onClick={() =>
+                                            handleRemoveFile(categoryId, index)
+                                          }
+                                          disabled={
+                                            uploadLoading[categoryId] ||
+                                            isUploading
+                                          }
+                                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                          title={
+                                            t("removeFile") || "Remove file"
+                                          }
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </button>
+                                      </div>
+
+                                      {/* Permissions Button - Always enabled */}
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handlePermissions(
+                                            categoryId,
+                                            fileData.name
+                                          )
+                                        }
+                                        disabled={isUploading}
+                                        className="w-full inline-flex items-center justify-center gap-1 px-1 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors font-small disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title={
+                                          isUploading
+                                            ? t("uploading") || "Uploading..."
+                                            : t("configurePermissions") || "Configure Permissions"
+                                        }
+                                      >
+                                        <Shield className="w-4 h-4" />
+                                        {(() => {
+                                          // Get ACL rules count from uploaded file or temp storage
+                                          const fileKey = `${categoryId}_${fileData.name}`;
+                                          const aclRulesCount =
+                                            uploadedFile?.aclRules?.length ||
+                                            tempAclRules[fileKey]?.length ||
+                                            0;
+
+                                          return (
+                                            aclRulesCount > 0 && (
+                                              <span className="bg-orange-800 text-white px-2 py-1 rounded-full text-xs">
+                                                {aclRulesCount}
+                                              </span>
+                                            )
+                                          );
+                                        })()}
+                                      </button>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
 
                             {/* Action Buttons */}

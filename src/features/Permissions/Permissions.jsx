@@ -283,6 +283,7 @@
 
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
@@ -306,8 +307,30 @@ function Permissions({
     initialSelectedPermissions
   );
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState(null);
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+
+  // Calculate dropdown position
+  const calculatePosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  };
+
+  // Update position when dropdown opens
+  useEffect(() => {
+    if (isDropdownOpen) {
+      calculatePosition();
+    } else {
+      setDropdownPosition(null);
+    }
+  }, [isDropdownOpen]);
 
   // ✅ UPDATED: Fetch when entityType changes or permissions don't match
   useEffect(() => {
@@ -455,22 +478,24 @@ function Permissions({
         </div>
       </button>
 
-      {/* Dropdown Portal-style positioning */}
-      {isDropdownOpen && (
-        <>
-          {/* Fixed backdrop to capture outside clicks */}
-          <div className="fixed inset-0 z-[9998]" />
+      {/* Dropdown using Portal to escape overflow-hidden */}
+      {isDropdownOpen && dropdownPosition &&
+        createPortal(
+          <>
+            {/* Fixed backdrop to capture outside clicks */}
+            <div className="fixed inset-0 z-[9998]" />
 
-          {/* Dropdown List with improved positioning */}
-          <div
-            ref={dropdownRef}
-            className="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-72 overflow-hidden flex flex-col"
-            style={{
-              minWidth: buttonRef.current?.offsetWidth || 200,
-              left: 0,
-              top: "100%",
-            }}
-          >
+            {/* Dropdown List with absolute positioning */}
+            <div
+              ref={dropdownRef}
+              className="absolute z-[9999] bg-white border border-gray-300 rounded-md shadow-xl max-h-72 overflow-hidden flex flex-col"
+              style={{
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+                minWidth: "200px",
+              }}
+            >
             {/* Search Input */}
             <div className="sticky top-0 bg-white p-3 border-b border-gray-200">
               <input
@@ -562,7 +587,8 @@ function Permissions({
               </div>
             )}
           </div>
-        </>
+        </>,
+        document.body
       )}
 
       {/* Error State */}

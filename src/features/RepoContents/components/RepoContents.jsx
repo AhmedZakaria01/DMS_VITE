@@ -2,7 +2,16 @@ import { useDispatch, useSelector } from "react-redux";
 import ReUsableTable from "../../../resusableComponents/table/ReUsableTable";
 import React, { useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Plus, Folder, FileText, Edit, Trash2, Shield, FolderIcon, FileIcon } from "lucide-react";
+import {
+  Plus,
+  Folder,
+  FileText,
+  Edit,
+  Trash2,
+  Shield,
+  FolderIcon,
+  FileIcon,
+} from "lucide-react";
 import { getRepoContents } from "../repoContentThunks";
 import { clearRepoContents } from "../repoContentSlice";
 import { useTranslation } from "react-i18next";
@@ -242,7 +251,7 @@ function RepoContents() {
           <p className="text-gray-600">{t("repoContentsDescription")}</p>
         </div>
         <div className="flex items-center gap-3">
-          {!canCreateFolder && (
+          {canCreateFolder && (
             <button
               onClick={() => navigate(`/repoContents/${repoId}/createFolder`)}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 whitespace-nowrap"
@@ -255,7 +264,7 @@ function RepoContents() {
             </button>
           )}
 
-          {!canCreateDocument && (
+          {canCreateDocument && (
             <button
               onClick={() => navigate(`/repoContents/${repoId}/createDocument`)}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 whitespace-nowrap"

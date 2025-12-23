@@ -3740,7 +3740,7 @@ function UsersRolesPermissionsTable({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 max-w-full overflow-hidden">
       {/* Debug Panel */}
-      <div className="p-3 bg-blue-50 border-b border-blue-200 text-sm">
+      {/* <div className="p-3 bg-blue-50 border-b border-blue-200 text-sm">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <strong>{t("status")}:</strong> {principlesStatus} |{" "}
@@ -3754,7 +3754,7 @@ function UsersRolesPermissionsTable({
             <strong>Entity:</strong> {currentEntityType || "None"}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Enhanced Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border">

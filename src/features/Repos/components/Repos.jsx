@@ -114,7 +114,7 @@ function Repos() {
               <Shield className="w-4 h-4" />
             </button>
           )}
-
+          {console.log(repo)}
           {repo.canDelete && (
             <button
               onClick={(e) => {
@@ -174,7 +174,7 @@ function Repos() {
       // Store repository name in sessionStorage
       sessionStorage.setItem("currentRepoName", row.original.name);
 
-      if (!isAdmin) {
+      if (isAdmin) {
         // Navigate to Document Type for Admins
         navigate(`/documentTypes/${row.original.id}`, {
           state: { repoName: row.original.name },

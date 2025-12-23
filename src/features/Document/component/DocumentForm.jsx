@@ -1114,68 +1114,7 @@ function DocumentForm({ onDocumentTypeChange }) {
         />
       )}
 
-      {/* JSON Preview Card */}
-      {selectedDocumentType && Object.keys(jsonData).length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {t("jsonDataPreview")}
-            </h3>
-          </div>
-          <div className="p-6">
-            <div className="bg-gray-900 rounded-lg p-4 font-mono text-sm">
-              <pre className="text-green-400 overflow-x-auto">
-                {JSON.stringify(
-                  {
-                    documentTypeId: selectedDocumentTypeId,
-                    documentType: selectedDocumentType,
-                    metadata: jsonData,
-                    aclRules: permissionsData.aclRules.map((rule) => {
-                      let permissionsArray = [];
-                      if (Array.isArray(rule.permissions)) {
-                        permissionsArray = rule.permissions
-                          .filter((p) => p != null)
-                          .map((p) => {
-                            if (typeof p === "object" && p.code) {
-                              return p.code;
-                            } else if (
-                              typeof p === "string" &&
-                              p.trim() !== ""
-                            ) {
-                              return p.trim();
-                            }
-                            return null;
-                          })
-                          .filter((p) => p != null);
-                      } else if (
-                        typeof rule.permissions === "string" &&
-                        rule.permissions.trim() !== ""
-                      ) {
-                        permissionsArray = [rule.permissions.trim()];
-                      }
-
-                      return {
-                        principalId: String(rule.principalId || ""),
-                        principalType: rule.principalType || "user",
-                        permissions: permissionsArray,
-                        accessType: rule.accessType === 0 ? "deny" : "allow",
-                      };
-                    }),
-                  },
-                  null,
-                  2
-                )}
-              </pre>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              * {t("jsonDataAutomaticallyLogged")}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              * {t("jsonFormatReady")}
-            </p>
-          </div>
-        </div>
-      )}
+ 
     </div>
   );
 }

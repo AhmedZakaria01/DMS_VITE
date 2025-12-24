@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Plus, Edit, Shield, Trash2, ArrowLeft, FileType } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
-import { fetchDocTypesByRepo } from "./DocTypeThunks";
+import { fetchDocTypesByRepo } from "./docTypeThunks";
 import { clearDocTypes } from "./docTypeSlice";
 
 function DocumentTypes() {

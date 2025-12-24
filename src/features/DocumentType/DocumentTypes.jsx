@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import ReUsableTable from "../../resusableComponents/table/ReUsableTable";
 import { fetchDocTypesByRepo } from "./docTypeThunks";
 import { clearDocTypes } from "./docTypeSlice";
-
+  
 function DocumentTypes() {
   const { t, i18n } = useTranslation();
   const { repoId } = useParams(); // Get repository ID from URL params

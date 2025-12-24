@@ -26,7 +26,7 @@ function Login() {
   const { user, status, error } = useSelector((state) => state.authReducer);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
 
   // Login Schema Config
   const loginSchema = z.object({
@@ -78,11 +78,12 @@ function Login() {
   };
 
   return (
-    <section 
-      className="min-h-screen flex" 
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      <div className={`w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 ${isRTL ? 'lg:order-2' : ''}`}>
+    <section className="min-h-screen flex" dir={isRTL ? "rtl" : "ltr"}>
+      <div
+        className={`w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 ${
+          isRTL ? "lg:order-2" : ""
+        }`}
+      >
         <div className="w-full max-w-md">
           {/* Glassmorphism Card */}
           <div className="backdrop-blur-md bg-white/70 rounded-2xl shadow-xl border border-white/50 p-8">
@@ -113,12 +114,18 @@ function Login() {
                   {t("email")}
                 </label>
                 <div className="relative">
-                  <div className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
+                  <div
+                    className={`absolute inset-y-0 ${
+                      isRTL ? "right-0 pr-3" : "left-0 pl-3"
+                    } flex items-center pointer-events-none`}
+                  >
                     <Mail className="h-5 w-5 text-black" />
                   </div>
                   <input
                     autoComplete="true"
-                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    className={`w-full ${
+                      isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
+                    } py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
                       errors.email
                         ? "border-red-500 ring-2 ring-red-500/50"
                         : "border-gray-300"
@@ -132,7 +139,10 @@ function Login() {
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1" dir="auto">
+                  <p
+                    className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                    dir="auto"
+                  >
                     <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
                     {errors.email.message}
                   </p>
@@ -149,11 +159,17 @@ function Login() {
                   {t("password")}
                 </label>
                 <div className="relative">
-                  <div className={`absolute inset-y-0 ${isRTL ? 'right-0 pr-3' : 'left-0 pl-3'} flex items-center pointer-events-none`}>
+                  <div
+                    className={`absolute inset-y-0 ${
+                      isRTL ? "right-0 pr-3" : "left-0 pl-3"
+                    } flex items-center pointer-events-none`}
+                  >
                     <Lock className="h-5 w-5 text-black" />
                   </div>
                   <input
-                    className={`w-full ${isRTL ? 'pr-11' : 'pl-11'} ${isRTL ? 'pl-12' : 'pr-12'} py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
+                    className={`w-full ${isRTL ? "pr-11" : "pl-11"} ${
+                      isRTL ? "pl-12" : "pr-12"
+                    } py-3 bg-white/50 backdrop-blur-sm text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${
                       errors.password
                         ? "border-red-500 ring-2 ring-red-500/50"
                         : "border-gray-300"
@@ -162,15 +178,23 @@ function Login() {
                     name="password"
                     id="password"
                     autoComplete="true"
-                    placeholder={t("passwordPlaceholder") || "Enter your password"}
+                    placeholder={
+                      t("passwordPlaceholder") || "Enter your password"
+                    }
                     {...register("password")}
                     dir="auto"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute inset-y-0 ${isRTL ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center text-gray-500 hover:text-gray-700 transition-colors`}
-                    aria-label={showPassword ? t("hidePassword") || "Hide password" : t("showPassword") || "Show password"}
+                    className={`absolute inset-y-0 ${
+                      isRTL ? "left-0 pl-3" : "right-0 pr-3"
+                    } flex items-center text-gray-500 hover:text-gray-700 transition-colors`}
+                    aria-label={
+                      showPassword
+                        ? t("hidePassword") || "Hide password"
+                        : t("showPassword") || "Show password"
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -180,7 +204,10 @@ function Login() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center gap-1" dir="auto">
+                  <p
+                    className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                    dir="auto"
+                  >
                     <span className="inline-block w-1 h-1 bg-red-500 rounded-full"></span>
                     {errors.password.message}
                   </p>
@@ -190,17 +217,19 @@ function Login() {
               {/* Error Message */}
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 text-sm text-center" dir="auto">{error}</p>
+                  <p className="text-red-600 text-sm text-center" dir="auto">
+                    {error}
+                  </p>
                 </div>
               )}
 
               {/* Submit Button */}
               <button
-                className={`w-full py-3.5 px-6 rounded-lg font-semibold text-white shadow-lg transition-all duration-300 transform flex items-center justify-center gap-2 mt-6 ${
-                  isLoading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-xl"
-                }`}
+                // className={`w-full py-3.5 px-6 rounded-lg font-semibold text-white shadow-lg transition-all duration-300 transform flex items-center justify-center gap-2 mt-6 ${
+                //   isLoading
+                //     ? "bg-gray-400 cursor-not-allowed"
+                //     : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:shadow-xl"
+                // }`}
                 type="submit"
                 disabled={isLoading}
               >
@@ -237,7 +266,11 @@ function Login() {
         </div>
       </div>
 
-      <div className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 relative overflow-hidden ${isRTL ? 'lg:order-1' : ''}`}>
+      <div
+        className={`hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 relative overflow-hidden ${
+          isRTL ? "lg:order-1" : ""
+        }`}
+      >
         {/* Content - Centered */}
         <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
           <div className="max-w-lg space-y-8">
@@ -254,7 +287,11 @@ function Login() {
             {/* Features */}
             <div className="space-y-6 mt-12">
               {/* Secure Storage Feature */}
-              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
+              <div
+                className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${
+                  isRTL ? "text-right" : ""
+                }`}
+              >
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Shield className="h-6 w-6" />
                 </div>
@@ -269,7 +306,11 @@ function Login() {
               </div>
 
               {/* Fast Access Feature */}
-              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
+              <div
+                className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${
+                  isRTL ? "text-right" : ""
+                }`}
+              >
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Zap className="h-6 w-6" />
                 </div>
@@ -284,7 +325,11 @@ function Login() {
               </div>
 
               {/* Team Collaboration Feature */}
-              <div className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${isRTL ? 'text-right' : ''}`}>
+              <div
+                className={`flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 ${
+                  isRTL ? "text-right" : ""
+                }`}
+              >
                 <div className="p-3 bg-white/20 rounded-lg flex-shrink-0">
                   <Users className="h-6 w-6" />
                 </div>

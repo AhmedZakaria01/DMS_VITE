@@ -557,11 +557,10 @@ import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../../globalComponents/Popup";
 import UsersRolesPermissionsTable from "../../Permissions/UsersRolesPermissionsTable";
 import { fetchPrinciples } from "../../Permissions/permissionsThunks";
-import {
-  fetchDocTypesByRepo,
-  fetchtDocTypeByAttributes,
-} from "../../DocumentType/DocTypeThunks";
+import { fetchDocTypesByRepo, fetchtDocTypeByAttributes } from "../../DocumentType/docTypeThunks";
 import { setDocumentData } from "../documentViewerSlice";
+ 
+
 
 function DocumentForm({ onDocumentTypeChange }) {
   const { t } = useTranslation();
